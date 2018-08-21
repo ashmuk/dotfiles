@@ -30,12 +30,25 @@ export EXECIGNORE="*.dll"
 PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
 
 # Source
+# ref: http://naktatty64.hatenablog.com/entry/2016/02/23/022837
+# prompt$ cd ~/etc
+# prompt$ git clone https://github.com/mavnn/mintty-colors-solarized
 source ~/etc/mintty-colors-solarized/sol.dark
 
 # Uncomment to use the terminal colours set in DIR_COLORS
+# ref: http://naktatty64.hatenablog.com/entry/2016/02/23/022837
+# prompt$ cd ~/etc
+# prompt$ git clone https://github.com/seebi/dircolors-solarized
 eval `dircolors ~/etc/dircolors-solarized/dircolors.ansi-dark`
 
 # Alias
 alias ls="ls --color"
 alias ll="ls -l --color"
 alias lla="ls -la --color"
+alias pu="pushd"
+alias pu2="pushd +2"
+alias po="popd"
+alias pdir="dirs"
+
+# Memo:
+# https://usagidaioh.exblog.jp/17578556/

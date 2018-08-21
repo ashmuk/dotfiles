@@ -4,7 +4,7 @@ scriptencoding utf-8
 " An example for a Japanese version vimrc file.
 " 日本語版のデフォルト設定ファイル(vimrc) - Vim 7.4
 "
-" Last Change: 30-May-2017.
+" Last Change: 21-Aug-2018.
 " Maintainer:  MURAOKA Taro <koron.kaoriya@gmail.com>
 "
 " 解説:
@@ -169,6 +169,8 @@ set listchars=tab:^\ ,trail:~,eol:$
 "swap output directory
 set directory=$HOME\vimfiles\tmp
 set backupdir=$HOME\vimfiles\tmp
+"Don't create un~ file
+set noundofile
 
 "---------------------------------------------------------------------------
 " GUI固有ではない画面表示の設定:

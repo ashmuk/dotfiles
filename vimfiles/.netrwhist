@@ -1,7 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =5
-let g:netrw_dirhist_1='C:/VCS/src/lab/sample/src'
-let g:netrw_dirhist_2='C:/VCS/src/lab/sample/src/reporter'
-let g:netrw_dirhist_3='C:/VCS/src/lab/Kaku/IdeaProjects'
-let g:netrw_dirhist_4='C:/VCS/src/lab/Kaku/IdeaProjects/GMW-Combine'
-let g:netrw_dirhist_5='C:/VCS/src/lab/Kaku/IdeaProjects/GMW-Combine/src'
