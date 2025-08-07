@@ -38,11 +38,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # --------------------------------------------
 # プロンプト設定（シンプル）
 # %n = ユーザ名, %m = ホスト名, %~ = カレントディレクトリ
+# oh-my-zsh 運用時は、テーマ設定された後に個別にPROMPT設定をして上書きが必要
+# そのため、この内容は .zshrc 側の後処理に書く
 #PROMPT="%F{green}%n@%m%f:%F{blue}%~%f %# "
-
-# zsh のプロンプト設定（色つき・2行構成）
-ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
-PROMPT="%F{green}bash-${ZSH_VER}-%n %F{yellow}%~%f"
 
 # --------------------------------------------
 # エイリアス
