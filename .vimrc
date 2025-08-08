@@ -282,4 +282,41 @@ if has('win32') "Added by Mukai to avoid error on Mac
   endif
 endif
 
+"---------------------------------------------------------------------------
+" Vim 上で git diff 実行
+
+" 現在のファイルをorigin/mainと比較
+"command! Gmain !git difftool origin/main -- %
+" 現在のファイルをHEADと比較  
+"command! Ghead !git difftool HEAD -- %
+" ワンキーでorigin/mainとの差分を表示
+"nnoremap <leader>gd :!git difftool origin/main -- %<CR>
+
+" diffモードの設定
+"if &diff
+"    " diffモード時の色設定
+"    syntax off
+"    set nospell
+"endif
+
+" diffモードのキーマップ
+"if &diff
+"    map <leader>1 :diffget LOCAL<CR>
+"    map <leader>2 :diffget BASE<CR>
+"    map <leader>3 :diffget REMOTE<CR>
+"endif
+
+" vim-plugの設定開始
+call plug#begin('~/.vim/plugged')
+
+" プラグインの指定
+Plug 'tpope/vim-fugitive'           " Git統合
+Plug 'preservim/nerdtree'           " ファイルツリー
+Plug 'vim-airline/vim-airline'       " ステータスライン
+Plug 'dense-analysis/ale'            " リンター
+Plug 'davidhalter/jedi-vim'          " Python補完
+
+" vim-plugの設定終了
+call plug#end()
+
 " Copyright (C) 2009-2018 KaoriYa/MURAOKA Taro
