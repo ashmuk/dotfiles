@@ -193,3 +193,8 @@ alias gloga='git log --oneline --decorate --graph --all'
 # ブランチ切り替えを簡単に
 alias gmain='git checkout main'
 alias gdev='git checkout develop'
+
+# For pushd, popd and dirs
+alias pu='pushd'
+alias pd='popd'
+alias ds='dirs -v'
