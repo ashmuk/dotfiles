@@ -151,7 +151,7 @@ fi
 # Git aliases
 # 基本コマンド
 alias g='git'
-alias gs='git status'
+alias gs='git status' # git status --short is defined by Oh!MyZsh instead
 alias ga='git add'
 alias gaa='git add .'
 alias gc='git commit'
