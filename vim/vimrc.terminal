@@ -1,0 +1,76 @@
+scriptencoding utf-8
+"
+" ターミナル版 Vim 専用設定
+"
+
+"---------------------------------------------------------------------------
+" カラー・表示設定:
+"
+" カラースキーム
+if has('termguicolors')
+  set termguicolors
+endif
+
+colorscheme solarized
+set background=dark
+
+"---------------------------------------------------------------------------
+" プラットフォーム固有の端末設定:
+"
+if has('unix') && !has('gui_running')
+  let s:uname = system('uname')
+  if s:uname =~? "linux"
+    " Linux では builtin_term は不要
+  elseif s:uname =~? "freebsd"
+    set term=builtin_cons25
+  elseif s:uname =~? "Darwin"
+    set term=builtin_beos-ansi
+  else
+    set term=builtin_xterm
+  endif
+  unlet s:uname
+endif
+
+"---------------------------------------------------------------------------
+" クリップボード設定:
+"
+" コンソール版で環境変数$DISPLAYが設定されていると起動が遅くなる件へ対応
+if !has('gui_running') && has('xterm_clipboard')
+  set clipboard=exclude:cons\\\|linux\\\|cygwin\\\|rxvt\\\|screen
+endif
+
+"---------------------------------------------------------------------------
+" ファイル形式・エンコーディング:
+"
+" 非GUI日本語コンソールを使っている場合の設定
+if &encoding != 'cp932' && &term == 'win32'
+  set termencoding=cp932
+endif
+
+"---------------------------------------------------------------------------
+" 表示設定:
+"
+" タブや改行を非表示
+set nolist
+" 長い行を折り返して表示
+set wrap
+
+" 行番号を表示（ターミナルでは見やすさ重視）
+set number
+
+"---------------------------------------------------------------------------
+" プラグイン設定（ターミナル版専用）:
+"
+" vim-plug がインストールされている場合のみ
+if filereadable(expand('~/.vim/autoload/plug.vim'))
+  call plug#begin('~/.vim/plugged')
+  
+  " ターミナルで有用なプラグイン
+  Plug 'tpope/vim-fugitive'           " Git統合
+  Plug 'preservim/nerdtree'           " ファイルツリー
+  Plug 'vim-airline/vim-airline'       " ステータスライン
+  Plug 'dense-analysis/ale'            " リンター
+  Plug 'davidhalter/jedi-vim'          " Python補完
+  
+  call plug#end()
+endif

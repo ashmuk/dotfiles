@@ -1,0 +1,94 @@
+scriptencoding utf-8
+"
+" IdeaVim (PyCharm, IntelliJ IDEA) 専用設定
+"
+
+"---------------------------------------------------------------------------
+" IdeaVim 固有設定:
+"
+" 検索結果をハイライト
+set hlsearch
+" インクリメンタル検索
+set incsearch
+" IdeaVim の join 動作を IDE に合わせる
+set ideajoin
+" ステータスアイコンの色設定
+set ideastatusicon=gray
+
+"---------------------------------------------------------------------------
+" IDE 機能との統合キーマップ:
+"
+" リーダーキーを設定
+let mapleader = " "
+
+" ナビゲーション
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gr :action FindUsages<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gt :action GotoTypeDeclaration<CR>
+
+" 検索・置換
+nnoremap <leader>f :action Find<CR>
+nnoremap <leader>r :action Replace<CR>
+nnoremap <leader>/ :action FindInPath<CR>
+nnoremap <leader>? :action ReplaceInPath<CR>
+
+" ファイル・プロジェクト操作
+nnoremap <leader>p :action ActivateProjectToolWindow<CR>
+nnoremap <leader>e :action SelectInProjectView<CR>
+nnoremap <leader>b :action RecentFiles<CR>
+nnoremap <leader>o :action GotoFile<CR>
+
+" リファクタリング
+nnoremap <leader>rn :action RenameElement<CR>
+nnoremap <leader>rf :action RenameFile<CR>
+nnoremap <leader>ri :action Inline<CR>
+nnoremap <leader>rm :action ExtractMethod<CR>
+nnoremap <leader>rv :action IntroduceVariable<CR>
+
+" デバッグ・実行
+nnoremap <leader>d :action Debug<CR>
+nnoremap <leader>R :action Run<CR>
+nnoremap <leader>c :action Stop<CR>
+
+" ツールウィンドウ
+nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
+nnoremap <leader>g :action ActivateVersionControlToolWindow<CR>
+
+" エラー・警告
+nnoremap ]e :action GotoNextError<CR>
+nnoremap [e :action GotoPreviousError<CR>
+
+" コード整形
+nnoremap <leader>= :action ReformatCode<CR>
+nnoremap <leader>i :action OptimizeImports<CR>
+
+"---------------------------------------------------------------------------
+" エディタ操作:
+"
+" 行の複製
+nnoremap <leader>yy :action EditorDuplicate<CR>
+
+" コメントアウト
+nnoremap <leader>cc :action CommentByLineComment<CR>
+vnoremap <leader>cc :action CommentByLineComment<CR>
+
+" 折り畳み
+nnoremap zC :action CollapseAllRegions<CR>
+nnoremap zO :action ExpandAllRegions<CR>
+
+"---------------------------------------------------------------------------
+" IDE 固有の便利機能:
+"
+" クイックドキュメント表示
+nnoremap K :action QuickJavaDoc<CR>
+
+" パラメータ情報表示
+inoremap <C-p> <C-o>:action ParameterInfo<CR>
+
+" 自動補完
+inoremap <C-Space> <C-o>:action CodeCompletion<CR>
+
+" 最近のロケーション
+nnoremap <C-o> :action Back<CR>
+nnoremap <C-i> :action Forward<CR>

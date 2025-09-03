@@ -3,7 +3,7 @@ if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common
 endif
 
-" GUI版専用設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.gui'))
-  source ~/dotfiles/vim/vimrc.gui
+" IdeaVim専用設定を読み込み
+if filereadable(expand('~/dotfiles/vim/vimrc.idea'))
+  source ~/dotfiles/vim/vimrc.idea
 endif

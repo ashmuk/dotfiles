@@ -1,0 +1,102 @@
+scriptencoding utf-8
+"
+" GUI版 Vim 専用設定 (GVim, MacVim)
+"
+
+"---------------------------------------------------------------------------
+" カラー設定:
+"
+colorscheme solarized
+set background=dark
+
+"---------------------------------------------------------------------------
+" フォント設定:
+"
+if has('win32')
+  " Windows用フォント設定
+  set guifont=MyricaM_M:h12:cSHIFTJIS:qDRAFT
+  if &guifont == ''
+    set guifont=MS_Gothic:h12:cSHIFTJIS
+  endif
+  " 行間隔の設定
+  set linespace=1
+  " 一部のUCS文字の幅を自動計測して決める
+  if has('kaoriya')
+    set ambiwidth=auto
+  endif
+elseif has('mac')
+  " macOS用フォント設定
+  set guifont=Menlo:h14
+  if &guifont == ''
+    set guifont=Monaco:h14
+  endif
+elseif has('xfontset')
+  " UNIX用 (xfontsetを使用)
+  if &guifontset == ''
+    set guifontset=a14,r14,k14
+  endif
+endif
+
+"---------------------------------------------------------------------------
+" ウインドウ設定:
+"
+" ウィンドウの位置
+winpos 500 0
+" ウインドウの幅
+set columns=200
+" ウインドウの高さ
+set lines=80
+
+"---------------------------------------------------------------------------
+" GUI要素の設定:
+"
+" メニューバーを表示
+set guioptions+=m
+" ツールバーを非表示
+set guioptions-=T
+" 右・左スクロールバーを非表示
+set guioptions-=rL
+
+" ビジュアル選択を自動的にクリップボードへ（コメントアウト推奨）
+"set guioptions+=a
+
+"---------------------------------------------------------------------------
+" マウス設定:
+"
+" どのモードでもマウスを使えるようにする
+set mouse=a
+" マウスの移動でフォーカスを自動的に切替えない
+set nomousefocus
+" 入力時にマウスポインタを隠す
+set mousehide
+
+"---------------------------------------------------------------------------
+" 日本語入力設定:
+"
+if has('multi_byte_ime') || has('xim')
+  " IME ON時のカーソルの色を設定(紫)
+  highlight CursorIM guibg=Purple guifg=NONE
+endif
+
+" MacOS Xメニューの日本語化
+if has('mac')
+  set langmenu=japanese
+endif
+
+"---------------------------------------------------------------------------
+" 表示設定:
+"
+" 行を折り返さない（GUI では横スクロール可能）
+set nowrap
+
+" 行番号を表示
+set number
+
+"---------------------------------------------------------------------------
+" 印刷設定:
+"
+if has('printer')
+  if has('win32')
+    set printfont=MS_Mincho:h12:cSHIFTJIS
+  endif
+endif

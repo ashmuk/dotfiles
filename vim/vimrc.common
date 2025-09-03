@@ -1,0 +1,69 @@
+scriptencoding utf-8
+" vim:set ts=8 sts=2 sw=2 tw=0:
+"
+" 全環境共通設定 (Terminal Vim, GUI Vim, IdeaVim)
+"
+
+"---------------------------------------------------------------------------
+" 検索の挙動に関する設定:
+"
+" 検索時に大文字小文字を無視
+set ignorecase
+" 大文字小文字の両方が含まれている場合は大文字小文字を区別
+set smartcase
+" 検索時にファイルの最後まで行ったら最初に戻る
+set wrapscan
+
+"---------------------------------------------------------------------------
+" 編集に関する設定:
+"
+" タブをスペースに展開
+set expandtab
+" タブの画面上での幅
+set tabstop=4
+" シフト幅
+set shiftwidth=4
+" ソフトタブストップ（無効化）
+set softtabstop=0
+
+" 自動的にインデントする
+set autoindent
+" バックスペースでインデントや改行を削除できるようにする
+set backspace=indent,eol,start
+" 括弧入力時に対応する括弧を表示
+set showmatch
+" コマンドライン補完するときに強化されたものを使う
+set wildmenu
+" テキスト挿入中の自動折り返しを日本語に対応させる
+set formatoptions+=mM
+
+"---------------------------------------------------------------------------
+" 画面表示の設定:
+"
+" 行番号を非表示（環境ごとに上書き可能）
+set nonumber
+" ルーラーを表示
+set ruler
+" 常にステータス行を表示
+set laststatus=2
+" コマンドラインの高さ
+set cmdheight=2
+" コマンドをステータス行に表示
+set showcmd
+" タイトルを表示
+set title
+
+"---------------------------------------------------------------------------
+" ファイルエンコーディング設定:
+"
+" ファイルエンコーディング
+set fileencoding=utf-8
+" ファイルエンコーディングの候補
+set fileencodings=utf-8,cp932
+
+"---------------------------------------------------------------------------
+" 共通キーマップの読み込み:
+"
+if filereadable(expand('~/dotfiles/vim/mappings.common'))
+  source ~/dotfiles/vim/mappings.common
+endif
