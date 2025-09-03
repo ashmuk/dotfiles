@@ -62,6 +62,24 @@ set fileencoding=utf-8
 set fileencodings=utf-8,cp932
 
 "---------------------------------------------------------------------------
+" 検索ハイライト色の設定:
+"
+" 検索結果のハイライト（初期設定）
+highlight Search guibg=#ffeb3b guifg=#000000 ctermbg=226 ctermfg=16
+highlight IncSearch guibg=#ff9800 guifg=#000000 ctermbg=208 ctermfg=16
+
+" カラースキーム変更時の自動色変更
+augroup SearchHighlight
+  autocmd!
+  " カラースキーム読み込み後に検索色を再設定
+  autocmd ColorScheme * highlight Search guibg=#ffeb3b guifg=#000000 ctermbg=226 ctermfg=16
+  autocmd ColorScheme * highlight IncSearch guibg=#ff9800 guifg=#000000 ctermbg=208 ctermfg=16
+augroup END
+
+" 検索を有効化
+set hlsearch
+
+"---------------------------------------------------------------------------
 " 共通キーマップの読み込み:
 "
 if filereadable(expand('~/dotfiles/vim/mappings.common'))
