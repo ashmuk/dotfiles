@@ -148,6 +148,78 @@ if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
   source "$HOME/etc/mintty-colors-solarized/sol.light"
 fi
 
+# alias
+function gvim() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if command -v mvim >/dev/null 2>&1; then
+      command mvim "$@"
+    elif [[ -x "/Applications/MacVim.app/Contents/bin/mvim" ]]; then
+      "/Applications/MacVim.app/Contents/bin/mvim" "$@"
+    else
+      if command -v open >/dev/null 2>&1; then
+        open -a "MacVim" --args "$@"
+      else
+        vim -g "$@"
+      fi
+    fi
+    return
+  fi
+
+  # WSL (Windows Subsystem for Linux)
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    local win_gvim="/mnt/c/Program Files/vim/gvim.exe"
+    if [[ -x "$win_gvim" ]]; then
+      local args=()
+      if command -v wslpath >/dev/null 2>&1; then
+        for a in "$@"; do
+          if [[ -e "$a" || "$a" == /* ]]; then
+            args+=("$(wslpath -w -- "$a")")
+          else
+            args+=("$a")
+          fi
+        done
+      else
+        args=("$@")
+      fi
+      "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+      disown
+      return
+    fi
+  fi
+
+  # MSYS/Cygwin on Windows
+  case "$OSTYPE" in
+    msys*|cygwin*)
+      local win_gvim="/c/Program Files/vim/gvim.exe"
+      if [[ -x "$win_gvim" ]]; then
+        local args=()
+        if command -v cygpath >/dev/null 2>&1; then
+          for a in "$@"; do
+            if [[ -e "$a" || "$a" == /* ]]; then
+              args+=("$(cygpath -w -- "$a")")
+            else
+              args+=("$a")
+            fi
+          done
+        else
+          args=("$@")
+        fi
+        "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+        disown
+        return
+      fi
+      ;;
+  esac
+
+  # Fallbacks: native gvim or terminal GUI mode
+  if command -v gvim >/dev/null 2>&1; then
+    command gvim "$@" & disown
+  else
+    vim -g "$@"
+  fi
+}
+
 # Git aliases
 # 基本コマンド
 alias g='git'
@@ -197,4 +269,5 @@ alias gdev='git checkout develop'
 # For pushd, popd and dirs
 alias pu='pushd'
 alias pd='popd'
+alias po='popd'
 alias ds='dirs -v'
