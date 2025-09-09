@@ -16,6 +16,25 @@ set ideajoin
 set ideastatusicon=gray
 
 "---------------------------------------------------------------------------
+" 検索ハイライト色の設定:
+"
+" IdeaVim では highlight コマンドの効果が限定的だが、
+" 一部の IDE テーマで有効になる場合があるため設定
+highlight Search guibg=#ffeb3b guifg=#000000 ctermbg=226 ctermfg=16
+highlight IncSearch guibg=#ff9800 guifg=#000000 ctermbg=208 ctermfg=16
+
+" IdeaVim 固有の検索ハイライト設定
+" (IDE の設定と連携するため、IDE側の設定も重要)
+if exists(':highlight')
+  " 検索結果のハイライト（明るい黄色背景に黒文字）
+  silent! highlight Search guibg=#ffeb3b guifg=#000000 gui=NONE
+  " インクリメンタル検索のハイライト（オレンジ背景に黒文字）
+  silent! highlight IncSearch guibg=#ff9800 guifg=#000000 gui=bold
+  " 単語ハイライト（* コマンド用）
+  silent! highlight MatchParen guibg=#4fc3f7 guifg=#000000 gui=NONE
+endif
+
+"---------------------------------------------------------------------------
 " IDE 機能との統合キーマップ:
 "
 " リーダーキーを設定

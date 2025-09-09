@@ -4,15 +4,90 @@ scriptencoding utf-8
 "
 
 "---------------------------------------------------------------------------
-" カラー・表示設定:
+" Terminfo / 端末設定:
 "
-" カラースキーム
-if has('termguicolors')
-  set termguicolors
+" 端末タイプの検証と修正
+if !empty($TERM)
+  " 既存のTERM環境変数を尊重
+  let s:current_term = $TERM
+else
+  " TERM が設定されていない場合のデフォルト
+  let s:current_term = 'xterm-256color'
 endif
 
-colorscheme solarized
-set background=dark
+" 問題のある端末タイプの修正
+if s:current_term =~ 'beos-ansi\|builtin_'
+  let s:current_term = 'xterm-256color'
+endif
+
+" 端末タイプを安全に設定
+try
+  execute 'set term=' . s:current_term
+catch /^Vim\%((\a\+)\)\=:E474/
+  " フォールバック: 基本的な端末タイプを試す
+  for fallback_term in ['xterm-256color', 'xterm-color', 'xterm', 'ansi', 'dumb']
+    try
+      execute 'set term=' . fallback_term
+      break
+    catch /^Vim\%((\a\+)\)\=:E474/
+      continue
+    endtry
+  endfor
+endtry
+
+" 色数の設定
+if &term =~ '256color'
+  set t_Co=256
+elseif &term =~ 'xterm\|screen\|tmux'
+  set t_Co=256
+else
+  set t_Co=16
+endif
+
+" True Color (24bit) 対応
+if has('termguicolors')
+  " True Color をサポートする端末の判定
+  if ($TERM =~ 'truecolor' || $TERM =~ '256color' || 
+    \ $COLORTERM == 'truecolor' || $TERM_PROGRAM == 'iTerm.app' ||
+    \ $TERM_PROGRAM == 'Apple_Terminal')
+    set termguicolors
+  endif
+endif
+
+" カーソル形状の設定（対応端末のみ）
+if &term =~ 'xterm\|screen\|tmux' && !has('gui_running')
+  " 挿入モード: 縦線カーソル
+  let &t_SI = "\e[6 q"
+  " 通常モード: ブロックカーソル  
+  let &t_EI = "\e[2 q"
+  " 置換モード: アンダーラインカーソル
+  if exists('&t_SR')
+    let &t_SR = "\e[4 q"
+  endif
+endif
+
+" 背景色消去の設定（tmux/screen対応）
+if &term =~ 'screen\|tmux'
+  set t_ut=
+endif
+
+" デバッグ情報（必要に応じてコメントアウト）
+" echom "Terminal: " . &term . " Colors: " . &t_Co
+
+unlet s:current_term
+
+"---------------------------------------------------------------------------
+" カラー・表示設定:
+"
+" カラースキーム設定
+try
+  colorscheme solarized
+  set background=dark
+catch /^Vim\%((\a\+)\)\=:E185/
+  " solarized が見つからない場合のフォールバック
+  colorscheme default
+  set background=dark
+endtry
 
 "---------------------------------------------------------------------------
 " プラットフォーム固有の端末設定:
