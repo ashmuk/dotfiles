@@ -1,7 +1,26 @@
-# vim: set ft=sh:
+
+###############################################################################
+#
 # Common aliases for bash and zsh
 # This file contains aliases that work in both bash and zsh shells
 # Source this file in your .bashrc and .zshrc files
+#
+###############################################################################
+
+# =============================================================================
+# Standard alias
+# =============================================================================
+alias ..="cd .."
+
+# =============================================================================
+# Directory Navigation Aliases
+# =============================================================================
+
+# For pushd, popd and dirs
+alias pu='pushd'
+alias pd='popd'
+alias po='popd'
+alias ds='dirs -v'
 
 # =============================================================================
 # Multibyte Character Search Aliases
@@ -63,16 +82,6 @@ alias gloga='git log --oneline --decorate --graph --all'
 # ブランチ切り替えを簡単に (Easy branch switching)
 alias gmain='git checkout main'
 alias gdev='git checkout develop'
-
-# =============================================================================
-# Directory Navigation Aliases
-# =============================================================================
-
-# For pushd, popd and dirs
-alias pu='pushd'
-alias pd='popd'
-alias po='popd'
-alias ds='dirs -v'
 
 # =============================================================================
 # Shell-specific aliases (to be defined in shell config files)

@@ -1,7 +1,11 @@
-# vim: set ft=sh:
+
+###############################################################################
+#
 # Shell-specific aliases (bash and zsh)
 # This file contains aliases that depend on shell variables like $grep_command
 # Source this file after sourcing aliases.common and setting up shell variables
+#
+###############################################################################
 
 # =============================================================================
 # Grep-based Multibyte Character Search Aliases

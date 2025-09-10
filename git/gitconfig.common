@@ -1,0 +1,168 @@
+# Common Git Configuration
+# This file contains common git settings that work across different environments
+
+# =============================================================================
+# User Configuration
+# =============================================================================
+# Note: User-specific settings should be added to ~/.gitconfig
+# This file provides a template for common settings
+
+# =============================================================================
+# Core Settings
+# =============================================================================
+[core]
+    # Line ending handling
+    autocrlf = input
+    # File mode handling
+    filemode = true
+    # Case sensitivity
+    ignorecase = false
+    # Precompose unicode
+    precomposeunicode = true
+    # Editor
+    editor = vim
+    # Pager
+    pager = less -R
+    # Excludes file
+    excludesfile = ~/.gitignore
+
+# =============================================================================
+# Diff Settings
+# =============================================================================
+[diff]
+    # Diff tool
+    tool = vimdiff
+    # Color output
+    color = auto
+    # Algorithm
+    algorithm = patience
+
+[difftool]
+    # Don't prompt before each invocation
+    prompt = false
+
+[difftool "vimdiff"]
+    # Vimdiff command
+    cmd = mvim -d -f "$LOCAL" "$REMOTE"
+
+# =============================================================================
+# Merge Settings
+# =============================================================================
+[merge]
+    # Merge tool
+    tool = vimdiff
+    # Conflict style
+    conflictstyle = diff3
+
+[mergetool]
+    # Don't prompt before each invocation
+    prompt = false
+
+[mergetool "vimdiff"]
+    # Vimdiff merge command
+    cmd = mvim -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+
+# =============================================================================
+# Branch Settings
+# =============================================================================
+[branch]
+    # Default branch name
+    default = main
+
+# =============================================================================
+# Push Settings
+# =============================================================================
+[push]
+    # Default push behavior
+    default = simple
+    # Auto setup remote tracking
+    autoSetupRemote = true
+
+# =============================================================================
+# Pull Settings
+# =============================================================================
+[pull]
+    # Default pull behavior
+    rebase = false
+
+# =============================================================================
+# Color Settings
+# =============================================================================
+[color]
+    # Enable color output
+    ui = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+
+# =============================================================================
+# Alias Settings
+# =============================================================================
+[alias]
+    # Basic aliases
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    df = diff
+    lg = log --oneline --decorate --graph
+    lga = log --oneline --decorate --graph --all
+    
+    # Advanced aliases
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+    amend = commit --amend
+    wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+    
+    # Branch management
+    bclean = "!f() { git branch --merged | grep -v '\\*\\|main\\|develop' | xargs -n 1 git branch -d; }; f"
+    bmerged = branch --merged
+    bunmerged = branch --no-merged
+    
+    # Stash management
+    stash-list = stash list
+    stash-clear = stash clear
+    stash-pop = stash pop
+    stash-apply = stash apply
+    
+    # Remote management
+    remotes = remote -v
+    remote-url = remote get-url origin
+    
+    # File management
+    files = ls-files
+    ignored = ls-files --others --ignored --exclude-standard
+    
+    # History
+    graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+    
+    # Workflow
+    wip = commit -am "WIP: $(date)"
+    unwip = reset HEAD~1
+    save = stash push -m
+    pop = stash pop
+    
+    # Quick fixes
+    fixup = commit --fixup
+    squash = rebase -i --autosquash
+    
+    # Information
+    who = blame
+    what = show
+    when = log --pretty=format:"%C(yellow)%h%C(reset) %C(blue)%ad%C(reset) %s" --date=short
+    where = log --pretty=format:"%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %s" --date=short
