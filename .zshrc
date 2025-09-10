@@ -220,6 +220,52 @@ function gvim() {
   fi
 }
 
+# alias for grep
+# Build grep command with options
+grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
+
+# Determine which grep to use and build the command
+# Environment-aware grep alias (prioritizes GNU grep over BSD grep)
+if command -v ggrep >/dev/null 2>&1; then
+  alias grep='ggrep'
+  grep_command="ggrep $grep_options"
+elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
+  alias grep='/usr/local/bin/grep'
+  grep_command="/usr/local/bin/grep $grep_options"
+elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
+  alias grep='/opt/homebrew/bin/grep'
+  grep_command="/opt/homebrew/bin/grep $grep_options"
+else
+  grep_command="grep $grep_options"
+fi
+
+# Multibyte character search aliases (improved patterns to reduce false positives)
+# File names with multibyte characters
+alias findmbnames="LC_ALL=C find . -name '*[^ -~]*' -type f"
+
+# Grep-based multibyte character search (using UTF-8 byte patterns)
+# List files containing multibyte characters in content
+alias grepmb="LC_ALL=C $grep_command -r -l -I -P '[\x80-\xFF]' ."
+# Show multibyte characters in a specific file
+alias grepmbin="LC_ALL=C $grep_command -P '[\x80-\xFF]'"
+
+if command -v rg >/dev/null 2>&1; then
+  # Ripgrep-based multibyte character search (using valid Unicode properties)
+  # List files containing multibyte characters in content
+  alias rgmb="rg -l '[^\x00-\x7F]'"
+  # Show multibyte characters in a specific file
+  alias rgmbin="rg '[^\x00-\x7F]'"
+
+  # Alternative patterns for more specific multibyte character detection
+  # CJK (Chinese, Japanese, Korean) characters specifically
+  alias rgcjk="rg -l '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
+  alias rgcjkin="rg '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
+
+  # Extended Latin and other common multibyte characters
+  alias rgextmb="rg -l '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
+  alias rgextmbin="rg '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
+fi
+
 # Git aliases
 # 基本コマンド
 alias g='git'
