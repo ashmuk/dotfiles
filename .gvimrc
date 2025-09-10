@@ -1,9 +1,0 @@
-" 共通設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.common'))
-  source ~/dotfiles/vim/vimrc.common
-endif
-
-" GUI版専用設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.gui'))
-  source ~/dotfiles/vim/vimrc.gui
-endif
