@@ -239,81 +239,13 @@ else
   grep_command="grep $grep_options"
 fi
 
-# Multibyte character search aliases (improved patterns to reduce false positives)
-# File names with multibyte characters
-alias findmbnames="LC_ALL=C find . -name '*[^ -~]*' -type f"
-
-# Grep-based multibyte character search (using UTF-8 byte patterns)
-# List files containing multibyte characters in content
-alias grepmb="LC_ALL=C $grep_command -r -l -I -P '[\x80-\xFF]' ."
-# Show multibyte characters in a specific file
-alias grepmbin="LC_ALL=C $grep_command -P '[\x80-\xFF]'"
-
-if command -v rg >/dev/null 2>&1; then
-  # Ripgrep-based multibyte character search (using valid Unicode properties)
-  # List files containing multibyte characters in content
-  alias rgmb="rg -l '[^\x00-\x7F]'"
-  # Show multibyte characters in a specific file
-  alias rgmbin="rg '[^\x00-\x7F]'"
-
-  # Alternative patterns for more specific multibyte character detection
-  # CJK (Chinese, Japanese, Korean) characters specifically
-  alias rgcjk="rg -l '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
-  alias rgcjkin="rg '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
-
-  # Extended Latin and other common multibyte characters
-  alias rgextmb="rg -l '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
-  alias rgextmbin="rg '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
+export DOTFILES_DIR=$HOME/dotfiles
+# Source common aliases (works for both bash and zsh)
+if [[ -f "$DOTFILES_DIR/shell/aliases.common" ]]; then
+  source "$DOTFILES_DIR/shell/aliases.common"
 fi
 
-# Git aliases
-# 基本コマンド
-alias g='git'
-alias gs='git status' # git status --short is defined by Oh!MyZsh instead
-alias ga='git add'
-alias gaa='git add .'
-alias gc='git commit'
-alias gcm='git commit -m'
-alias gp='git push'
-alias gpl='git pull'
-
-# ブランチ関連
-alias gb='git branch'
-alias gco='git checkout'
-alias gcb='git checkout -b'
-alias gm='git merge'
-
-# ログとdiff
-alias gl='git log'
-alias glo='git log --oneline'
-alias gd='git diff'
-alias gds='git diff --staged'
-
-# リモート関連
-alias gr='git remote'
-alias grv='git remote -v'
-
-# その他便利なもの
-alias gst='git stash'
-alias gstp='git stash pop'
-alias grh='git reset HEAD'
-alias grhh='git reset --hard HEAD'
-
-# 複合コマンド
-alias gacp='git add . && git commit -m'
-alias gpom='git push origin main'
-alias gplom='git pull origin main'
-
-# ログを見やすく
-alias glog='git log --oneline --decorate --graph'
-alias gloga='git log --oneline --decorate --graph --all'
-
-# ブランチ切り替えを簡単に
-alias gmain='git checkout main'
-alias gdev='git checkout develop'
-
-# For pushd, popd and dirs
-alias pu='pushd'
-alias pd='popd'
-alias po='popd'
-alias ds='dirs -v'
+# Source shell-specific aliases (after grep_command is set)
+if [[ -f "$DOTFILES_DIR/shell/aliases.shell" ]]; then
+  source "$DOTFILES_DIR/shell/aliases.shell"
+fi

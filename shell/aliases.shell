@@ -1,0 +1,37 @@
+# vim: set ft=sh:
+# Shell-specific aliases (bash and zsh)
+# This file contains aliases that depend on shell variables like $grep_command
+# Source this file after sourcing aliases.common and setting up shell variables
+
+# =============================================================================
+# Grep-based Multibyte Character Search Aliases
+# =============================================================================
+# These depend on $grep_command variable set in shell config
+
+# Grep-based multibyte character search (using UTF-8 byte patterns)
+# List files containing multibyte characters in content
+alias grepmb="LC_ALL=C $grep_command -r -l -I -P '[\x80-\xFF]' ."
+# Show multibyte characters in a specific file
+alias grepmbin="LC_ALL=C $grep_command -P '[\x80-\xFF]'"
+
+# =============================================================================
+# Ripgrep-based Multibyte Character Search Aliases
+# =============================================================================
+# These depend on 'rg' command availability
+
+if command -v rg >/dev/null 2>&1; then
+  # Ripgrep-based multibyte character search (using valid Unicode properties)
+  # List files containing multibyte characters in content
+  alias rgmb="rg -l '[^\x00-\x7F]'"
+  # Show multibyte characters in a specific file
+  alias rgmbin="rg '[^\x00-\x7F]'"
+
+  # Alternative patterns for more specific multibyte character detection
+  # CJK (Chinese, Japanese, Korean) characters specifically
+  alias rgcjk="rg -l '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
+  alias rgcjkin="rg '[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]'"
+
+  # Extended Latin and other common multibyte characters
+  alias rgextmb="rg -l '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
+  alias rgextmbin="rg '[\p{Latin Extended-A}\p{Latin Extended-B}\p{Latin Extended Additional}]'"
+fi
