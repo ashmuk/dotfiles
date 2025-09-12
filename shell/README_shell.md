@@ -11,10 +11,22 @@ shell/
 ├── shell.bash          # Bash-specific settings and functions
 ├── shell.zsh           # Zsh-specific settings and functions
 ├── shell.ohmy.zsh      # Oh My Zsh specific configuration
-├── shellfirst.zsh     # Zsh initialization script
+├── performance.sh      # Performance monitoring system
 ├── aliases.common      # Common aliases (git, dir nav, etc.)
 ├── aliases.shell       # Shell-specific aliases (grep, ripgrep)
-└── README_shell.md     # This documentation file
+├── local.example       # Example local customization file
+├── profile/            # Shell profile configurations
+│   ├── ref/            # Reference comprehensive profiles
+│   │   ├── bash_profile.comprehensive
+│   │   ├── bashrc.comprehensive
+│   │   ├── zprofile.comprehensive
+│   │   └── zshrc.comprehensive
+│   ├── bash_profile    # Existing bash profile
+│   ├── zprofile        # Existing zsh profile
+│   ├── bash_logout     # Bash logout script
+│   └── README_profile.md # Profile configuration documentation
+├── README_shell.md     # This documentation file
+└── README_command.md   # Command reference documentation
 ```
 
 ## Installation
@@ -77,6 +89,24 @@ make status
 - Ripgrep aliases (rgmb, rgmbin, rgcjk, rgextmb)
 - Conditional loading based on tool availability
 
+### `performance.sh`
+- Shell startup performance monitoring system
+- Timing measurement for shell initialization
+- Performance analysis and optimization tools
+- Optional profiling capabilities
+
+### `local.example`
+- Example local customization file
+- Template for user-specific configurations
+- Demonstrates common customization patterns
+- Guidelines for personal shell settings
+
+### `profile/` Directory
+- **Reference profiles**: Comprehensive shell configurations for advanced users
+- **Existing profiles**: Simple, lightweight profile configurations
+- **Documentation**: Detailed setup and customization guides
+- **Cross-platform**: Optimized for macOS, Linux, and Windows environments
+
 ## Features
 
 ### Multibyte Character Search
@@ -107,8 +137,39 @@ make status
 
 ## Customization
 
+### Local Customizations
+Create local configuration files for personal settings:
+- `$HOME/.dotfiles-local` - Primary local customization file
+- `$HOME/.config/dotfiles/local` - Alternative location
+- `$HOME/dotfiles/shell/local` - Repository-specific customizations
+
+Use the example as a template:
+```bash
+cp shell/local.example ~/.dotfiles-local
+vim ~/.dotfiles-local
+```
+
+### Shell-Specific Customizations
 After installation, you can add shell-specific customizations to:
 - `~/.bashrc` - Additional bash settings
 - `~/.zshrc` - Additional zsh settings
 
+### Advanced Profile Customizations
+For comprehensive shell configurations, see:
+- `profile/README_profile.md` - Detailed profile documentation
+- `profile/ref/` - Reference implementations for advanced users
+- Compare with generated configs for selective adoption
+
 The installed files are symlinks to the dotfiles repository, so changes to the source files will be reflected immediately.
+
+## Performance Monitoring
+
+Enable performance monitoring to track shell startup times:
+```bash
+# Enable monitoring
+export SHELL_PERFORMANCE_MONITOR=1
+
+# View startup times
+bash -l  # Shows loading time
+zsh -l   # Shows loading time
+```

@@ -1,0 +1,381 @@
+#!/bin/zsh
+# Comprehensive Zsh Runtime Configuration
+# Interactive zsh shell configuration
+# Source: dotfiles/shell/profile/zshrc.comprehensive
+
+# Exit if not interactive
+[[ $- != *i* ]] && return
+
+# Prevent recursive sourcing
+if [[ -n "$ZSHRC_LOADED" ]]; then
+    return
+fi
+export ZSHRC_LOADED=1
+
+#---------------------------------------------------------------------------
+# Performance Monitoring Setup
+#---------------------------------------------------------------------------
+
+if [[ -n "$SHELL_PERFORMANCE_MONITOR" ]]; then
+    ZSHRC_START_TIME=$(date +%s%N 2>/dev/null || date +%s)
+fi
+
+#---------------------------------------------------------------------------
+# Zsh Options & Behavior
+#---------------------------------------------------------------------------
+
+# History options
+setopt EXTENDED_HISTORY          # Write timestamp to history file
+setopt SHARE_HISTORY            # Share history between sessions
+setopt HIST_EXPIRE_DUPS_FIRST   # Expire duplicates first
+setopt HIST_IGNORE_DUPS         # Don't record duplicates
+setopt HIST_IGNORE_ALL_DUPS     # Remove older duplicates
+setopt HIST_FIND_NO_DUPS        # Don't display duplicates during search
+setopt HIST_IGNORE_SPACE        # Don't record commands starting with space
+setopt HIST_SAVE_NO_DUPS        # Don't save duplicates to history file
+setopt HIST_VERIFY              # Verify history expansions
+
+# Directory options
+setopt AUTO_CD                   # Auto cd when typing directory name
+setopt AUTO_PUSHD               # Automatically push directories to stack
+setopt PUSHD_IGNORE_DUPS        # Don't push duplicate directories
+setopt PUSHD_MINUS              # Make - work like + for directory stack
+setopt PUSHD_SILENT             # Don't print directory stack
+
+# Completion options
+setopt COMPLETE_IN_WORD         # Complete from both ends of word
+setopt ALWAYS_TO_END            # Move cursor to end after completion
+setopt PATH_DIRS                # Perform path search even on command names with /
+setopt AUTO_MENU                # Show completion menu on tab
+setopt AUTO_LIST                # List choices on ambiguous completion
+setopt AUTO_PARAM_SLASH         # Add slash after completing directories
+setopt NO_MENU_COMPLETE         # Don't insert first match immediately
+setopt LIST_PACKED              # Pack completion lists
+setopt LIST_TYPES               # Show file types in completion lists
+
+# Globbing options
+setopt EXTENDED_GLOB            # Extended globbing patterns
+setopt GLOB_DOTS                # Include dotfiles in globbing
+setopt NUMERIC_GLOB_SORT        # Sort numeric filenames numerically
+setopt NO_CASE_GLOB             # Case insensitive globbing
+
+# Input/Output options
+setopt CORRECT                  # Spelling correction for commands
+setopt NO_CORRECT_ALL           # Don't correct arguments
+setopt INTERACTIVE_COMMENTS     # Allow comments in interactive shells
+setopt RC_EXPAND_PARAM          # Expand parameters in braces
+
+# Job control options
+setopt AUTO_RESUME              # Resume suspended jobs with command name
+setopt LONG_LIST_JOBS           # List jobs in long format
+setopt NOTIFY                   # Report job status immediately
+
+# Prompt options
+setopt PROMPT_SUBST             # Enable parameter expansion in prompts
+
+# Set vi mode for command line editing
+bindkey -v
+
+#---------------------------------------------------------------------------
+# Environment Integration
+#---------------------------------------------------------------------------
+
+# Source common shell configuration
+DOTFILES_ROOT="${DOTFILES_ROOT:-$HOME/dotfiles}"
+
+if [[ -f "$DOTFILES_ROOT/shell/shell.common" ]]; then
+    source "$DOTFILES_ROOT/shell/shell.common"
+fi
+
+if [[ -f "$DOTFILES_ROOT/shell/shell.zsh" ]]; then
+    source "$DOTFILES_ROOT/shell/shell.zsh"
+fi
+
+#---------------------------------------------------------------------------
+# Enhanced Prompt Configuration
+#---------------------------------------------------------------------------
+
+# Load colors
+autoload -U colors && colors
+
+# Git status function for prompt
+git_prompt() {
+    local git_status git_branch
+    if git_status=$(git status --porcelain 2>/dev/null); then
+        git_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+        if [[ -n "$git_branch" ]]; then
+            if [[ -n "$git_status" ]]; then
+                echo " %F{yellow}(${git_branch}*)%f"
+            else
+                echo " %F{green}(${git_branch})%f"
+            fi
+        fi
+    fi
+}
+
+# Enhanced prompt with git integration
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    # Simplified prompt for VS Code terminal
+    PROMPT='%F{green}%n@%m%f:%F{blue}%~%f$(git_prompt) $ '
+else
+    # Full-featured prompt with right-side information
+    PROMPT='%B%F{green}%n@%m%f%b:%B%F{blue}%~%f%b$(git_prompt)
+%B%F{cyan}❯%f%b '
+    RPROMPT='%F{240}[%D{%H:%M:%S}]%f'
+fi
+
+#---------------------------------------------------------------------------
+# Enhanced Completion System
+#---------------------------------------------------------------------------
+
+# Initialize completion system
+autoload -Uz compinit
+compinit
+
+# Completion styling
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*' use-cache true
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# Group completions by category
+zstyle ':completion:*:descriptions' format '%B%F{blue}-- %d --%f%b'
+zstyle ':completion:*:messages' format '%B%F{purple}-- %d --%f%b'
+zstyle ':completion:*:warnings' format '%B%F{red}-- no matches found --%f%b'
+
+# Process completion
+zstyle ':completion:*:processes' command 'ps -u $USER -o pid,user,comm -w -w'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+
+# SSH/SCP completion
+zstyle ':completion:*:(ssh|scp|rsync):*' tag-order 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
+zstyle ':completion:*:(scp|rsync):*' group-order users files all-files hosts-domain hosts-host hosts-ipaddr
+zstyle ':completion:*:ssh:*' group-order users hosts-domain hosts-host users hosts-ipaddr
+
+# Directory completion
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+
+#---------------------------------------------------------------------------
+# Key Bindings
+#---------------------------------------------------------------------------
+
+# Vi mode key bindings
+bindkey -v
+
+# History search
+bindkey '^R' history-incremental-search-backward
+bindkey '^F' history-incremental-search-forward
+
+# Edit command line
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
+# Better word navigation
+bindkey '^[b' backward-word
+bindkey '^[f' forward-word
+
+# Delete key fix
+bindkey "^[[3~" delete-char
+
+#---------------------------------------------------------------------------
+# Aliases & Functions
+#---------------------------------------------------------------------------
+
+# Source alias configurations
+if [[ -f "$DOTFILES_ROOT/shell/aliases.common" ]]; then
+    source "$DOTFILES_ROOT/shell/aliases.common"
+fi
+
+if [[ -f "$DOTFILES_ROOT/shell/aliases.shell" ]]; then
+    source "$DOTFILES_ROOT/shell/aliases.shell"
+fi
+
+# Zsh-specific aliases
+alias -g L='| less'
+alias -g G='| grep'
+alias -g H='| head'
+alias -g T='| tail'
+alias -g S='| sort'
+alias -g U='| uniq'
+alias -g N='>/dev/null 2>&1'
+
+# Directory navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+# Enhanced directory listing
+if command -v exa >/dev/null 2>&1; then
+    alias ls='exa --icons --group-directories-first'
+    alias ll='exa -l --icons --group-directories-first --time-style=long-iso'
+    alias la='exa -la --icons --group-directories-first --time-style=long-iso'
+    alias tree='exa --tree --icons'
+elif ls --color=auto >/dev/null 2>&1; then
+    alias ls='ls --color=auto --group-directories-first'
+    alias ll='ls -l --color=auto --group-directories-first --time-style=long-iso'
+    alias la='ls -la --color=auto --group-directories-first --time-style=long-iso'
+else
+    alias ll='ls -l'
+    alias la='ls -la'
+fi
+
+# Safety aliases
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Quick navigation
+alias home='cd ~'
+alias projects='cd ~/Projects'
+alias downloads='cd ~/Downloads'
+alias documents='cd ~/Documents'
+
+# Utility functions
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+extract() {
+    if [[ -f "$1" ]]; then
+        case "$1" in
+            *.tar.bz2)   tar xjf "$1"     ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"     ;;
+            *.rar)       unrar e "$1"     ;;
+            *.gz)        gunzip "$1"      ;;
+            *.tar)       tar xf "$1"      ;;
+            *.tbz2)      tar xjf "$1"     ;;
+            *.tgz)       tar xzf "$1"     ;;
+            *.zip)       unzip "$1"       ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"        ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Directory stack utilities
+alias d='dirs -v'
+for index in {1..9}; do
+    alias "$index"="cd +${index}"
+done; unset index
+
+#---------------------------------------------------------------------------
+# Development Tools Integration
+#---------------------------------------------------------------------------
+
+# Oh My Zsh integration (optional)
+if [[ -f "$DOTFILES_ROOT/shell/shell.ohmy.zsh" ]]; then
+    source "$DOTFILES_ROOT/shell/shell.ohmy.zsh"
+fi
+
+# FZF integration (if available)
+if command -v fzf >/dev/null 2>&1; then
+    # FZF key bindings and completion
+    if [[ -f ~/.fzf.zsh ]]; then
+        source ~/.fzf.zsh
+    elif [[ -f /usr/local/opt/fzf/shell/key-bindings.zsh ]]; then
+        source /usr/local/opt/fzf/shell/key-bindings.zsh
+        source /usr/local/opt/fzf/shell/completion.zsh
+    elif [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
+        source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+        source /opt/homebrew/opt/fzf/shell/completion.zsh
+    fi
+    
+    # FZF configuration
+    export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --preview "head -100 {}"'
+    export FZF_CTRL_T_COMMAND='find . -type f'
+    export FZF_ALT_C_COMMAND='find . -type d'
+fi
+
+# Direnv integration (if available)
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
+fi
+
+# Zoxide integration (if available)
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+    alias cd='z'
+fi
+
+# Starship prompt (if available and preferred)
+if command -v starship >/dev/null 2>&1 && [[ -n "$USE_STARSHIP" ]]; then
+    eval "$(starship init zsh)"
+fi
+
+#---------------------------------------------------------------------------
+# Syntax Highlighting & Auto-suggestions
+#---------------------------------------------------------------------------
+
+# Zsh syntax highlighting (if available)
+syntax_highlighting_paths=(
+    "/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+)
+
+for path in $syntax_highlighting_paths; do
+    if [[ -f "$path" ]]; then
+        source "$path"
+        break
+    fi
+done
+
+# Zsh auto-suggestions (if available)
+autosuggestions_paths=(
+    "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+)
+
+for path in $autosuggestions_paths; do
+    if [[ -f "$path" ]]; then
+        source "$path"
+        # Configure auto-suggestions
+        ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'
+        ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+        break
+    fi
+done
+
+#---------------------------------------------------------------------------
+# Local Customizations
+#---------------------------------------------------------------------------
+
+# Source local zshrc customizations
+local_zshrc_files=(
+    "$HOME/.zshrc.local"
+    "$HOME/dotfiles/shell/profile/local.zshrc"
+    "$DOTFILES_ROOT/shell/local.zsh"
+)
+
+for local_file in $local_zshrc_files; do
+    if [[ -f "$local_file" ]]; then
+        source "$local_file"
+    fi
+done
+
+#---------------------------------------------------------------------------
+# Performance Monitoring Conclusion
+#---------------------------------------------------------------------------
+
+if [[ -n "$SHELL_PERFORMANCE_MONITOR" ]] && [[ -n "$ZSHRC_START_TIME" ]]; then
+    ZSHRC_END_TIME=$(date +%s%N 2>/dev/null || date +%s)
+    ZSHRC_LOAD_TIME=$((ZSHRC_END_TIME - ZSHRC_START_TIME))
+    echo "Zshrc loaded in ${ZSHRC_LOAD_TIME}ns" >&2
+fi
+
+# Welcome message
+if [[ -z "$DOTFILES_QUIET" ]] && [[ -o interactive ]]; then
+    echo "💻 Interactive Zsh session ready! ($ZSH_VERSION)"
+fi

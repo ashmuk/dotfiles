@@ -35,28 +35,37 @@ dotfiles/
 │   ├── shell.bash          # Bash-specific configuration
 │   ├── shell.zsh           # Zsh-specific configuration
 │   ├── shell.ohmy.zsh      # Oh My Zsh specific configuration
-│   ├── shellfirst.zsh     # Zsh initialization script
+│   ├── performance.sh      # Performance monitoring system
 │   ├── aliases.common      # Universal aliases
 │   ├── aliases.shell       # Shell-specific aliases
-│   └── README_shell.md     # Shell configuration documentation
+│   ├── local.example       # Example local customization file
+│   ├── profile/            # Shell profile configurations
+│   │   ├── ref/            # Reference comprehensive profiles
+│   │   │   ├── bash_profile.comprehensive
+│   │   │   ├── bashrc.comprehensive
+│   │   │   ├── zprofile.comprehensive
+│   │   │   └── zshrc.comprehensive
+│   │   ├── bash_profile    # Existing bash profile
+│   │   ├── zprofile        # Existing zsh profile
+│   │   └── README_profile.md # Profile configuration documentation
+│   ├── README_shell.md     # Shell configuration documentation
+│   └── README_command.md   # Command reference documentation
 ├── vim/                    # Vim configuration directory
 │   ├── setup_vimrc.sh      # Vim installation script
 │   ├── vimrc.common        # Common vim settings
 │   ├── vimrc.gui           # GUI vim settings
 │   ├── vimrc.terminal      # Terminal vim settings
 │   ├── vimrc.idea          # IntelliJ IDEA vim settings
+│   ├── plugins.vim         # vim-plug plugin management
 │   ├── mappings.common     # Common key mappings
+│   ├── local.example.vim   # Example local vim customization
 │   ├── README_vim.md       # Vim configuration documentation
-│   └── vimfiles/           # Vim plugin files
-│       ├── colors/         # Color schemes
-│       │   └── solarized.vim
-│       ├── autoload/       # Vim autoload functions
-│       │   └── togglebg.vim
+│   └── vimfiles/           # Vim plugin files and data
+│       ├── autoload/       # Vim autoload functions (vim-plug)
+│       ├── plugged/        # Installed plugins (vim-fugitive, ale, etc.)
+│       ├── colors/         # Color schemes (solarized)
 │       ├── bitmaps/        # Bitmap files
-│       │   └── togglebg.png
-│       ├── doc/            # Vim documentation
-│       │   └── solarized.txt
-│       └── tmp/            # Temporary files
+│       └── doc/            # Plugin documentation
 ├── git/                    # Git configuration directory
 │   ├── setup_git.sh        # Git installation script
 │   ├── gitconfig.common    # Common git settings and aliases
@@ -77,7 +86,12 @@ dotfiles/
 │   └── mintty-colors-solarized/ # Mintty color schemes
 │       ├── sol.dark
 │       └── sol.light
-└── backup/                 # Backup directory for existing files
+├── backup/                 # Backup directory for existing files
+├── notes/                  # Project documentation and analysis
+│   ├── claude_report_1500_20250912_before.md  # Pre-implementation analysis
+│   └── claude_report_1700_20250912_after.md   # Post-implementation review
+└── windows/               # Windows-specific configurations
+    └── Microsoft.PowerShell_profile.ps1
 ```
 
 ## 🛠️ Available Commands
@@ -106,12 +120,16 @@ dotfiles/
 - **Comprehensive aliases**: Git shortcuts, directory navigation, multibyte character search
 - **Utility functions**: Archive extraction, directory management
 - **Modular design**: Common and shell-specific configurations
+- **Performance monitoring**: Built-in shell startup performance tracking
+- **Reference profiles**: Comprehensive bash/zsh profile configurations for advanced users
 
 ### Vim Configuration
 - **Multiple environments**: GUI, terminal, IDE-specific settings
 - **Solarized theme**: Consistent color scheme across environments
 - **Custom mappings**: Optimized key bindings
-- **Plugin management**: Organized plugin structure
+- **Plugin ecosystem**: vim-plug integration with curated essential plugins
+- **Git integration**: vim-fugitive for advanced git operations
+- **Enhanced completion**: Improved TAB completion and command-line completion
 
 ### Multibyte Character Search
 - **File names**: Find files with multibyte characters in names
@@ -310,8 +328,12 @@ make status
 
 ## 📚 Documentation
 
-- [Shell Configuration](shell/README.md) - Detailed shell setup documentation
-- [Vim Configuration](vim/README.md) - Detailed vim setup documentation
+- [Shell Configuration](shell/README_shell.md) - Detailed shell setup documentation
+- [Shell Profile Reference](shell/profile/README_profile.md) - Comprehensive shell profiles
+- [Command Reference](shell/README_command.md) - Available shell commands and aliases
+- [Vim Configuration](vim/README_vim.md) - Detailed vim setup documentation
+- [Git Configuration](git/README_git.md) - Git setup and customization
+- [Project Analysis](notes/) - Technical analysis and implementation reports
 
 ## 🤝 Contributing
 

@@ -1,0 +1,218 @@
+#!/bin/bash
+# Comprehensive Bash Profile Configuration
+# Cross-platform bash login shell configuration
+# Source: dotfiles/shell/profile/bash_profile.comprehensive
+
+# Prevent recursive sourcing
+if [[ -n "$BASH_PROFILE_LOADED" ]]; then
+    return
+fi
+export BASH_PROFILE_LOADED=1
+
+#---------------------------------------------------------------------------
+# Environment Detection & Platform Setup
+#---------------------------------------------------------------------------
+
+# OS Detection
+case "$(uname -s)" in
+    Darwin*)
+        export DOTFILES_OS="mac"
+        # macOS-specific PATH setup
+        if [[ -d /opt/homebrew ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [[ -d /usr/local/bin ]]; then
+            export PATH="/usr/local/bin:$PATH"
+        fi
+        ;;
+    Linux*)
+        export DOTFILES_OS="linux"
+        # Linux-specific PATH setup
+        if [[ -d ~/.linuxbrew ]]; then
+            eval "$(~/.linuxbrew/bin/brew shellenv)"
+        elif [[ -d /home/linuxbrew/.linuxbrew ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        fi
+        ;;
+    CYGWIN*|MINGW*|MSYS*)
+        export DOTFILES_OS="windows"
+        ;;
+    *)
+        export DOTFILES_OS="unknown"
+        ;;
+esac
+
+#---------------------------------------------------------------------------
+# Essential Environment Variables
+#---------------------------------------------------------------------------
+
+# Basic environment
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+export PAGER="less"
+export SHELL="$(command -v bash)"
+
+# History configuration
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+export HISTCONTROL=ignoreboth:erasedups
+export HISTIGNORE="ls:cd:pwd:exit:date:* --help"
+export HISTTIMEFORMAT="%F %T "
+
+# Less configuration
+export LESS="-R -i -M -F -X"
+export LESSHISTFILE=-
+
+# Locale settings
+if [[ "$DOTFILES_OS" == "mac" ]]; then
+    export LANG="ja_JP.UTF-8"
+    export LC_ALL="ja_JP.UTF-8"
+else
+    export LANG="en_US.UTF-8"
+    export LC_ALL="en_US.UTF-8"
+fi
+
+#---------------------------------------------------------------------------
+# Development Environment Setup
+#---------------------------------------------------------------------------
+
+# Python Development
+if command -v python3 >/dev/null 2>&1; then
+    # Python 3.12 Framework (macOS specific)
+    if [[ -d "/Library/Frameworks/Python.framework/Versions/3.12/bin" ]]; then
+        export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
+    fi
+    
+    # Python user base
+    if [[ -d "$HOME/.local/bin" ]]; then
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+fi
+
+# Node.js Development (lazy loading)
+export NVM_LAZY_LOAD=1
+if [[ -d "$HOME/.nvm" ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    # Lazy load nvm to improve shell startup time
+    nvm() {
+        unset nvm
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm "$@"
+    }
+fi
+
+# Ruby Development (lazy loading)
+if [[ -d "$HOME/.rbenv" ]]; then
+    export RBENV_ROOT="$HOME/.rbenv"
+    export PATH="$RBENV_ROOT/bin:$PATH"
+    rbenv() {
+        unset rbenv
+        eval "$(command rbenv init - bash)"
+        rbenv "$@"
+    }
+fi
+
+# Go Development
+if command -v go >/dev/null 2>&1; then
+    export GOPATH="$HOME/go"
+    export PATH="$GOPATH/bin:$PATH"
+fi
+
+# Java Development
+if [[ -n "$JAVA_HOME" ]] && [[ -d "$JAVA_HOME" ]]; then
+    export PATH="$JAVA_HOME/bin:$PATH"
+elif [[ "$DOTFILES_OS" == "mac" ]] && [[ -x /usr/libexec/java_home ]]; then
+    export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null)
+    [[ -n "$JAVA_HOME" ]] && export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
+#---------------------------------------------------------------------------
+# Shell Behavior Configuration
+#---------------------------------------------------------------------------
+
+# Bash-specific options
+set -o vi                    # Vi mode for command line editing
+shopt -s histappend         # Append to history file
+shopt -s checkwinsize       # Update LINES and COLUMNS after each command
+shopt -s cdspell            # Minor errors in cd arguments are corrected
+shopt -s dirspell           # Minor errors in directory component spelling
+shopt -s autocd             # Auto cd when typing just a directory name
+shopt -s globstar           # ** recursive globbing
+shopt -s nocaseglob         # Case-insensitive globbing
+shopt -s histverify         # Verify history expansions before execution
+
+# Completion enhancements
+if [[ -f /usr/local/etc/bash_completion ]] && [[ "$DOTFILES_OS" == "mac" ]]; then
+    source /usr/local/etc/bash_completion
+elif [[ -f /opt/homebrew/etc/bash_completion ]] && [[ "$DOTFILES_OS" == "mac" ]]; then
+    source /opt/homebrew/etc/bash_completion
+elif [[ -f /etc/bash_completion ]] && [[ "$DOTFILES_OS" == "linux" ]]; then
+    source /etc/bash_completion
+fi
+
+#---------------------------------------------------------------------------
+# Security & Privacy
+#---------------------------------------------------------------------------
+
+# Secure umask
+umask 022
+
+# Clear potentially sensitive environment variables
+unset SSH_AGENT_PID
+unset SSH_AUTH_SOCK
+
+# Disable core dumps for security
+ulimit -c 0
+
+#---------------------------------------------------------------------------
+# Performance Optimization
+#---------------------------------------------------------------------------
+
+# Faster directory navigation
+export CDPATH=".:$HOME:$HOME/Documents:$HOME/Projects"
+
+# Cache frequently used paths
+export PROJECTS_DIR="$HOME/Projects"
+export DOWNLOADS_DIR="$HOME/Downloads"
+export DOCUMENTS_DIR="$HOME/Documents"
+
+#---------------------------------------------------------------------------
+# Integration with Dotfiles System
+#---------------------------------------------------------------------------
+
+# Source bashrc if it exists (main shell configuration)
+if [[ -f "$HOME/.bashrc" ]]; then
+    source "$HOME/.bashrc"
+fi
+
+# Source local profile customizations
+local_profiles=(
+    "$HOME/.bash_profile.local"
+    "$HOME/.profile.local"
+    "$HOME/dotfiles/shell/profile/local.bash"
+)
+
+for local_profile in "${local_profiles[@]}"; do
+    if [[ -f "$local_profile" ]]; then
+        source "$local_profile"
+        break
+    fi
+done
+
+#---------------------------------------------------------------------------
+# Startup Performance Monitoring
+#---------------------------------------------------------------------------
+
+# Track profile loading time (if performance monitoring is enabled)
+if [[ -n "$SHELL_PERFORMANCE_MONITOR" ]] && command -v date >/dev/null 2>&1; then
+    PROFILE_END_TIME=$(date +%s%N 2>/dev/null || date +%s)
+    if [[ -n "$PROFILE_START_TIME" ]]; then
+        PROFILE_LOAD_TIME=$((PROFILE_END_TIME - PROFILE_START_TIME))
+        echo "Bash profile loaded in ${PROFILE_LOAD_TIME}ns" >&2
+    fi
+fi
+
+# Welcome message (optional, can be disabled)
+if [[ -z "$DOTFILES_QUIET" ]] && [[ -n "$PS1" ]]; then
+    echo "🚀 Bash profile loaded successfully! ($(basename "$BASH_VERSION"))"
+fi

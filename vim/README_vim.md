@@ -11,8 +11,21 @@ vim/
 ├── vimrc.gui           # GUI vim settings (GVim, MacVim)
 ├── vimrc.terminal      # Terminal vim settings
 ├── vimrc.idea          # IdeaVim settings (IntelliJ IDEA, PyCharm)
+├── plugins.vim         # vim-plug plugin management configuration
 ├── mappings.common     # Common key mappings
-└── README_vim.md       # This documentation file
+├── local.example.vim   # Example local vim customization
+├── README_vim.md       # This documentation file
+└── vimfiles/           # Vim plugin files and data
+    ├── autoload/       # Vim autoload functions (includes vim-plug)
+    ├── plugged/        # Installed plugins directory
+    │   ├── vim-fugitive/    # Git integration plugin
+    │   ├── ale/            # Async linting engine
+    │   ├── nerdtree/       # File explorer
+    │   ├── vim-airline/    # Status line enhancement
+    │   └── ...             # Other plugins
+    ├── colors/         # Color schemes (solarized)
+    ├── bitmaps/        # Bitmap files
+    └── doc/            # Plugin documentation
 ```
 
 ## 🚀 Installation
@@ -41,6 +54,8 @@ make install-vim
 - **Editing settings**: Tab expansion, auto-indentation, line wrapping
 - **Display options**: Line numbers, syntax highlighting, status line
 - **File handling**: Encoding, file format detection
+- **Enhanced completion**: Improved TAB completion with wildmode and completeopt
+- **Plugin integration**: Loads and configures vim-plug plugin manager
 - **Performance**: Lazy loading, optimized settings
 
 ### `vimrc.gui`
@@ -67,13 +82,25 @@ make install-vim
 - **Compatibility**: Optimized for IDE environments
 - **Customization**: IDE-specific color schemes
 
+### `plugins.vim`
+**vim-plug Plugin Management**
+
+- **Essential plugins**: Curated selection of productivity-enhancing plugins
+- **Git integration**: vim-fugitive for advanced git operations (`:Gdiffsplit`, `:Git status`)
+- **File explorer**: NERDTree for directory navigation
+- **Async linting**: ALE for real-time syntax checking
+- **Status enhancement**: vim-airline for improved status line
+- **Auto-installation**: Automatically installs vim-plug if not present
+- **Cross-platform**: Handles Windows/Unix directory differences
+
 ### `mappings.common`
 **Universal key mappings**
 
 - **Search shortcuts**: Enhanced search behavior
 - **Movement**: Screen-line aware navigation
 - **Editing**: Efficient text manipulation
-- **Utility**: Quick access to common functions
+- **Git operations**: Quick access to vim-fugitive commands
+- **Plugin shortcuts**: NERDTree toggle, FZF integration
 
 ## 🎨 Features
 
@@ -87,7 +114,17 @@ make install-vim
 - **Enhanced search**: `*` searches forward and positions cursor at beginning
 - **Clear highlights**: `ESC ESC` clears search highlighting
 - **Screen-line movement**: `j`/`k` move by screen lines, `gj`/`gk` move by actual lines
-- **Efficient navigation**: Optimized cursor movement
+- **Git operations**: `<leader>gs` (git status), `<leader>gd` (git diff), `<leader>gc` (git commit)
+- **File navigation**: `<F2>` toggles NERDTree, `<C-p>` opens file finder
+- **Plugin shortcuts**: `<C-f>` for ripgrep search, `<C-b>` for buffer list
+
+### Plugin Ecosystem
+- **vim-fugitive**: Complete git integration (`:Gdiffsplit`, `:Git status`, `:Git commit`)
+- **NERDTree**: File explorer with customizable settings
+- **vim-airline**: Enhanced status line with git branch info
+- **ALE**: Async linting for real-time error checking
+- **FZF**: Fuzzy file finder integration (if available)
+- **Auto-pairs**: Automatic bracket/quote pairing
 
 ### Environment-Specific Optimizations
 - **Terminal**: Optimized for terminal performance and compatibility
@@ -97,7 +134,29 @@ make install-vim
 ## 🔧 Customization
 
 ### Adding Custom Settings
-After installation, you can add custom settings to:
+
+Create local configuration files for personal vim customizations:
+- `~/.vim/local.vim` (Unix/macOS)
+- `~/vimfiles/local.vim` (Windows) 
+- `~/.config/nvim/local.vim` (Neovim)
+- `~/dotfiles/vim/local.vim`
+
+Use the example as a template:
+```bash
+cp vim/local.example.vim ~/.vim/local.vim
+vim ~/.vim/local.vim
+```
+
+### Plugin Customization
+Add personal plugins to your local configuration:
+```vim
+" Add to ~/.vim/local.vim
+Plug 'tpope/vim-commentary'    " Comment/uncomment shortcuts
+Plug 'junegunn/fzf.vim'        " Enhanced fuzzy finding
+```
+
+### Global Settings Override
+After installation, you can also add settings to:
 - `~/.vimrc` - Additional vim settings
 - `~/_vimrc` - Windows vim settings
 - `~/_gvimrc` - Windows GUI vim settings
@@ -136,13 +195,43 @@ The vim setup creates symlinks to:
 - **PyCharm**: Complete vim emulation
 - **Other JetBrains IDEs**: Compatible with IdeaVim plugin
 
-## 🛠️ Advanced Configuration
+## 🚀 Plugin Management
 
-### Plugin Management
-The configuration is designed to work with popular plugin managers:
-- **Vim-Plug**: Add plugins to `~/.vimrc`
-- **Pathogen**: Place plugins in `~/.vim/bundle/`
-- **Vundle**: Configure in `~/.vimrc`
+### vim-plug Integration
+The configuration uses vim-plug for plugin management:
+
+**Install plugins:**
+```vim
+:PlugInstall
+```
+
+**Update plugins:**
+```vim
+:PlugUpdate
+```
+
+**Clean unused plugins:**
+```vim
+:PlugClean
+```
+
+**Current plugin list:**
+- **tpope/vim-sensible**: Sensible defaults
+- **tpope/vim-fugitive**: Git wrapper (:Gdiffsplit support!)
+- **tpope/vim-surround**: Surround text objects  
+- **preservim/nerdtree**: File tree explorer
+- **vim-airline/vim-airline**: Status line enhancement
+- **dense-analysis/ale**: Async linting engine
+- **junegunn/fzf.vim**: Fuzzy finder integration
+
+### Adding New Plugins
+Add to your local vim configuration:
+```vim
+" In ~/.vim/local.vim
+Plug 'your-username/your-plugin'
+```
+
+## 🛠️ Advanced Configuration
 
 ### Color Scheme Customization
 ```vim

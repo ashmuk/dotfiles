@@ -1,0 +1,248 @@
+#!/bin/zsh
+# Comprehensive Zsh Profile Configuration
+# Cross-platform zsh login shell configuration
+# Source: dotfiles/shell/profile/zprofile.comprehensive
+
+# Prevent recursive sourcing
+if [[ -n "$ZPROFILE_LOADED" ]]; then
+    return
+fi
+export ZPROFILE_LOADED=1
+
+#---------------------------------------------------------------------------
+# Environment Detection & Platform Setup
+#---------------------------------------------------------------------------
+
+# OS Detection
+case "$(uname -s)" in
+    Darwin*)
+        export DOTFILES_OS="mac"
+        # macOS-specific PATH setup
+        if [[ -d /opt/homebrew ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [[ -d /usr/local/bin ]]; then
+            export PATH="/usr/local/bin:$PATH"
+        fi
+        ;;
+    Linux*)
+        export DOTFILES_OS="linux"
+        # Linux-specific PATH setup
+        if [[ -d ~/.linuxbrew ]]; then
+            eval "$(~/.linuxbrew/bin/brew shellenv)"
+        elif [[ -d /home/linuxbrew/.linuxbrew ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        fi
+        ;;
+    CYGWIN*|MINGW*|MSYS*)
+        export DOTFILES_OS="windows"
+        ;;
+    *)
+        export DOTFILES_OS="unknown"
+        ;;
+esac
+
+#---------------------------------------------------------------------------
+# Essential Environment Variables
+#---------------------------------------------------------------------------
+
+# Basic environment
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+export PAGER="less"
+export SHELL="$(command -v zsh)"
+
+# Less configuration
+export LESS="-R -i -M -F -X"
+export LESSHISTFILE=-
+
+# Locale settings
+if [[ "$DOTFILES_OS" == "mac" ]]; then
+    export LANG="ja_JP.UTF-8"
+    export LC_ALL="ja_JP.UTF-8"
+else
+    export LANG="en_US.UTF-8"
+    export LC_ALL="en_US.UTF-8"
+fi
+
+#---------------------------------------------------------------------------
+# Zsh-specific Configuration
+#---------------------------------------------------------------------------
+
+# Zsh configuration directory
+export ZDOTDIR="${ZDOTDIR:-$HOME}"
+
+# Zsh history configuration
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=50000
+export SAVEHIST=100000
+
+# Zsh options for history
+setopt EXTENDED_HISTORY          # Write timestamp to history file
+setopt SHARE_HISTORY            # Share history between sessions
+setopt HIST_EXPIRE_DUPS_FIRST   # Expire duplicates first
+setopt HIST_IGNORE_DUPS         # Don't record duplicates
+setopt HIST_IGNORE_ALL_DUPS     # Remove older duplicates
+setopt HIST_FIND_NO_DUPS        # Don't display duplicates during search
+setopt HIST_IGNORE_SPACE        # Don't record commands starting with space
+setopt HIST_SAVE_NO_DUPS        # Don't save duplicates to history file
+setopt HIST_VERIFY              # Verify history expansions before execution
+
+# Zsh directory options
+setopt AUTO_CD                   # Auto cd when typing directory name
+setopt AUTO_PUSHD               # Automatically push directories to stack
+setopt PUSHD_IGNORE_DUPS        # Don't push duplicate directories
+setopt PUSHD_MINUS              # Make - work like + for directory stack
+
+# Zsh completion options
+setopt COMPLETE_IN_WORD         # Complete from both ends of word
+setopt ALWAYS_TO_END            # Move cursor to end after completion
+setopt PATH_DIRS                # Perform path search even on command names with /
+setopt AUTO_MENU                # Show completion menu on tab
+setopt AUTO_LIST                # List choices on ambiguous completion
+setopt AUTO_PARAM_SLASH         # Add slash after completing directories
+setopt NO_MENU_COMPLETE         # Don't insert first match immediately
+
+# Zsh globbing options
+setopt EXTENDED_GLOB            # Extended globbing patterns
+setopt GLOB_DOTS                # Include dotfiles in globbing
+setopt NUMERIC_GLOB_SORT        # Sort numeric filenames numerically
+
+# Zsh prompt options
+setopt PROMPT_SUBST             # Enable parameter expansion in prompts
+
+#---------------------------------------------------------------------------
+# Development Environment Setup
+#---------------------------------------------------------------------------
+
+# Python Development
+if command -v python3 >/dev/null 2>&1; then
+    # Python 3.12 Framework (macOS specific)
+    if [[ -d "/Library/Frameworks/Python.framework/Versions/3.12/bin" ]]; then
+        export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
+    fi
+    
+    # Python user base
+    if [[ -d "$HOME/.local/bin" ]]; then
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+    
+    # Poetry configuration
+    if command -v poetry >/dev/null 2>&1; then
+        export POETRY_VENV_IN_PROJECT=1
+    fi
+fi
+
+# Node.js Development (lazy loading)
+export NVM_LAZY_LOAD=1
+if [[ -d "$HOME/.nvm" ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    # Lazy load nvm to improve shell startup time
+    nvm() {
+        unset -f nvm
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm "$@"
+    }
+fi
+
+# Ruby Development (lazy loading)
+if [[ -d "$HOME/.rbenv" ]]; then
+    export RBENV_ROOT="$HOME/.rbenv"
+    export PATH="$RBENV_ROOT/bin:$PATH"
+    rbenv() {
+        unset -f rbenv
+        eval "$(command rbenv init - zsh)"
+        rbenv "$@"
+    }
+fi
+
+# Go Development
+if command -v go >/dev/null 2>&1; then
+    export GOPATH="$HOME/go"
+    export PATH="$GOPATH/bin:$PATH"
+fi
+
+# Rust Development
+if [[ -d "$HOME/.cargo" ]]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+# Java Development
+if [[ -n "$JAVA_HOME" ]] && [[ -d "$JAVA_HOME" ]]; then
+    export PATH="$JAVA_HOME/bin:$PATH"
+elif [[ "$DOTFILES_OS" == "mac" ]] && command -v /usr/libexec/java_home >/dev/null 2>&1; then
+    export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null)
+    [[ -n "$JAVA_HOME" ]] && export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
+#---------------------------------------------------------------------------
+# Security & Privacy
+#---------------------------------------------------------------------------
+
+# Secure umask
+umask 022
+
+# Clear potentially sensitive environment variables
+unset SSH_AGENT_PID
+unset SSH_AUTH_SOCK
+
+# Disable core dumps for security
+ulimit -c 0
+
+#---------------------------------------------------------------------------
+# Performance Optimization
+#---------------------------------------------------------------------------
+
+# Faster directory navigation
+export CDPATH=".:$HOME:$HOME/Documents:$HOME/Projects"
+
+# Cache frequently used paths
+export PROJECTS_DIR="$HOME/Projects"
+export DOWNLOADS_DIR="$HOME/Downloads"
+export DOCUMENTS_DIR="$HOME/Documents"
+
+# Zsh module loading for performance
+zmodload zsh/zprof 2>/dev/null  # For profiling if needed
+zmodload zsh/complist          # For enhanced completion
+zmodload zsh/terminfo          # For terminal capabilities
+
+#---------------------------------------------------------------------------
+# Integration with Dotfiles System
+#---------------------------------------------------------------------------
+
+# Source zshrc if it exists (main shell configuration)
+if [[ -f "$HOME/.zshrc" ]]; then
+    source "$HOME/.zshrc"
+fi
+
+# Source local profile customizations
+local_profiles=(
+    "$HOME/.zprofile.local"
+    "$HOME/.profile.local"
+    "$HOME/dotfiles/shell/profile/local.zsh"
+)
+
+for local_profile in $local_profiles; do
+    if [[ -f "$local_profile" ]]; then
+        source "$local_profile"
+        break
+    fi
+done
+
+#---------------------------------------------------------------------------
+# Startup Performance Monitoring
+#---------------------------------------------------------------------------
+
+# Track profile loading time (if performance monitoring is enabled)
+if [[ -n "$SHELL_PERFORMANCE_MONITOR" ]] && command -v date >/dev/null 2>&1; then
+    ZPROFILE_END_TIME=$(date +%s%N 2>/dev/null || date +%s)
+    if [[ -n "$ZPROFILE_START_TIME" ]]; then
+        ZPROFILE_LOAD_TIME=$((ZPROFILE_END_TIME - ZPROFILE_START_TIME))
+        echo "Zsh profile loaded in ${ZPROFILE_LOAD_TIME}ns" >&2
+    fi
+fi
+
+# Welcome message (optional, can be disabled)
+if [[ -z "$DOTFILES_QUIET" ]] && [[ -o interactive ]]; then
+    echo "🚀 Zsh profile loaded successfully! ($ZSH_VERSION)"
+fi
