@@ -136,11 +136,10 @@ PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
 bindkey -v
 
 # Display indicator of vi mode in prompt
+# shellcheck disable=SC2034  # PROMPT is used by zsh prompt system in case branches
 function zle-keymap-select {
   case $KEYMAP in
-    # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system
     vicmd) PROMPT="%F{red}[NORMAL]%f $PROMPT_BASE" ;;
-    # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system  
     main|viins) PROMPT="%F{green}[INSERT]%f $PROMPT_BASE" ;;
   esac
   zle reset-prompt
