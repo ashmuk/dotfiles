@@ -244,6 +244,7 @@ grepalias() {
       # Remove outer single quotes
       result="${result:1:-1}"
       # Convert escaped single quotes '\'' back to single quotes '
+      # shellcheck disable=SC1003
       result="${result//'\''/'}"
 
     # Fallback case: Double-quoted string (legacy patterns)
@@ -267,6 +268,7 @@ grepalias() {
         if [[ "$result" =~ \'$ ]]; then
           result="${result%\'}"
         fi
+        # shellcheck disable=SC1003
         result="${result//'\''/'}"
       elif [[ "$result" =~ ^\" ]]; then
         # Starts with double quote but doesn't end properly
