@@ -17,6 +17,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# shellcheck disable=SC2034  # ZSH_THEME is used by Oh My Zsh
 ZSH_THEME="robbyrussell"
 
 # Set list of themes to pick from when loading at random
@@ -89,7 +90,8 @@ plugins=(
   zsh-syntax-highlighting
 )
 
-source $ZSH/oh-my-zsh.sh
+# shellcheck disable=SC1091  # Oh My Zsh script is external dependency
+source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
 
