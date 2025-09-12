@@ -26,9 +26,10 @@ help: ## Show this help message
 	@echo "  $(BLUE)check-prereqs$(NC)   Check for required tools before installation"
 	@echo "  $(BLUE)make install$(NC)    Automatically checks prerequisites before installing"
 	@echo ""
-	@echo "WSL Users:"
-	@echo "  $(BLUE)setup-wsl-bridge$(NC) Create Windows junction to WSL dotfiles"
-	@echo "  $(BLUE)install-windows$(NC)  Install Windows config (auto-creates bridge in WSL)"
+	@echo "WSL Integration:"
+	@echo "  $(BLUE)setup-wsl-bridge$(NC)    WSL-first: Create Windows junction (WSL -> Windows)"
+	@echo "  $(BLUE)setup-windows-bridge$(NC) Windows-first: Create WSL symlink (Windows -> WSL)"  
+	@echo "  $(BLUE)install-windows$(NC)      Install Windows config (auto-detects layout)"
 
 .PHONY: check-prereqs
 check-prereqs: ## Check for required tools and suggest installation commands
@@ -138,6 +139,63 @@ setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) WSL-Windows bridge created"
 
+.PHONY: setup-windows-bridge  
+setup-windows-bridge: ## Create WSL symlink to Windows dotfiles (for Windows-first users)
+	@echo "$(BLUE)[INFO]$(NC) Setting up Windows-WSL bridge (Windows-first)..."
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+		$(MAKE) -s _create_windows_symlink; \
+	else \
+		echo "$(RED)[ERROR]$(NC) This command is only for WSL environments"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Windows-WSL bridge created"
+
+.PHONY: _create_windows_symlink
+_create_windows_symlink:
+	@echo "$(BLUE)[INFO]$(NC) Creating WSL symlink to Windows dotfiles..."
+	@username="$$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"; \
+	if [ -z "$$username" ]; then \
+		echo "$(RED)[ERROR]$(NC) Failed to get Windows username"; \
+		exit 1; \
+	fi; \
+	\
+	windows_path="/mnt/c/Users/$$username/dotfiles"; \
+	wsl_dotfiles="$$HOME/dotfiles"; \
+	echo "$(BLUE)[INFO]$(NC) Windows dotfiles path: $$windows_path"; \
+	echo "$(BLUE)[INFO]$(NC) WSL symlink target: $$wsl_dotfiles"; \
+	\
+	if [ ! -d "$$windows_path" ]; then \
+		echo "$(RED)[ERROR]$(NC) Windows dotfiles not found at: $$windows_path"; \
+		echo "$(YELLOW)[INFO]$(NC) Please clone dotfiles to Windows first: %USERPROFILE%\\dotfiles"; \
+		exit 1; \
+	fi; \
+	\
+	if [ -e "$$wsl_dotfiles" ]; then \
+		if [ -L "$$wsl_dotfiles" ]; then \
+			echo "$(GREEN)[INFO]$(NC) Symlink already exists, checking target..."; \
+			current_target="$$(readlink "$$wsl_dotfiles")"; \
+			if [ "$$current_target" = "$$windows_path" ]; then \
+				echo "$(GREEN)[INFO]$(NC) Symlink already points to correct location"; \
+			else \
+				echo "$(YELLOW)[WARNING]$(NC) Symlink points to different location: $$current_target"; \
+				echo "$(BLUE)[INFO]$(NC) Updating symlink to point to: $$windows_path"; \
+				rm "$$wsl_dotfiles" && ln -sf "$$windows_path" "$$wsl_dotfiles"; \
+			fi; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) Directory exists but is not a symlink: $$wsl_dotfiles"; \
+			echo "$(BLUE)[INFO]$(NC) You may need to manually remove it first"; \
+			echo "$(BLUE)[INFO]$(NC) Then run this command again"; \
+			exit 1; \
+		fi; \
+	else \
+		echo "$(BLUE)[INFO]$(NC) Creating symlink: $$wsl_dotfiles -> $$windows_path"; \
+		ln -sf "$$windows_path" "$$wsl_dotfiles" || { \
+			echo "$(RED)[ERROR]$(NC) Failed to create symlink"; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)[SUCCESS]$(NC) Symlink created successfully"; \
+	fi
+
 .PHONY: _create_windows_junction
 _create_windows_junction:
 	@echo "$(BLUE)[INFO]$(NC) Creating Windows junction to WSL dotfiles..."
@@ -181,12 +239,37 @@ _create_windows_junction:
 		echo "$(GREEN)[SUCCESS]$(NC) Junction created successfully"; \
 	fi
 
+.PHONY: _setup_wsl_bridge_auto
+_setup_wsl_bridge_auto:
+	@echo "$(BLUE)[INFO]$(NC) Auto-detecting dotfiles layout..."
+	@username="$$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"; \
+	if [ -z "$$username" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Could not detect Windows username, using WSL-first approach"; \
+		$(MAKE) -s _create_windows_junction; \
+	else \
+		windows_path="/mnt/c/Users/$$username/dotfiles"; \
+		wsl_path="$(DOTFILES_DIR)"; \
+		echo "$(BLUE)[INFO]$(NC) Checking for Windows dotfiles at: $$windows_path"; \
+		echo "$(BLUE)[INFO]$(NC) Current WSL dotfiles at: $$wsl_path"; \
+		\
+		if [ -d "$$windows_path" ] && [ ! -L "$$HOME/dotfiles" ]; then \
+			echo "$(BLUE)[INFO]$(NC) Windows-first layout detected - creating WSL symlink"; \
+			$(MAKE) -s _create_windows_symlink; \
+		elif [ -d "$$wsl_path" ] && [ "$$wsl_path" = "$$HOME/dotfiles" ]; then \
+			echo "$(BLUE)[INFO]$(NC) WSL-first layout detected - creating Windows junction"; \
+			$(MAKE) -s _create_windows_junction; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) Cannot determine layout, defaulting to WSL-first approach"; \
+			$(MAKE) -s _create_windows_junction; \
+		fi; \
+	fi
+
 .PHONY: install-windows
 install-windows: validate ## Install Windows PowerShell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing Windows configuration..."
 	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
-		echo "$(BLUE)[INFO]$(NC) WSL detected - setting up Windows junction first..."; \
-		$(MAKE) -s _create_windows_junction; \
+		echo "$(BLUE)[INFO]$(NC) WSL detected - determining dotfiles layout..."; \
+		$(MAKE) -s _setup_wsl_bridge_auto; \
 	fi
 	@if command -v powershell.exe >/dev/null 2>&1; then \
 		powershell.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
