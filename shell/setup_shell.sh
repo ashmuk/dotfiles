@@ -71,9 +71,9 @@ print_status "Detected platform: $PLATFORM"
 create_symlinks() {
     print_status "Creating symbolic links in home directory..."
 
-    # Create symlinks to platform-specific files
-    ln -sf "$DOTFILES_DIR/bashrc" "$HOME/.bashrc"
-    ln -sf "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
+    # Create symlinks to platform-specific generated files
+    ln -sf "$DOTFILES_DIR/bashrc.generated" "$HOME/.bashrc"
+    ln -sf "$DOTFILES_DIR/zshrc.generated" "$HOME/.zshrc"
     
     # Create symlinks to profile files
     print_status "Creating profile file symlinks..."
@@ -103,28 +103,60 @@ backup_existing_files() {
 create_platform_files() {
     print_status "Creating platform-dependent files in dotfiles root..."
 
-    # Create bashrc
-    cat $DOTFILES_DIR/shell/shell.common $DOTFILES_DIR/shell/shell.bash > "$DOTFILES_DIR/bashrc"
-    if [[ -f "$DOTFILES_DIR/bashrc" ]]; then
+    # Create bashrc.generated
+    cat $DOTFILES_DIR/shell/shell.common $DOTFILES_DIR/shell/shell.bash > "$DOTFILES_DIR/bashrc.generated"
+    if [[ -f "$DOTFILES_DIR/bashrc.generated" ]]; then
         case "$PLATFORM" in
             mac*)   sed -i '' '1i\
-#!/bin/bash' "$DOTFILES_DIR/bashrc" ;;
-            *)      sed -i '1i#!/bin/bash' "$DOTFILES_DIR/bashrc" ;;
+#!/bin/bash' "$DOTFILES_DIR/bashrc.generated" ;;
+            *)      sed -i '1i#!/bin/bash' "$DOTFILES_DIR/bashrc.generated" ;;
         esac
     fi
 
-    # Create zshrc
-    cat $DOTFILES_DIR/shell/shell.common $DOTFILES_DIR/shell/shell.zsh $DOTFILES_DIR/shell/shell.ohmy.zsh > "$DOTFILES_DIR/zshrc"
-    if [[ -f "$DOTFILES_DIR/zshrc" ]]; then
+    # Create zshrc.generated
+    cat $DOTFILES_DIR/shell/shell.common $DOTFILES_DIR/shell/shell.zsh $DOTFILES_DIR/shell/shell.ohmy.zsh > "$DOTFILES_DIR/zshrc.generated"
+    if [[ -f "$DOTFILES_DIR/zshrc.generated" ]]; then
         case "$PLATFORM" in
             mac*)   sed -i '' '1i\
-#!/bin/zsh' "$DOTFILES_DIR/zshrc" ;;
-            *)      sed -i '1i#!/bin/zsh' "$DOTFILES_DIR/zshrc" ;;
+#!/bin/zsh' "$DOTFILES_DIR/zshrc.generated" ;;
+            *)      sed -i '1i#!/bin/zsh' "$DOTFILES_DIR/zshrc.generated" ;;
         esac
 
     fi
 
     print_success "Platform-dependent files created in dotfiles directory"
+}
+
+# Check and restore generated files if no actual changes
+check_generated_files() {
+    print_status "Checking for actual changes in generated files..."
+    
+    local files_restored=0
+    
+    for file in "bashrc.generated" "zshrc.generated"; do
+        if [[ -f "$DOTFILES_DIR/$file" ]]; then
+            # Check if file is tracked by git and has changes
+            if git -C "$DOTFILES_DIR" ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+                # File is tracked, check for actual content differences
+                if ! git -C "$DOTFILES_DIR" diff --quiet "$file" 2>/dev/null; then
+                    # File has changes, check if they are meaningful
+                    local temp_diff=$(git -C "$DOTFILES_DIR" diff --ignore-space-change --ignore-blank-lines "$file" 2>/dev/null)
+                    if [[ -z "$temp_diff" ]]; then
+                        # No meaningful differences, restore the file
+                        print_status "No actual differences in $file, restoring..."
+                        git -C "$DOTFILES_DIR" restore "$file" 2>/dev/null || true
+                        files_restored=$((files_restored + 1))
+                    fi
+                fi
+            fi
+        fi
+    done
+    
+    if [[ $files_restored -gt 0 ]]; then
+        print_success "Restored $files_restored generated file(s) with no actual differences"
+    else
+        print_status "All generated files have meaningful changes or are unchanged"
+    fi
 }
 
 # Main execution
@@ -139,6 +171,7 @@ main() {
 
     backup_existing_files
     create_platform_files
+    check_generated_files
     create_symlinks
 
     print_success "Shell configuration setup completed!"

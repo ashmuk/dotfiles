@@ -162,6 +162,38 @@ EOF
     print_success "Configuration files created in dotfiles directory"
 }
 
+# Check and restore generated vim files if no actual changes
+check_generated_vim_files() {
+    print_info "Checking for actual changes in generated vim files..."
+    
+    local files_restored=0
+    
+    for file in "vimrc.$PLATFORM" "gvimrc.$PLATFORM" "ideavimrc.$PLATFORM"; do
+        if [[ -f "$DOTFILES_DIR/$file" ]]; then
+            # Check if file is tracked by git and has changes
+            if git -C "$DOTFILES_DIR" ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+                # File is tracked, check for actual content differences
+                if ! git -C "$DOTFILES_DIR" diff --quiet "$file" 2>/dev/null; then
+                    # File has changes, check if they are meaningful
+                    local temp_diff=$(git -C "$DOTFILES_DIR" diff --ignore-space-change --ignore-blank-lines "$file" 2>/dev/null)
+                    if [[ -z "$temp_diff" ]]; then
+                        # No meaningful differences, restore the file
+                        print_info "No actual differences in $file, restoring..."
+                        git -C "$DOTFILES_DIR" restore "$file" 2>/dev/null || true
+                        files_restored=$((files_restored + 1))
+                    fi
+                fi
+            fi
+        fi
+    done
+    
+    if [[ $files_restored -gt 0 ]]; then
+        print_success "Restored $files_restored generated vim file(s) with no actual differences"
+    else
+        print_info "All generated vim files have meaningful changes or are unchanged"
+    fi
+}
+
 # メイン処理
 main() {
     print_info "Starting Vim configuration setup..."
@@ -176,6 +208,7 @@ main() {
     backup_existing_files
     create_directories
     create_platform_files
+    check_generated_vim_files
     create_symlinks
 
     print_success "Vim configuration setup completed!"

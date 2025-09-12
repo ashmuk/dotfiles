@@ -64,13 +64,12 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@echo "$(YELLOW)[WARNING]$(NC) This will remove all installed dotfiles!"
 	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)[INFO]$(NC) Removing shell configuration..."
+	@rm -f $(HOME_DIR)/.bashrc $(HOME_DIR)/.zshrc
+	@rm -f $(HOME_DIR)/.bash_logout $(HOME_DIR)/.bash_profile $(HOME_DIR)/.zprofile
 	@rm -f $(HOME_DIR)/shell.common $(HOME_DIR)/shell.bash $(HOME_DIR)/shell.zsh
 	@rm -f $(HOME_DIR)/aliases.common $(HOME_DIR)/aliases.shell
-	@rm -f $(DOTFILES_DIR)/shell.common $(DOTFILES_DIR)/shell.bash.* $(DOTFILES_DIR)/shell.zsh.*
-	@rm -f $(DOTFILES_DIR)/aliases.common $(DOTFILES_DIR)/aliases.shell.*
 	@echo "$(BLUE)[INFO]$(NC) Removing vim configuration..."
 	@rm -f $(HOME_DIR)/.vimrc $(HOME_DIR)/_vimrc $(HOME_DIR)/_gvimrc $(HOME_DIR)/.ideavimrc
-	@rm -f $(DOTFILES_DIR)/vimrc.* $(DOTFILES_DIR)/gvimrc.* $(DOTFILES_DIR)/ideavimrc.*
 	@echo "$(BLUE)[INFO]$(NC) Removing git configuration..."
 	@rm -f $(HOME_DIR)/.gitconfig $(HOME_DIR)/.gitignore $(HOME_DIR)/.gitattributes
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"

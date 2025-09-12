@@ -22,8 +22,8 @@ make status
 dotfiles/
 ├── Makefile                 # Main installation and management script
 ├── README.md               # This file
-├── bashrc                  # Generated bash configuration file
-├── zshrc                   # Generated zsh configuration file
+├── bashrc.generated        # Generated bash configuration file
+├── zshrc.generated         # Generated zsh configuration file
 ├── _vimrc                  # Windows vim configuration
 ├── _gvimrc                 # Windows GUI vim configuration
 ├── vimrc.mac               # macOS-specific vim configuration
@@ -136,13 +136,15 @@ Add vim-specific customizations to:
 
 ### Shell Configuration
 The shell setup creates symlinks to:
-- `~/.bashrc` → Sources shell.common and shell.bash
-- `~/.zshrc` → Sources shell.common and shell.zsh
-- `~/shell.common` → Common shell settings
-- `~/shell.bash` → Bash-specific settings
-- `~/shell.zsh` → Zsh-specific settings
-- `~/aliases.common` → Universal aliases
-- `~/aliases.shell` → Shell-specific aliases
+- `~/.bashrc` → Generated bash configuration (bashrc.generated)
+- `~/.zshrc` → Generated zsh configuration (zshrc.generated)
+- `~/.bash_logout` → Bash logout configuration
+- `~/.bash_profile` → Bash profile configuration
+- `~/.zprofile` → Zsh profile configuration
+
+Generated files combine modular components:
+- `bashrc.generated` = `shell.common` + `shell.bash`
+- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh`
 
 ### Vim Configuration
 The vim setup creates symlinks to:
