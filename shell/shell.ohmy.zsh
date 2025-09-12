@@ -82,6 +82,7 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git)
 # Added by Mukai
+# shellcheck disable=SC2034  # plugins array is used by Oh My Zsh
 plugins=(
   git
   z
