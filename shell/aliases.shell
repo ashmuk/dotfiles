@@ -8,6 +8,14 @@
 ###############################################################################
 
 # =============================================================================
+# Du-based Directory Size Aliases
+# =============================================================================
+# These depend on $du_command variable set in shell config
+
+# Environment-aware directory size by subdirectory
+alias dubydir='$du_command'
+
+# =============================================================================
 # Grep-based Multibyte Character Search Aliases
 # =============================================================================
 # These depend on $grep_command variable set in shell config

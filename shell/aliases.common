@@ -11,6 +11,10 @@
 # Standard alias
 # =============================================================================
 alias ..='cd ..'
+alias du='du -h'
+alias dus='du -sh'
+# Note: dubydir alias depends on $du_command variable
+# This should be defined after du_command is set in the shell config
 
 # =============================================================================
 # Directory Navigation Aliases

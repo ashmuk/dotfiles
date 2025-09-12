@@ -68,6 +68,35 @@ fi
 export grep_command
 
 # =============================================================================
+# Du Configuration
+# =============================================================================
+
+# Determine which du to use and build the command
+du_options="-h"
+
+# Check if du supports GNU-style --max-depth option
+if du --max-depth=1 /tmp >/dev/null 2>&1; then
+  # GNU du
+  du_command="du $du_options --max-depth=1"
+elif command -v gdu >/dev/null 2>&1 && gdu --max-depth=1 /tmp >/dev/null 2>&1; then
+  # GNU du as gdu
+  alias du='gdu'
+  du_command="gdu $du_options --max-depth=1"
+elif command -v /usr/local/bin/du >/dev/null 2>&1 && /usr/local/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+  # GNU du in /usr/local/bin
+  alias du='/usr/local/bin/du'
+  du_command="/usr/local/bin/du $du_options --max-depth=1"
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && /opt/homebrew/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+  # GNU du in /opt/homebrew/bin
+  alias du='/opt/homebrew/bin/du'
+  du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
+else
+  # BSD du (fallback)
+  du_command="du $du_options -d 1"
+fi
+export du_command
+
+# =============================================================================
 # Source Common Aliases
 # =============================================================================
 export DOTFILES_DIR=$HOME/dotfiles
