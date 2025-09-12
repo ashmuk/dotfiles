@@ -61,6 +61,7 @@ jobs:
         brew install grep gnu-tar coreutils
     
     - name: Test shell configuration loading
+      shell: bash
       run: |
         if [ "${{ matrix.shell }}" = "bash" ]; then
           bash -c "source shell/shell.common && echo 'Shell configuration loaded successfully'"
@@ -69,6 +70,7 @@ jobs:
         fi
     
     - name: Test aliases
+      shell: bash
       run: |
         if [ "${{ matrix.shell }}" = "bash" ]; then
           bash -c "source shell/shell.common && alias | head -3 >/dev/null"
@@ -77,6 +79,7 @@ jobs:
         fi
     
     - name: Test environment-aware features
+      shell: bash
       run: |
         if [ "${{ matrix.shell }}" = "bash" ]; then
           bash -c "source shell/shell.common && echo 'grep_command: $grep_command' && echo 'du_command: $du_command'"
