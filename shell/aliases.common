@@ -18,7 +18,9 @@ alias ..="cd .."
 
 # For pushd, popd and dirs
 alias pu='pushd'
-alias pd='popd'
+alias pu2='pushd +2'
+alias pu3='pushd +3'
+alias pd='dirs -v'
 alias po='popd'
 alias ds='dirs -v'
 
@@ -39,33 +41,33 @@ alias findmbd="LC_ALL=C find . -name '*[^ -~]*' -type d"
 # =============================================================================
 
 # 基本コマンド (Basic commands)
-alias g='git'
+alias g='git' # also defined in Oh!MyZsh
 alias gs='git status' # git status --short is defined by Oh!MyZsh instead
-alias ga='git add'
+alias ga='git add' # also defined in Oh!MyZsh
 alias gaa='git add .'
-alias gc='git commit'
+alias gc='git commit' # also defined in Oh!MyZsh
 alias gcm='git commit -m'
-alias gp='git push'
-alias gpl='git pull'
+alias gp='git push' # also defined in Oh!MyZsh
+alias gpl='git pull' # also defined in Oh!MyZsh
 
 # ブランチ関連 (Branch related)
-alias gb='git branch'
-alias gco='git checkout'
+alias gb='git branch' # also defined in Oh!MyZsh
+alias gco='git checkout' # also defined in Oh!MyZsh
 alias gcb='git checkout -b'
-alias gm='git merge'
+alias gm='git merge' # also defined in Oh!MyZsh
 
 # ログとdiff (Log and diff)
-alias gl='git log'
+alias gl='git log' # also defined in Oh!MyZsh
 alias glo='git log --oneline'
-alias gd='git diff'
+alias gd='git diff' # also defined in Oh!MyZsh
 alias gds='git diff --staged'
 
 # リモート関連 (Remote related)
-alias gr='git remote'
+alias gr='git remote' # also defined in Oh!MyZsh
 alias grv='git remote -v'
 
 # その他便利なもの (Other useful commands)
-alias gst='git stash'
+alias gst='git stash' # also defined in Oh!MyZsh
 alias gstp='git stash pop'
 alias grh='git reset HEAD'
 alias grhh='git reset --hard HEAD'

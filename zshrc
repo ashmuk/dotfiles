@@ -39,6 +39,16 @@ export LC_ALL=ja_JP.UTF-8
 # Grep Configuration
 # =============================================================================
 
+# Common config files
+if [ -n "$BASH_VERSION" ]; then
+  config_files="~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+elif [ -n "$ZSH_VERSION" ]; then
+  config_files="~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
+else
+  config_files=""
+fi
+export config_files
+
 # Build grep command with options
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
 
@@ -72,48 +82,8 @@ if [[ -f "$DOTFILES_DIR/shell/aliases.shell" ]]; then
   source "$DOTFILES_DIR/shell/aliases.shell"
 fi
 
-###############################################################################
-#
-# Zsh-specific configuration
-# This file contains zsh-specific settings and functions
-#
-###############################################################################
-
 # =============================================================================
-# Zsh-specific Settings
-# =============================================================================
-
-# History setting
-export HISTFILE=~/.zsh_history
-
-# Zsh options
-setopt AUTO_CD
-setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt CORRECT
-setopt NO_BEEP
-setopt INTERACTIVE_COMMENTS
-
-# =============================================================================
-# Auto completion
-# =============================================================================
-
-# Enable auto completion
-autoload -Uz compinit
-compinit
-
-# Show auto completion like 'menu'
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# =============================================================================
-# Zsh Functions
+# Commoon Functions
 # =============================================================================
 
 # Function to extract archives
@@ -146,6 +116,17 @@ mkcd() {
 # Function to show directory history
 dh() {
   dirs -v
+}
+
+# Function to show where an alias is defined
+grepalias() {
+  alias "$1" | sed "s/.*='\(.*\)'/\1/" | xargs -I{} $grep_command -R "{}" $config_files 2>/dev/null
+}
+aliaswh() {
+  grepalias "$1"
+}
+grepal() {
+  grepalias "$1"
 }
 
 # Function to jump to directory by number
@@ -232,6 +213,52 @@ gvim() {
     vim -g "$@"
   fi
 }
+
+###############################################################################
+#
+# Zsh-specific configuration
+# This file contains zsh-specific settings and functions
+#
+###############################################################################
+
+# =============================================================================
+# Zsh-specific Settings
+# =============================================================================
+
+# History setting
+export HISTFILE=~/.zsh_history
+
+# Zsh options
+setopt AUTO_CD
+#setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt CORRECT
+setopt NO_BEEP
+setopt INTERACTIVE_COMMENTS
+
+# =============================================================================
+# Auto completion
+# =============================================================================
+
+# Enable auto completion
+autoload -Uz compinit
+compinit
+
+# Show auto completion like 'menu'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# =============================================================================
+# Zsh Functions
+# =============================================================================
+
+# to be defined if any applicable
 ###############################################################################
 #
 # Oh-my-zsh

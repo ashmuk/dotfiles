@@ -39,6 +39,16 @@ export LC_ALL=ja_JP.UTF-8
 # Grep Configuration
 # =============================================================================
 
+# Common config files
+if [ -n "$BASH_VERSION" ]; then
+  config_files="~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+elif [ -n "$ZSH_VERSION" ]; then
+  config_files="~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
+else
+  config_files=""
+fi
+export config_files
+
 # Build grep command with options
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
 
@@ -71,3 +81,135 @@ fi
 if [[ -f "$DOTFILES_DIR/shell/aliases.shell" ]]; then
   source "$DOTFILES_DIR/shell/aliases.shell"
 fi
+
+# =============================================================================
+# Commoon Functions
+# =============================================================================
+
+# Function to extract archives
+extract() {
+  if [[ -f $1 ]]; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1     ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1     ;;
+      *.rar)       unrar e $1     ;;
+      *.gz)        gunzip $1      ;;
+      *.tar)       tar xf $1      ;;
+      *.tbz2)      tar xjf $1     ;;
+      *.tgz)       tar xzf $1     ;;
+      *.zip)       unzip $1       ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1        ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Function to create directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# Function to show directory history
+dh() {
+  dirs -v
+}
+
+# Function to show where an alias is defined
+grepalias() {
+  alias "$1" | sed "s/.*='\(.*\)'/\1/" | xargs -I{} $grep_command -R "{}" $config_files 2>/dev/null
+}
+aliaswh() {
+  grepalias "$1"
+}
+grepal() {
+  grepalias "$1"
+}
+
+# Function to jump to directory by number
+j() {
+  if [[ $1 =~ ^[0-9]+$ ]]; then
+    local dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
+    if [[ -n $dir ]]; then
+      cd "$dir"
+    else
+      echo "Directory not found"
+    fi
+  else
+    echo "Usage: j <number>"
+  fi
+}
+
+gvim() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if command -v mvim >/dev/null 2>&1; then
+      command mvim "$@"
+    elif [[ -x "/Applications/MacVim.app/Contents/bin/mvim" ]]; then
+      "/Applications/MacVim.app/Contents/bin/mvim" "$@"
+    else
+      if command -v open >/dev/null 2>&1; then
+        open -a "MacVim" --args "$@"
+      else
+        vim -g "$@"
+      fi
+    fi
+    return
+  fi
+
+  # WSL (Windows Subsystem for Linux)
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    local win_gvim="/mnt/c/Program Files/vim/gvim.exe"
+    if [[ -x "$win_gvim" ]]; then
+      local args=()
+      if command -v wslpath >/dev/null 2>&1; then
+        for a in "$@"; do
+          if [[ -e "$a" || "$a" == /* ]]; then
+            args+=("$(wslpath -w -- "$a")")
+          else
+            args+=("$a")
+          fi
+        done
+      else
+        args=("$@")
+      fi
+      "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+      disown
+      return
+    fi
+  fi
+
+  # MSYS/Cygwin on Windows
+  case "$OSTYPE" in
+    msys*|cygwin*)
+      local win_gvim="/c/Program Files/vim/gvim.exe"
+      if [[ -x "$win_gvim" ]]; then
+        local args=()
+        if command -v cygpath >/dev/null 2>&1; then
+          for a in "$@"; do
+            if [[ -e "$a" || "$a" == /* ]]; then
+              args+=("$(cygpath -w -- "$a")")
+            else
+              args+=("$a")
+            fi
+          done
+        else
+          args=("$@")
+        fi
+        "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+        disown
+        return
+      fi
+      ;;
+  esac
+
+  # Fallbacks: native gvim or terminal GUI mode
+  if command -v gvim >/dev/null 2>&1; then
+    command gvim "$@" & disown
+  else
+    vim -g "$@"
+  fi
+}
