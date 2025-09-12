@@ -91,15 +91,24 @@ dotfiles/
 │   ├── claude_report_1500_20250912_before.md  # Pre-implementation analysis
 │   └── claude_report_1700_20250912_after.md   # Post-implementation review
 └── windows/               # Windows-specific configurations
-    └── Microsoft.PowerShell_profile.ps1
+    ├── Microsoft.PowerShell_profile.ps1  # PowerShell profile
+    ├── setup_windows.ps1                 # Windows installation script
+    ├── setup_wsl_orchestration.ps1       # Windows-first WSL orchestration
+    └── README-WindowsFirst.md            # Windows-first workflow documentation
 ```
 
 ## 🛠️ Available Commands
 
 ### Installation
-- `make install` - Install all dotfiles (shell + vim)
+- `make install` - Install all dotfiles (shell + vim + git)
 - `make install-shell` - Install only shell configuration
 - `make install-vim` - Install only vim configuration
+- `make install-git` - Install only git configuration
+- `make install-windows` - Install Windows PowerShell configuration (from WSL)
+
+### WSL/Windows Integration
+- `make setup-wsl-bridge` - Create Windows junction (WSL-first layout)
+- `make setup-windows-bridge` - Create WSL symlink (Windows-first layout)
 
 ### Management
 - `make status` - Show status of installed dotfiles
@@ -107,8 +116,12 @@ dotfiles/
 - `make clean` - Remove installed dotfiles (with confirmation)
 - `make update` - Update dotfiles from repository
 
-### Development
-- `make test` - Test shell configuration syntax
+### Development & Testing
+- `make test` - Run comprehensive test suite (syntax, ShellCheck, compatibility)
+- `make test-syntax` - Test shell configuration syntax only
+- `make test-shellcheck` - Run ShellCheck static analysis
+- `make test-compat` - Test platform compatibility
+- `make check-prereqs` - Check required tools and dependencies
 - `make info` - Show project information
 - `make help` - Show all available commands
 
@@ -122,6 +135,8 @@ dotfiles/
 - **Modular design**: Common and shell-specific configurations
 - **Performance monitoring**: Built-in shell startup performance tracking
 - **Reference profiles**: Comprehensive bash/zsh profile configurations for advanced users
+- **ShellCheck compliance**: All shell code passes static analysis for best practices
+- **Cross-platform compatibility**: Tested on macOS, Linux, and WSL environments
 
 ### Vim Configuration
 - **Multiple environments**: GUI, terminal, IDE-specific settings
@@ -326,6 +341,39 @@ make status
    - Output of `make validate`
    - Specific error messages
 
+## 🪟 Windows Support
+
+This dotfiles system provides comprehensive Windows integration through two workflows:
+
+### Windows-First Approach (Recommended)
+**Layout**: `%USERPROFILE%\dotfiles` (primary) → WSL symlink
+- Better Windows performance (native filesystem access)
+- Seamless WSL integration via symlinks
+- Single source of truth for both systems
+
+```powershell
+# 1. Clone to Windows (PowerShell)
+git clone <repo-url> "$env:USERPROFILE\dotfiles"
+
+# 2. Install Windows configuration
+.\windows\setup_windows.ps1
+
+# 3. Set up WSL integration
+.\windows\setup_wsl_orchestration.ps1 -SetupWSL
+```
+
+### WSL-First Approach
+**Layout**: `$HOME/dotfiles` (primary) → Windows junction
+- Better for Linux-centric workflows
+- Windows access via junction points
+
+```bash
+# From WSL after cloning to $HOME/dotfiles
+make install-windows    # Creates Windows junction automatically
+```
+
+See [Windows-First Documentation](windows/README-WindowsFirst.md) for detailed setup instructions.
+
 ## 📚 Documentation
 
 - [Shell Configuration](shell/README_shell.md) - Detailed shell setup documentation
@@ -333,6 +381,7 @@ make status
 - [Command Reference](shell/README_command.md) - Available shell commands and aliases
 - [Vim Configuration](vim/README_vim.md) - Detailed vim setup documentation
 - [Git Configuration](git/README_git.md) - Git setup and customization
+- [Windows-First Workflow](windows/README-WindowsFirst.md) - Windows-first installation guide
 - [Project Analysis](notes/) - Technical analysis and implementation reports
 
 ## 🤝 Contributing
