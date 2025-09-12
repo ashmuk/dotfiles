@@ -34,6 +34,10 @@ set backspace=indent,eol,start
 set showmatch
 " コマンドライン補完するときに強化されたものを使う
 set wildmenu
+" Enhanced command-line completion
+set wildmode=longest:full,full
+set wildignore=*.o,*.obj,*.pyc,*.swp,*.bak
+set completeopt=menu,menuone,noselect
 " テキスト挿入中の自動折り返しを日本語に対応させる
 set formatoptions+=mM
 
