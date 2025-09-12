@@ -24,8 +24,10 @@ export PS1='\u@\h:\w\$ '
 shopt -s histappend
 shopt -s checkwinsize
 
+# Kiro integration
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
+
 # =============================================================================
 # Bash Functions
 # =============================================================================
-
 # to be defined if any applicable

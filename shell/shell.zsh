@@ -39,8 +39,10 @@ compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
-# =============================================================================
-# Zsh Functions
-# =============================================================================
+# Kiro integration
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 
+# =============================================================================
+# Zsh specific
+# =============================================================================
 # to be defined if any applicable
