@@ -127,7 +127,9 @@ source $ZSH/oh-my-zsh.sh
 
 # zsh prompt (colored / 2-line)
 ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
+# shellcheck disable=SC2034  # PROMPT_BASE is used in zsh prompt system
 PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n %F{green}%~%f"$'\n'"%# "
+# shellcheck disable=SC2034  # PROMPT is used by zsh
 PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
 
 # Enable vi mode
@@ -136,7 +138,9 @@ bindkey -v
 # Display indicator of vi mode in prompt
 function zle-keymap-select {
   case $KEYMAP in
+    # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system
     vicmd) PROMPT="%F{red}[NORMAL]%f $PROMPT_BASE" ;;
+    # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system  
     main|viins) PROMPT="%F{green}[INSERT]%f $PROMPT_BASE" ;;
   esac
   zle reset-prompt
