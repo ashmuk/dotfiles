@@ -283,25 +283,53 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Validation completed successfully"
 
 .PHONY: test
-test: validate ## Test shell configuration syntax
-	@echo "$(BLUE)[INFO]$(NC) Testing shell configuration..."
+test: validate test-syntax test-shellcheck test-compat ## Run all tests (syntax, shellcheck, compatibility)
+
+.PHONY: test-syntax
+test-syntax: validate ## Test shell configuration syntax
+	@echo "$(BLUE)[INFO]$(NC) Testing shell configuration syntax..."
 	@if [ -f "$(DOTFILES_DIR)/lib/common.sh" ]; then \
 		bash -n $(DOTFILES_DIR)/lib/common.sh || exit 1; \
 	fi
 	@bash -n $(DOTFILES_DIR)/shell/shell.common || exit 1
 	@bash -n $(DOTFILES_DIR)/shell/shell.bash || exit 1
-	@zsh -n $(DOTFILES_DIR)/shell/shell.zsh || exit 1
+	@if command -v zsh >/dev/null 2>&1; then \
+		zsh -n $(DOTFILES_DIR)/shell/shell.zsh || exit 1; \
+		zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || exit 1; \
+	else \
+		echo "$(YELLOW)[WARNING]$(NC) zsh not found, skipping zsh syntax tests"; \
+	fi
+	@find $(DOTFILES_DIR) -name "*.sh" -type f -exec bash -n {} \; || exit 1
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 
-.PHONY: lint
-lint: validate ## Lint shell scripts with shellcheck (if available)
-	@echo "$(BLUE)[INFO]$(NC) Linting shell scripts..."
+.PHONY: test-shellcheck
+test-shellcheck: validate ## Run shellcheck on all shell scripts
+	@echo "$(BLUE)[INFO]$(NC) Running shellcheck..."
 	@if command -v shellcheck >/dev/null 2>&1; then \
-		find $(DOTFILES_DIR) -name "*.sh" -type f -exec shellcheck {} \; || exit 1; \
-		echo "$(GREEN)[SUCCESS]$(NC) Shell scripts passed linting"; \
+		find $(DOTFILES_DIR) -name "*.sh" -type f -not -path "*/vim/vimfiles/plugged/*" -exec shellcheck {} \; || exit 1; \
+		shellcheck $(DOTFILES_DIR)/shell/shell.common $(DOTFILES_DIR)/shell/shell.bash $(DOTFILES_DIR)/shell/shell.zsh $(DOTFILES_DIR)/shell/shell.ohmy.zsh || exit 1; \
+		echo "$(GREEN)[SUCCESS]$(NC) All shell scripts passed shellcheck"; \
 	else \
-		echo "$(YELLOW)[WARNING]$(NC) shellcheck not found, skipping linting"; \
+		echo "$(YELLOW)[WARNING]$(NC) shellcheck not found, skipping shellcheck tests"; \
 	fi
+
+.PHONY: test-compat
+test-compat: validate ## Test cross-platform compatibility
+	@echo "$(BLUE)[INFO]$(NC) Testing platform compatibility..."
+	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'Shell configuration loaded successfully'" || exit 1
+	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && alias | grep -E '^(g|du|\.\.\.)'" || exit 1
+	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $$grep_command' && echo 'du_command: $$du_command'" || exit 1
+	@if command -v zsh >/dev/null 2>&1; then \
+		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'Shell configuration loaded successfully'" || exit 1; \
+		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && alias | grep -E '^(g|du|\.\.\.)'" || exit 1; \
+		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $$grep_command' && echo 'du_command: $$du_command'" || exit 1; \
+	else \
+		echo "$(YELLOW)[WARNING]$(NC) zsh not found, skipping zsh compatibility tests"; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Platform compatibility tests passed"
+
+.PHONY: lint
+lint: test-shellcheck ## Alias for test-shellcheck (deprecated, use test-shellcheck)
 
 .PHONY: info
 info: ## Show information about this dotfiles project
