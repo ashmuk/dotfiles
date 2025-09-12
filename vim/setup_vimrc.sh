@@ -48,12 +48,27 @@ backup_existing_files() {
     local backup_dir="$HOME/dotfiles/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
+    # Backup vim configuration files
     for file in .vimrc .gvimrc .ideavimrc; do
         if [[ -f "$HOME/$file" ]]; then
             cp "$HOME/$file" "$backup_dir/"
             print_info "Backed up $file to $backup_dir"
         fi
     done
+    
+    # Backup vim directories (environment-aware)
+    local vim_dir=""
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        vim_dir="$HOME/vimfiles"
+    else
+        vim_dir="$HOME/.vim"
+    fi
+    
+    if [[ -d "$vim_dir" && ! -L "$vim_dir" ]]; then
+        print_info "Backing up existing vim directory: $vim_dir"
+        cp -r "$vim_dir" "$backup_dir/$(basename "$vim_dir")"
+        print_info "Backed up $(basename "$vim_dir") to $backup_dir"
+    fi
 }
 
 # プラットフォーム検出
@@ -162,6 +177,87 @@ EOF
     print_success "Configuration files created in dotfiles directory"
 }
 
+# Create vimfiles symlink (environment-aware)
+create_vimfiles_symlink() {
+    print_info "Setting up vim plugin directory symlink..."
+    
+    local vim_dir=""
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        vim_dir="$HOME/vimfiles"
+    else
+        vim_dir="$HOME/.vim"
+    fi
+    
+    # If existing directory is a symlink pointing to our dotfiles, skip
+    if [[ -L "$vim_dir" ]]; then
+        local link_target=$(readlink "$vim_dir")
+        if [[ "$link_target" == "$DOTFILES_DIR/vim/vimfiles" ]]; then
+            print_info "Vim plugin directory already correctly symlinked"
+            return 0
+        else
+            print_warning "Removing existing symlink: $vim_dir -> $link_target"
+            rm "$vim_dir"
+        fi
+    fi
+    
+    # If existing directory exists, integrate content
+    if [[ -d "$vim_dir" ]]; then
+        print_info "Integrating existing vim directory content..."
+        
+        # Copy user content to dotfiles vim/vimfiles, avoiding conflicts
+        local integration_needed=false
+        
+        for subdir in autoload colors pack ftplugin syntax plugin; do
+            if [[ -d "$vim_dir/$subdir" ]]; then
+                print_info "Found existing $subdir directory"
+                if [[ ! -d "$DOTFILES_DIR/vim/vimfiles/$subdir" ]]; then
+                    mkdir -p "$DOTFILES_DIR/vim/vimfiles/$subdir"
+                fi
+                
+                # Copy files that don't conflict
+                local files_copied=0
+                for file in "$vim_dir/$subdir"/*; do
+                    if [[ -f "$file" ]]; then
+                        local filename=$(basename "$file")
+                        local dest_file="$DOTFILES_DIR/vim/vimfiles/$subdir/$filename"
+                        
+                        if [[ ! -f "$dest_file" ]]; then
+                            cp "$file" "$dest_file"
+                            files_copied=$((files_copied + 1))
+                            print_info "Integrated: $subdir/$filename"
+                        else
+                            print_warning "Skipped conflicting file: $subdir/$filename"
+                        fi
+                    fi
+                done
+                
+                if [[ $files_copied -gt 0 ]]; then
+                    integration_needed=true
+                fi
+            fi
+        done
+        
+        # Preserve user's tmp directory structure
+        if [[ -d "$vim_dir/tmp" && ! -d "$DOTFILES_DIR/vim/vimfiles/tmp" ]]; then
+            mkdir -p "$DOTFILES_DIR/vim/vimfiles/tmp"
+        fi
+        
+        # Remove old directory after integration
+        print_info "Removing old vim directory: $vim_dir"
+        rm -rf "$vim_dir"
+        
+        if [[ $integration_needed == true ]]; then
+            print_success "Successfully integrated existing vim plugins and configurations"
+        fi
+    fi
+    
+    # Create the symlink
+    print_info "Creating symlink: $vim_dir -> $DOTFILES_DIR/vim/vimfiles"
+    ln -sf "$DOTFILES_DIR/vim/vimfiles" "$vim_dir"
+    
+    print_success "Vim plugin directory symlink created"
+}
+
 # Check and restore generated vim files if no actual changes
 check_generated_vim_files() {
     print_info "Checking for actual changes in generated vim files..."
@@ -209,6 +305,7 @@ main() {
     create_directories
     create_platform_files
     check_generated_vim_files
+    create_vimfiles_symlink
     create_symlinks
 
     print_success "Vim configuration setup completed!"

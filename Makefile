@@ -70,6 +70,8 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@rm -f $(HOME_DIR)/aliases.common $(HOME_DIR)/aliases.shell
 	@echo "$(BLUE)[INFO]$(NC) Removing vim configuration..."
 	@rm -f $(HOME_DIR)/.vimrc $(HOME_DIR)/_vimrc $(HOME_DIR)/_gvimrc $(HOME_DIR)/.ideavimrc
+	@if [ -L "$(HOME_DIR)/.vim" ]; then rm "$(HOME_DIR)/.vim"; fi
+	@if [ -L "$(HOME_DIR)/vimfiles" ]; then rm "$(HOME_DIR)/vimfiles"; fi
 	@echo "$(BLUE)[INFO]$(NC) Removing git configuration..."
 	@rm -f $(HOME_DIR)/.gitconfig $(HOME_DIR)/.gitignore $(HOME_DIR)/.gitattributes
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"
