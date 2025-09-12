@@ -12,8 +12,10 @@
 
 # Enable programmable completion
 if [[ -f /usr/local/etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
   source /usr/local/etc/bash_completion
 elif [[ -f /etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
   source /etc/bash_completion
 fi
 
