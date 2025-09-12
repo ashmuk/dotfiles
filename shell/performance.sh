@@ -213,7 +213,8 @@ if [[ -n "$ZSH_VERSION" ]]; then
     lazy_load_completion() {
         autoload -Uz compinit
         # Only regenerate completion cache once per day
-        if [[ -n "$HOME/.zcompdump"(#qN.mh+24) ]]; then
+        local zcompdump="${HOME}/.zcompdump"
+        if [[ -f "$zcompdump" && $(find "$zcompdump" -mtime +1 2>/dev/null) ]]; then
             compinit
         else
             compinit -C
