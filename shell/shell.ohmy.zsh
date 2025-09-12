@@ -154,5 +154,6 @@ zle -N zle-keymap-select
 # Adding this at the end of ~/.zshrc (e.g. get the setting back even after logout bash)
 # Actually, this is trapped at the end of .bashrc...
 if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
+  # shellcheck disable=SC1091  # Optional theme file may not exist
   source "$HOME/etc/mintty-colors-solarized/sol.light"
 fi
