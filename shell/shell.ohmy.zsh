@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148  # Shebang added in generated files
 ###############################################################################
 #
 # Oh-my-zsh
