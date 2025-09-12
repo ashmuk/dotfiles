@@ -25,6 +25,10 @@ help: ## Show this help message
 	@echo "Prerequisites:"
 	@echo "  $(BLUE)check-prereqs$(NC)   Check for required tools before installation"
 	@echo "  $(BLUE)make install$(NC)    Automatically checks prerequisites before installing"
+	@echo ""
+	@echo "WSL Users:"
+	@echo "  $(BLUE)setup-wsl-bridge$(NC) Create Windows junction to WSL dotfiles"
+	@echo "  $(BLUE)install-windows$(NC)  Install Windows config (auto-creates bridge in WSL)"
 
 .PHONY: check-prereqs
 check-prereqs: ## Check for required tools and suggest installation commands
@@ -123,9 +127,67 @@ install-git: validate ## Install git configuration
 	@$(DOTFILES_DIR)/git/setup_git.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Git configuration installed"
 
+.PHONY: setup-wsl-bridge
+setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
+	@echo "$(BLUE)[INFO]$(NC) Setting up WSL-Windows bridge for dotfiles..."
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+		$(MAKE) -s _create_windows_junction; \
+	else \
+		echo "$(RED)[ERROR]$(NC) This command is only for WSL environments"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) WSL-Windows bridge created"
+
+.PHONY: _create_windows_junction
+_create_windows_junction:
+	@echo "$(BLUE)[INFO]$(NC) Creating Windows junction to WSL dotfiles..."
+	@wsl_path="$(DOTFILES_DIR)"; \
+	windows_path="$$(wslpath -w "$$wsl_path" 2>/dev/null)"; \
+	if [ -z "$$windows_path" ]; then \
+		echo "$(RED)[ERROR]$(NC) Failed to convert WSL path to Windows path"; \
+		echo "$(YELLOW)[INFO]$(NC) Make sure wslpath is available"; \
+		exit 1; \
+	fi; \
+	\
+	home_path="$$(cmd.exe /c 'echo %HOMEPATH%' 2>/dev/null | tr -d '\r\n')"; \
+	if [ -z "$$home_path" ]; then \
+		echo "$(RED)[ERROR]$(NC) Failed to get Windows HOMEPATH"; \
+		exit 1; \
+	fi; \
+	\
+	windows_dotfiles="$$home_path\\dotfiles"; \
+	echo "$(BLUE)[INFO]$(NC) WSL dotfiles path: $$wsl_path"; \
+	echo "$(BLUE)[INFO]$(NC) Windows path: $$windows_path"; \
+	echo "$(BLUE)[INFO]$(NC) Target junction: $$windows_dotfiles"; \
+	\
+	if cmd.exe /c "if exist \"$$windows_dotfiles\" echo EXISTS" 2>/dev/null | grep -q EXISTS; then \
+		echo "$(YELLOW)[WARNING]$(NC) Windows dotfiles directory already exists"; \
+		echo "$(BLUE)[INFO]$(NC) Checking if it's already a junction..."; \
+		if cmd.exe /c "dir \"$$home_path\" | findstr /C:\"<JUNCTION>\" | findstr dotfiles" >/dev/null 2>&1; then \
+			echo "$(GREEN)[INFO]$(NC) Junction already exists, skipping creation"; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) Directory exists but is not a junction"; \
+			echo "$(BLUE)[INFO]$(NC) You may need to manually remove: $$windows_dotfiles"; \
+			echo "$(BLUE)[INFO]$(NC) Then run this command again"; \
+		fi; \
+	else \
+		echo "$(BLUE)[INFO]$(NC) Creating junction: $$windows_dotfiles -> $$windows_path"; \
+		cmd.exe /c "mklink /J \"$$windows_dotfiles\" \"$$windows_path\"" || { \
+			echo "$(RED)[ERROR]$(NC) Failed to create junction. You may need to:"; \
+			echo "  1. Run from an elevated command prompt, or"; \
+			echo "  2. Enable Developer Mode in Windows Settings"; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)[SUCCESS]$(NC) Junction created successfully"; \
+	fi
+
 .PHONY: install-windows
 install-windows: validate ## Install Windows PowerShell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing Windows configuration..."
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+		echo "$(BLUE)[INFO]$(NC) WSL detected - setting up Windows junction first..."; \
+		$(MAKE) -s _create_windows_junction; \
+	fi
 	@if command -v powershell.exe >/dev/null 2>&1; then \
 		powershell.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
 	elif command -v pwsh.exe >/dev/null 2>&1; then \
