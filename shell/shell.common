@@ -1,4 +1,6 @@
 
+# shellcheck disable=SC2148
+
 ###############################################################################
 #
 # Shell common configuration
@@ -53,9 +55,9 @@ fi
 
 # Common config files
 if [ -n "$BASH_VERSION" ]; then
-  config_files="~/dotfiles ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+  config_files="$HOME/dotfiles $HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
 elif [ -n "$ZSH_VERSION" ]; then
-  config_files="~/dotfiles ~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
+  config_files="$HOME/dotfiles $HOME/.zshrc $HOME/.zshenv $HOME/.zprofile $HOME/.zlogin $HOME/.zlogout /etc/zsh* $HOME/.oh-my-zsh $HOME/.zsh $HOME/.zshrc.local"
 else
   config_files=""
 fi
@@ -116,6 +118,7 @@ export du_command
 
 # Load performance utilities (lazy-loading framework)
 if [ -n "$DOTFILES_DIR" ] && [ -f "$DOTFILES_DIR/shell/performance.sh" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/performance.sh"
 fi
 
@@ -126,11 +129,13 @@ export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
 
 # Source common aliases (works for both bash and zsh)
 if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/aliases.common"
 fi
 
 # Source shell-specific aliases (after grep_command is set)
 if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/aliases.shell"
 fi
 
@@ -142,17 +147,17 @@ fi
 extract() {
   if [[ -f $1 ]]; then
     case $1 in
-      *.tar.bz2)   tar xjf $1     ;;
-      *.tar.gz)    tar xzf $1     ;;
-      *.bz2)       bunzip2 $1     ;;
-      *.rar)       unrar e $1     ;;
-      *.gz)        gunzip $1      ;;
-      *.tar)       tar xf $1      ;;
-      *.tbz2)      tar xjf $1     ;;
-      *.tgz)       tar xzf $1     ;;
-      *.zip)       unzip $1       ;;
-      *.Z)         uncompress $1  ;;
-      *.7z)        7z x $1        ;;
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar e "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
       *)           echo "'$1' cannot be extracted via extract()" ;;
     esac
   else
@@ -162,7 +167,7 @@ extract() {
 
 # Function to create directory and cd into it
 mkcd() {
-  mkdir -p "$1" && cd "$1"
+  mkdir -p "$1" && cd "$1" || return 1
 }
 
 # Function to show directory history
@@ -191,10 +196,12 @@ grepalias() {
       # Bash: use eval with proper quoting
       eval "set -- $config_files"
     elif [ -n "$ZSH_VERSION" ]; then
-      # Zsh: use word splitting
+      # Zsh: use word splitting (intentional for this shell)
+      # shellcheck disable=SC2086
       set -- ${=config_files}
     else
-      # Fallback: simple parsing
+      # Fallback: simple parsing (word splitting is intentional)
+      # shellcheck disable=SC2086
       set -- $config_files
     fi
     
@@ -283,11 +290,9 @@ grepalias() {
 
   # Search for the alias definition
   # First try exact match
-  grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null
-
-  # If no exact match found, try searching for the alias name itself
-  # This handles cases where variables are expanded or special characters cause issues
-  if [ $? -ne 0 ]; then
+  if ! grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null; then
+    # If no exact match found, try searching for the alias name itself
+    # This handles cases where variables are expanded or special characters cause issues
     grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "$@" 2>/dev/null
   fi
 }
@@ -301,9 +306,10 @@ grepal() {
 # Function to jump to directory by number
 j() {
   if [[ $1 =~ ^[0-9]+$ ]]; then
-    local dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
+    local dir
+    dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
     if [[ -n $dir ]]; then
-      cd "$dir"
+      cd "$dir" || return 1
     else
       echo "Directory not found"
     fi
@@ -394,6 +400,7 @@ set -- "$HOME/.dotfiles-local" "$HOME/.config/dotfiles/local" "$DOTFILES_DIR/she
 
 for local_config in "$@"; do
   if [ -f "$local_config" ] && [ -r "$local_config" ]; then
+    # shellcheck disable=SC1090
     source "$local_config"
     break
   fi
