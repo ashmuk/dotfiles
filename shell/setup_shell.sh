@@ -74,6 +74,12 @@ create_symlinks() {
     # Create symlinks to platform-specific files
     ln -sf "$DOTFILES_DIR/bashrc" "$HOME/.bashrc"
     ln -sf "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
+    
+    # Create symlinks to profile files
+    print_status "Creating profile file symlinks..."
+    ln -sf "$DOTFILES_DIR/shell/profile/bash_logout" "$HOME/.bash_logout"
+    ln -sf "$DOTFILES_DIR/shell/profile/bash_profile" "$HOME/.bash_profile"
+    ln -sf "$DOTFILES_DIR/shell/profile/zprofile" "$HOME/.zprofile"
 
     print_success "Symbolic links created in home directory"
 }
@@ -85,7 +91,7 @@ backup_existing_files() {
     local backup_dir="$HOME/dotfiles/backup/.shell_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
-    for file in .bashrc .zshrc ; do
+    for file in .bashrc .zshrc .bash_logout .bash_profile .zprofile ; do
         if [[ -f "$HOME/$file" ]]; then
             cp -L "$HOME/$file" "$backup_dir/"
             print_status "Backed up $file to $backup_dir"
@@ -140,6 +146,9 @@ main() {
     print_status "Symlinks created in home directory:"
     print_status "  - $HOME/.bashrc"
     print_status "  - $HOME/.zshrc"
+    print_status "  - $HOME/.bash_logout"
+    print_status "  - $HOME/.bash_profile"
+    print_status "  - $HOME/.zprofile"
     print_status ""
 }
 
