@@ -30,7 +30,7 @@ dotfiles/
 ├── gvimrc.mac              # macOS-specific GUI vim configuration
 ├── ideavimrc.mac           # macOS-specific IdeaVim configuration
 ├── shell/                  # Shell configuration directory
-│   ├── setup_script.sh     # Shell installation script
+│   ├── setup_shell.sh      # Shell installation script
 │   ├── shell.common        # Common shell settings (bash/zsh)
 │   ├── shell.bash          # Bash-specific configuration
 │   ├── shell.zsh           # Zsh-specific configuration
@@ -40,7 +40,7 @@ dotfiles/
 │   ├── aliases.shell       # Shell-specific aliases
 │   └── README_shell.md     # Shell configuration documentation
 ├── vim/                    # Vim configuration directory
-│   ├── setup_script.sh     # Vim installation script
+│   ├── setup_vimrc.sh      # Vim installation script
 │   ├── vimrc.common        # Common vim settings
 │   ├── vimrc.gui           # GUI vim settings
 │   ├── vimrc.terminal      # Terminal vim settings
@@ -48,7 +48,7 @@ dotfiles/
 │   ├── mappings.common     # Common key mappings
 │   └── README_vim.md       # Vim configuration documentation
 ├── git/                    # Git configuration directory
-│   ├── setup_script.sh     # Git installation script
+│   ├── setup_git.sh        # Git installation script
 │   ├── gitconfig.common    # Common git settings and aliases
 │   ├── gitignore.common    # Common gitignore patterns
 │   ├── gitattributes.common # Common gitattributes patterns

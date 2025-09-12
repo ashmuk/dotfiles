@@ -28,22 +28,22 @@ install: install-shell install-vim install-git ## Install all dotfiles
 .PHONY: install-shell
 install-shell: ## Install shell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing shell configuration..."
-	@chmod +x $(DOTFILES_DIR)/shell/setup_script.sh
-	@$(DOTFILES_DIR)/shell/setup_script.sh
+	@chmod +x $(DOTFILES_DIR)/shell/setup_shell.sh
+	@$(DOTFILES_DIR)/shell/setup_shell.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration installed"
 
 .PHONY: install-vim
 install-vim: ## Install vim configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing vim configuration..."
-	@chmod +x $(DOTFILES_DIR)/vim/setup_script.sh
-	@$(DOTFILES_DIR)/vim/setup_script.sh
+	@chmod +x $(DOTFILES_DIR)/vim/setup_vimrc.sh
+	@$(DOTFILES_DIR)/vim/setup_vimrc.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Vim configuration installed"
 
 .PHONY: install-git
 install-git: ## Install git configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing git configuration..."
-	@chmod +x $(DOTFILES_DIR)/git/setup_script.sh
-	@$(DOTFILES_DIR)/git/setup_script.sh
+	@chmod +x $(DOTFILES_DIR)/git/setup_git.sh
+	@$(DOTFILES_DIR)/git/setup_git.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Git configuration installed"
 
 .PHONY: backup

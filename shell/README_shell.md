@@ -6,7 +6,7 @@ This directory contains shell configuration files for bash and zsh, organized in
 
 ```
 shell/
-├── setup_script.sh      # Installation script for shell configs
+├── setup_shell.sh       # Installation script for shell configs
 ├── shell.common         # Common shell settings (bash/zsh)
 ├── shell.bash          # Bash-specific settings and functions
 ├── shell.zsh           # Zsh-specific settings and functions
@@ -34,7 +34,7 @@ make status
 ### Manual Installation
 ```bash
 # Run the setup script
-./shell/setup_script.sh
+./shell/setup_shell.sh
 ```
 
 ## File Descriptions

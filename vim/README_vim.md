@@ -6,7 +6,7 @@ A comprehensive vim configuration system with environment-specific settings for 
 
 ```
 vim/
-├── setup_script.sh     # Installation script for vim configurations
+├── setup_vimrc.sh      # Installation script for vim configurations
 ├── vimrc.common        # Common vim settings (all environments)
 ├── vimrc.gui           # GUI vim settings (GVim, MacVim)
 ├── vimrc.terminal      # Terminal vim settings
@@ -29,7 +29,7 @@ make install-vim
 ### Manual Installation
 ```bash
 # Run the vim setup script
-./vim/setup_script.sh
+./vim/setup_vimrc.sh
 ```
 
 ## 🎯 Configuration Files

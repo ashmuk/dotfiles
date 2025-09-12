@@ -6,7 +6,7 @@ A comprehensive git configuration system with common settings, aliases, and igno
 
 ```
 git/
-├── setup_script.sh        # Installation script for git configurations
+├── setup_git.sh           # Installation script for git configurations
 ├── gitconfig.common       # Common git settings and aliases
 ├── gitignore.common       # Common gitignore patterns
 ├── gitattributes.common   # Common gitattributes patterns
@@ -27,7 +27,7 @@ make install-git
 ### Manual Installation
 ```bash
 # Run the git setup script
-./git/setup_script.sh
+./git/setup_git.sh
 ```
 
 ## 🎯 Configuration Files
