@@ -107,8 +107,33 @@ augroup END
 set hlsearch
 
 "---------------------------------------------------------------------------
+" プラグイン管理の読み込み:
+"
+if filereadable(expand('~/dotfiles/vim/plugins.vim'))
+  source ~/dotfiles/vim/plugins.vim
+endif
+
+"---------------------------------------------------------------------------
 " 共通キーマップの読み込み:
 "
 if filereadable(expand('~/dotfiles/vim/mappings.common'))
   source ~/dotfiles/vim/mappings.common
 endif
+
+"---------------------------------------------------------------------------
+" ユーザー固有設定の読み込み:
+"
+" Load user-specific customizations (multiple possible locations)
+let local_vim_configs = [
+  \ expand('~/.vim/local.vim'),
+  \ expand('~/vimfiles/local.vim'),
+  \ expand('~/.config/nvim/local.vim'),
+  \ expand('~/dotfiles/vim/local.vim')
+  \ ]
+
+for local_config in local_vim_configs
+  if filereadable(local_config)
+    execute 'source ' . local_config
+    break
+  endif
+endfor

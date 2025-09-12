@@ -1,0 +1,195 @@
+#!/bin/bash
+# Example local configuration file
+# Copy this to ~/.dotfiles/shell/local and customize as needed
+#
+# This file provides examples for user-specific overrides and customizations
+# It will be sourced automatically if it exists
+
+# =============================================================================
+# Personal Information
+# =============================================================================
+
+# Override default editor if needed
+# export EDITOR=nvim
+# export VISUAL=nvim
+
+# Set your preferred language/locale
+# export LANG=en_US.UTF-8
+# export LC_ALL=en_US.UTF-8
+
+# =============================================================================
+# Path Customizations
+# =============================================================================
+
+# Add personal bin directories
+# export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+
+# Add language-specific paths
+# export PATH="$HOME/.cargo/bin:$PATH"     # Rust
+# export PATH="$HOME/go/bin:$PATH"         # Go
+# export PATH="$HOME/.npm-global/bin:$PATH" # npm global
+
+# =============================================================================
+# Development Environment Overrides
+# =============================================================================
+
+# Python development
+# export PYTHONPATH="$HOME/python-libs:$PYTHONPATH"
+# export PIP_USER=true
+
+# Node.js development
+# export NODE_ENV=development
+# export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+
+# Java development
+# export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
+# export MAVEN_HOME="$HOME/.maven"
+
+# =============================================================================
+# Tool Configuration Overrides
+# =============================================================================
+
+# Override grep behavior
+# export GREP_OPTIONS='--color=always'
+
+# Override du behavior (if you prefer different defaults)
+# du_command="du -h --max-depth=2"  # Show 2 levels deep
+
+# Git configuration (will be sourced after main config)
+# git config --global user.name "Your Name"
+# git config --global user.email "your.email@example.com"
+
+# =============================================================================
+# Alias Overrides and Additions
+# =============================================================================
+
+# Override existing aliases
+# alias ll='ls -la --time-style=long-iso'
+# alias grep='grep --color=always -n'
+
+# Add personal aliases
+# alias work='cd ~/workspace'
+# alias notes='cd ~/Documents/notes && vim'
+# alias weather='curl wttr.in/your-city'
+
+# Docker shortcuts
+# alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"'
+# alias dlog='docker logs -f'
+
+# Git aliases (in addition to common ones)
+# alias gits='git status --short'
+# alias gitl='git log --oneline --graph --decorate -10'
+
+# =============================================================================
+# Function Overrides and Additions
+# =============================================================================
+
+# Override existing functions or add new ones
+# Example: Enhanced cd function with auto-ls
+# cd() {
+#     builtin cd "$@" && ls -la
+# }
+
+# Example: Quick project switcher
+# project() {
+#     local project_dir="$HOME/projects/$1"
+#     if [[ -d "$project_dir" ]]; then
+#         cd "$project_dir"
+#     else
+#         echo "Project '$1' not found in $HOME/projects/"
+#         ls "$HOME/projects/"
+#     fi
+# }
+
+# Example: Enhanced extract function for additional formats
+# extract_local() {
+#     if [[ -f $1 ]]; then
+#         case $1 in
+#             *.tar.xz)    tar xJf $1     ;;
+#             *.txz)       tar xJf $1     ;;
+#             *)           extract $1     ;; # Fall back to main function
+#         esac
+#     fi
+# }
+
+# =============================================================================
+# Environment-Specific Settings
+# =============================================================================
+
+# Work-specific settings
+# if [[ "$HOSTNAME" == *"work"* ]]; then
+#     export http_proxy="http://proxy.company.com:8080"
+#     export https_proxy="$http_proxy"
+#     export no_proxy="localhost,127.0.0.1,.company.com"
+# fi
+
+# Home-specific settings
+# if [[ "$HOSTNAME" == *"home"* ]]; then
+#     alias backup='rsync -av --progress $HOME/Documents/ /media/backup/'
+# fi
+
+# macOS-specific overrides
+# if [[ "$OSTYPE" == darwin* ]]; then
+#     alias finder='open -a Finder'
+#     alias preview='open -a Preview'
+#     # Override du to use GNU version if installed via Homebrew
+#     if command -v gdu >/dev/null 2>&1; then
+#         du_command="gdu -h --max-depth=1"
+#     fi
+# fi
+
+# Linux-specific overrides
+# if [[ "$OSTYPE" == linux* ]]; then
+#     alias open='xdg-open'
+#     alias pbcopy='xclip -selection clipboard'
+#     alias pbpaste='xclip -selection clipboard -o'
+# fi
+
+# =============================================================================
+# Performance Optimizations (Local)
+# =============================================================================
+
+# Disable expensive operations on slow machines
+# export SKIP_EXPENSIVE_OPERATIONS=1
+
+# Enable additional lazy loading for development tools
+# if [[ -d "$HOME/.rbenv" ]]; then
+#     lazy_alias ruby 'export PATH="$HOME/.rbenv/bin:$PATH" && eval "$(rbenv init -)"'
+# fi
+
+# =============================================================================
+# Custom Completions
+# =============================================================================
+
+# Add custom completion scripts
+# if [[ -f "$HOME/.local/share/completions/my-tool" ]]; then
+#     source "$HOME/.local/share/completions/my-tool"
+# fi
+
+# =============================================================================
+# Experimental Features
+# =============================================================================
+
+# Enable experimental dotfiles features
+# export DOTFILES_EXPERIMENTAL=1
+
+# Test new features before they're added to main config
+# if [[ "$DOTFILES_EXPERIMENTAL" == "1" ]]; then
+#     # New feature testing goes here
+# fi
+
+# =============================================================================
+# Local History and Logging
+# =============================================================================
+
+# Keep a longer command history
+# export HISTSIZE=50000
+# export SAVEHIST=50000
+
+# Log commands with timestamps (be careful with sensitive data)
+# export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "
+
+# Ignore certain commands in history
+# export HISTIGNORE="ls:pwd:history:clear"
+
+echo "Local dotfiles configuration loaded successfully"

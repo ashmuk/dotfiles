@@ -121,16 +121,42 @@ dotfiles/
 
 ## 🔧 Customization
 
+The dotfiles system supports user-specific customizations without modifying the main configuration files.
+
 ### Shell Customization
-After installation, add shell-specific customizations to:
-- `~/.bashrc` - Additional bash settings
-- `~/.zshrc` - Additional zsh settings
+Create a local configuration file in any of these locations (first found will be loaded):
+- `$HOME/.dotfiles-local`
+- `$HOME/.config/dotfiles/local` 
+- `$HOME/dotfiles/shell/local`
+- `$HOME/.dotfiles/shell/local`
+
+Copy the example to get started:
+```bash
+cp ~/dotfiles/shell/local.example ~/.dotfiles-local
+# Edit with your personal settings
+vim ~/.dotfiles-local
+```
 
 ### Vim Customization
-Add vim-specific customizations to:
-- `~/.vimrc` - Additional vim settings
-- `~/_vimrc` - Windows vim settings
-- `~/_gvimrc` - Windows GUI vim settings
+Create a local vim configuration file in any of these locations:
+- `~/.vim/local.vim` (Unix/macOS)
+- `~/vimfiles/local.vim` (Windows)
+- `~/.config/nvim/local.vim` (Neovim)
+- `~/dotfiles/vim/local.vim`
+
+Copy the example to get started:
+```bash
+cp ~/dotfiles/vim/local.example.vim ~/.vim/local.vim
+# Edit with your personal vim settings
+vim ~/.vim/local.vim
+```
+
+### Customization Features
+- **Override any setting**: Personal configs are loaded last
+- **Add custom aliases**: Define personal shortcuts and commands
+- **Environment-specific settings**: Configure work vs. home environments
+- **Plugin management**: Add personal vim plugins
+- **Performance tuning**: Optimize for your specific setup
 
 ## 📋 Installation Details
 

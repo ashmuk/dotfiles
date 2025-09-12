@@ -1,4 +1,5 @@
 #!/bin/zsh
+
 ###############################################################################
 #
 # Shell common configuration
@@ -95,6 +96,15 @@ else
   du_command="du $du_options -d 1"
 fi
 export du_command
+
+# =============================================================================
+# Performance Optimizations
+# =============================================================================
+
+# Load performance utilities (lazy-loading framework)
+if [[ -f "$DOTFILES_DIR/shell/performance.sh" ]]; then
+  source "$DOTFILES_DIR/shell/performance.sh"
+fi
 
 # =============================================================================
 # Source Common Aliases
@@ -358,6 +368,26 @@ gvim() {
     vim -g "$@"
   fi
 }
+
+# =============================================================================
+# User Local Configuration
+# =============================================================================
+
+# Load user-specific customizations (if exists)
+# This allows users to override settings without modifying the main dotfiles
+LOCAL_CONFIG_PATHS=(
+  "$HOME/.dotfiles-local"
+  "$HOME/.config/dotfiles/local"
+  "$DOTFILES_DIR/shell/local"
+  "$HOME/.dotfiles/shell/local"
+)
+
+for local_config in "${LOCAL_CONFIG_PATHS[@]}"; do
+  if [[ -f "$local_config" && -r "$local_config" ]]; then
+    source "$local_config"
+    break
+  fi
+done
 
 ###############################################################################
 #
