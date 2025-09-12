@@ -171,6 +171,117 @@ make install
 make clean
 ```
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Installation Problems
+
+**Issue**: Permission denied errors during installation
+```bash
+# Solution: Ensure scripts are executable
+chmod +x shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh
+```
+
+**Issue**: Symlink creation fails
+```bash
+# Check if files already exist
+ls -la ~/.bashrc ~/.zshrc ~/.vimrc
+
+# If they exist as regular files, they will be automatically backed up
+make install
+```
+
+#### Platform-Specific Issues
+
+**macOS**: GNU tools not found
+```bash
+# Install GNU tools via Homebrew
+brew install grep gnu-tar coreutils
+
+# Tools will be automatically detected in PATH
+```
+
+**Windows (WSL/MSYS)**: Path issues
+```bash
+# Ensure you're using the correct shell environment
+# For WSL, use the Linux shell, not Windows Command Prompt
+# For MSYS, ensure MSYS2 is properly configured
+```
+
+**Linux**: Missing zsh or dependencies
+```bash
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install -y zsh vim git
+
+# CentOS/RHEL
+sudo yum install -y zsh vim git
+```
+
+#### Configuration Issues
+
+**Issue**: Aliases not working after installation
+```bash
+# Restart your terminal or reload configuration
+source ~/.bashrc  # for bash
+source ~/.zshrc   # for zsh
+```
+
+**Issue**: Vim plugins not loading
+```bash
+# Check vim plugin directory symlink
+ls -la ~/.vim  # should point to ~/dotfiles/vim/vimfiles
+ls -la ~/vimfiles  # Windows should point to ~/dotfiles/vim/vimfiles
+```
+
+**Issue**: Git configuration not applied
+```bash
+# Verify git configuration
+git config --list | grep -E "user\.|core\."
+
+# Reload git configuration
+git config --reload
+```
+
+#### Environment Detection Issues
+
+**Issue**: Wrong tools being used (BSD vs GNU)
+```bash
+# Check which tools are being detected
+echo $grep_command
+echo $du_command
+
+# Install GNU tools if needed (macOS)
+brew install grep coreutils
+
+# Or manually set aliases in your local config
+```
+
+### Validation and Testing
+
+Before reporting issues, run the validation checks:
+
+```bash
+# Validate configuration
+make validate
+
+# Test configuration syntax
+make test
+
+# Check installation status
+make status
+```
+
+### Getting Help
+
+1. Check the validation output: `make validate`
+2. Review the troubleshooting section above
+3. Check existing [GitHub Issues](https://github.com/your-username/dotfiles/issues)
+4. Create a new issue with:
+   - OS and shell version
+   - Output of `make validate`
+   - Specific error messages
+
 ## 📚 Documentation
 
 - [Shell Configuration](shell/README.md) - Detailed shell setup documentation
@@ -181,7 +292,7 @@ make clean
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test with `make test`
+4. Test with `make validate` and `make test`
 5. Submit a pull request
 
 ## 📄 License

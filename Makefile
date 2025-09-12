@@ -225,6 +225,63 @@ update: ## Update dotfiles from repository
 	@git pull origin main
 	@echo "$(GREEN)[SUCCESS]$(NC) Dotfiles updated"
 
+.PHONY: validate
+validate: ## Validate configuration files and dependencies
+	@echo "$(BLUE)[INFO]$(NC) Validating dotfiles configuration..."
+	@echo ""
+	@echo "Checking shell configuration syntax..."
+	@bash -n $(DOTFILES_DIR)/shell/shell.common || (echo "$(RED)[ERROR]$(NC) shell.common has syntax errors" && exit 1)
+	@bash -n $(DOTFILES_DIR)/shell/shell.bash || (echo "$(RED)[ERROR]$(NC) shell.bash has syntax errors" && exit 1)
+	@if command -v zsh >/dev/null 2>&1; then \
+		zsh -n $(DOTFILES_DIR)/shell/shell.zsh || (echo "$(RED)[ERROR]$(NC) shell.zsh has syntax errors" && exit 1); \
+		zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || (echo "$(RED)[ERROR]$(NC) shell.ohmy.zsh has syntax errors" && exit 1); \
+	else \
+		echo "$(YELLOW)[WARNING]$(NC) zsh not installed, skipping zsh syntax check"; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
+	@echo ""
+	@echo "Checking for required directories..."
+	@for dir in shell vim git; do \
+		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
+			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
+			exit 1; \
+		else \
+			echo "$(GREEN)✓$(NC) $$dir directory exists"; \
+		fi; \
+	done
+	@echo ""
+	@echo "Checking setup scripts..."
+	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh; do \
+		if [ ! -x "$(DOTFILES_DIR)/$$script" ]; then \
+			echo "$(YELLOW)[WARNING]$(NC) $$script is not executable"; \
+			chmod +x "$(DOTFILES_DIR)/$$script"; \
+			echo "$(GREEN)✓$(NC) Made $$script executable"; \
+		else \
+			echo "$(GREEN)✓$(NC) $$script is executable"; \
+		fi; \
+		bash -n "$(DOTFILES_DIR)/$$script" || (echo "$(RED)[ERROR]$(NC) $$script has syntax errors" && exit 1); \
+	done
+	@echo ""
+	@echo "Checking vim configuration..."
+	@if command -v vim >/dev/null 2>&1; then \
+		for vimrc in $(DOTFILES_DIR)/vim/vimrc.*; do \
+			if [ -f "$$vimrc" ]; then \
+				echo "$(GREEN)✓$(NC) Found vim config: $$(basename $$vimrc)"; \
+			fi; \
+		done; \
+	else \
+		echo "$(YELLOW)[WARNING]$(NC) vim not installed, skipping vim config check"; \
+	fi
+	@echo ""
+	@echo "Checking for common issues..."
+	@if [ -f "$(HOME_DIR)/.bashrc" ] && [ ! -L "$(HOME_DIR)/.bashrc" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) ~/.bashrc exists as regular file (will be backed up on install)"; \
+	fi
+	@if [ -f "$(HOME_DIR)/.zshrc" ] && [ ! -L "$(HOME_DIR)/.zshrc" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) ~/.zshrc exists as regular file (will be backed up on install)"; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Validation completed successfully"
+
 .PHONY: test
 test: validate ## Test shell configuration syntax
 	@echo "$(BLUE)[INFO]$(NC) Testing shell configuration..."

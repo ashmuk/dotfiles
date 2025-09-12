@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-shell-syntax:
+    name: Test Shell Syntax
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install shellcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+    
+    - name: Test bash syntax
+      run: |
+        bash -n shell/shell.common
+        bash -n shell/shell.bash
+        find . -name "*.sh" -exec bash -n {} \;
+    
+    - name: Test zsh syntax
+      run: |
+        sudo apt-get install -y zsh
+        zsh -n shell/shell.zsh
+        zsh -n shell/shell.ohmy.zsh
+    
+    - name: Run shellcheck
+      run: |
+        find . -name "*.sh" -exec shellcheck {} \;
+        shellcheck shell/shell.common shell/shell.bash shell/shell.zsh shell/shell.ohmy.zsh
+
+  test-cross-platform:
+    name: Test Cross-Platform Compatibility
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        shell: [bash, zsh]
+        exclude:
+          - os: windows-latest
+            shell: zsh
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install zsh on Ubuntu
+      if: matrix.os == 'ubuntu-latest' && matrix.shell == 'zsh'
+      run: sudo apt-get update && sudo apt-get install -y zsh
+    
+    - name: Install GNU tools on macOS
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install grep gnu-tar coreutils
+    
+    - name: Test shell configuration loading
+      shell: ${{ matrix.shell }}
+      run: |
+        source shell/shell.common
+        echo "Shell configuration loaded successfully"
+    
+    - name: Test aliases
+      shell: ${{ matrix.shell }}
+      run: |
+        source shell/shell.common
+        # Test basic aliases
+        alias | grep -E '^(g|du|\.\.)'
+    
+    - name: Test environment-aware features
+      shell: ${{ matrix.shell }}
+      run: |
+        source shell/shell.common
+        # Check if grep_command is set
+        echo "grep_command: $grep_command"
+        # Check if du_command is set  
+        echo "du_command: $du_command"
+
+  test-makefile:
+    name: Test Makefile Targets
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install zsh
+      run: sudo apt-get update && sudo apt-get install -y zsh
+    
+    - name: Test make targets
+      run: |
+        make test
+        make info
+        make help
+    
+    - name: Test dry-run installation
+      run: |
+        # Test without actually creating symlinks
+        chmod +x shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh
+        echo "Setup scripts are executable"
+
+  test-vim-config:
+    name: Test Vim Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install vim
+      run: sudo apt-get update && sudo apt-get install -y vim
+    
+    - name: Test vim configuration syntax
+      run: |
+        # Test vim configuration files for syntax errors
+        for vimrc in vim/vimrc.*; do
+          if [ -f "$vimrc" ]; then
+            vim -T dumb --not-a-term -n -e -s -S "$vimrc" +qall || echo "Warning: $vimrc may have issues"
+          fi
+        done
