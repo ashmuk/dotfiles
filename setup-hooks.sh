@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-if [ $? -ne 0 ]; then
+if ! git rev-parse --show-toplevel >/dev/null 2>&1; then
     echo "${RED}[ERROR]${NC} This script must be run from within a git repository"
     exit 1
 fi
