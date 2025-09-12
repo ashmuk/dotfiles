@@ -54,12 +54,39 @@ set showcmd
 set title
 
 "---------------------------------------------------------------------------
-" ファイルエンコーディング設定:
+" ファイル形式・エンコーディング設定:
 "
+" ファイル形式の設定
+set fileformat=unix
+set fileformats=unix,dos
 " ファイルエンコーディング
 set fileencoding=utf-8
 " ファイルエンコーディングの候補
 set fileencodings=utf-8,cp932
+
+"---------------------------------------------------------------------------
+" バックアップ・スワップファイル設定:
+"
+" スワップファイル・バックアップファイルの保存先
+" ディレクトリが存在しない場合は作成
+if !isdirectory($HOME . '/.vim')
+  call mkdir($HOME . '/.vim', 'p')
+endif
+if !isdirectory($HOME . '/.vim/tmp')
+  call mkdir($HOME . '/.vim/tmp', 'p')
+endif
+set directory=$HOME/.vim/tmp
+set backupdir=$HOME/.vim/tmp
+" アンドゥファイルを作成しない
+set noundofile
+
+"---------------------------------------------------------------------------
+" 特殊文字表示設定:
+"
+" タブや改行の表示文字設定
+set listchars=tab:^\ ,trail:~,eol:$
+" デフォルトでは非表示（環境ごとに上書き可能）
+set nolist
 
 "---------------------------------------------------------------------------
 " 検索ハイライト色の設定:
