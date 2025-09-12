@@ -21,9 +21,86 @@ help: ## Show this help message
 	@echo ""
 	@echo "Available targets:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(BLUE)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  $(BLUE)check-prereqs$(NC)   Check for required tools before installation"
+	@echo "  $(BLUE)make install$(NC)    Automatically checks prerequisites before installing"
+
+.PHONY: check-prereqs
+check-prereqs: ## Check for required tools and suggest installation commands
+	@echo "$(BLUE)[INFO]$(NC) Checking prerequisites..."
+	@$(MAKE) -s _check_essential_tools
+	@$(MAKE) -s _check_optional_tools
+	@echo "$(GREEN)[SUCCESS]$(NC) All essential prerequisites are available"
+
+.PHONY: _check_essential_tools
+_check_essential_tools:
+	@echo "$(BLUE)[INFO]$(NC) Checking essential tools..."
+	@missing_tools=""; \
+	for tool in make git bash; do \
+		if ! command -v $$tool >/dev/null 2>&1; then \
+			missing_tools="$$missing_tools $$tool"; \
+		fi; \
+	done; \
+	if [ -n "$$missing_tools" ]; then \
+		echo "$(RED)[ERROR]$(NC) Missing essential tools:$$missing_tools"; \
+		$(MAKE) -s _suggest_installation "$$missing_tools"; \
+		exit 1; \
+	fi
+
+.PHONY: _check_optional_tools
+_check_optional_tools:
+	@echo "$(BLUE)[INFO]$(NC) Checking optional tools..."
+	@missing_optional=""; \
+	for tool in zsh vim shellcheck; do \
+		if ! command -v $$tool >/dev/null 2>&1; then \
+			missing_optional="$$missing_optional $$tool"; \
+		fi; \
+	done; \
+	if [ -n "$$missing_optional" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Optional tools not found:$$missing_optional"; \
+		echo "$(YELLOW)[WARNING]$(NC) Some features may not work optimally"; \
+		$(MAKE) -s _suggest_installation "$$missing_optional"; \
+	fi
+
+.PHONY: _suggest_installation
+_suggest_installation:
+	@tools="$(filter-out _suggest_installation,$(MAKECMDGOALS))"; \
+	if [ -z "$$tools" ]; then tools="$$1"; fi; \
+	echo "$(BLUE)[INFO]$(NC) Installation suggestions:"; \
+	\
+	if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+		echo "$(YELLOW)[WSL DETECTED]$(NC) Windows Subsystem for Linux"; \
+		echo "  Ubuntu/Debian: sudo apt update && sudo apt install$$tools"; \
+		echo "  Alpine: sudo apk add$$tools"; \
+		echo "  CentOS/RHEL: sudo yum install$$tools"; \
+	elif [ -f /etc/debian_version ]; then \
+		echo "$(YELLOW)[DEBIAN/UBUNTU]$(NC)"; \
+		echo "  sudo apt update && sudo apt install$$tools"; \
+	elif [ -f /etc/redhat-release ]; then \
+		echo "$(YELLOW)[REDHAT/CENTOS]$(NC)"; \
+		echo "  sudo yum install$$tools"; \
+	elif [ -f /etc/alpine-release ]; then \
+		echo "$(YELLOW)[ALPINE]$(NC)"; \
+		echo "  sudo apk add$$tools"; \
+	elif [ -f /etc/arch-release ]; then \
+		echo "$(YELLOW)[ARCH LINUX]$(NC)"; \
+		echo "  sudo pacman -S$$tools"; \
+	elif [[ "$$OSTYPE" == darwin* ]]; then \
+		echo "$(YELLOW)[MACOS]$(NC)"; \
+		echo "  brew install$$tools"; \
+		echo "  Note: Install Homebrew first: /bin/bash -c \"\$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
+	elif [[ "$$OSTYPE" =~ ^(msys|cygwin) ]]; then \
+		echo "$(YELLOW)[WINDOWS MSYS/CYGWIN]$(NC)"; \
+		echo "  Use package manager or install Git for Windows"; \
+	else \
+		echo "$(YELLOW)[UNKNOWN PLATFORM]$(NC)"; \
+		echo "  Please install manually:$$tools"; \
+	fi; \
+	echo ""
 
 .PHONY: install
-install: validate install-shell install-vim install-git ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
