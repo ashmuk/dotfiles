@@ -10,7 +10,7 @@
 # =============================================================================
 # Standard alias
 # =============================================================================
-alias ..="cd .."
+alias ..='cd ..'
 
 # =============================================================================
 # Directory Navigation Aliases
@@ -29,9 +29,9 @@ alias ds='dirs -v'
 # =============================================================================
 
 # File names with multibyte characters
-alias findmbf="LC_ALL=C find . -name '*[^ -~]*' -type f"
+alias findmb='LC_ALL=C find . -name "*[^ -~]*" -type f'
 # Directory names with multibyte characters
-alias findmbd="LC_ALL=C find . -name '*[^ -~]*' -type d"
+alias findmbd='LC_ALL=C find . -name "*[^ -~]*" -type d'
 
 # Note: Grep-based aliases depend on $grep_command variable
 # These should be defined after grep_command is set in the shell config

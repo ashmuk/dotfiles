@@ -41,9 +41,9 @@ export LC_ALL=ja_JP.UTF-8
 
 # Common config files
 if [ -n "$BASH_VERSION" ]; then
-  config_files="~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+  config_files="~/dotfiles ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
 elif [ -n "$ZSH_VERSION" ]; then
-  config_files="~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
+  config_files="~/dotfiles ~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
 else
   config_files=""
 fi
@@ -120,7 +120,123 @@ dh() {
 
 # Function to show where an alias is defined
 grepalias() {
-  alias "$1" | sed "s/.*='\(.*\)'/\1/" | xargs -I{} $grep_command -R "{}" $config_files 2>/dev/null
+  # Input validation
+  if [ $# -eq 0 ]; then
+    echo "Usage: grepalias <alias_name> [file1] [file2] ..." >&2
+    return 1
+  fi
+
+  local alias_name="$1"
+  shift || true
+
+  # Determine search files
+  local -a files
+  if [ "$#" -gt 0 ]; then
+    files=("$@")
+  elif [ -n "${config_files+set}" ]; then
+    # Parse config_files string into array (compatible with both bash and zsh)
+    if [ -n "$BASH_VERSION" ]; then
+      # Bash: use read -a
+      local old_ifs="$IFS"
+      IFS=' ' read -ra files <<< "$config_files"
+      IFS="$old_ifs"
+    elif [ -n "$ZSH_VERSION" ]; then
+      # Zsh: use read -A
+      local old_ifs="$IFS"
+      IFS=' ' read -A files <<< "$config_files"
+      IFS="$old_ifs"
+    else
+      # Fallback: manual parsing
+      files=($(echo "$config_files"))
+    fi
+
+    # Expand tilde in file paths
+    local -a expanded_files
+    for file in "${files[@]}"; do
+      expanded_files+=("${file/#\~/$HOME}")
+    done
+    files=("${expanded_files[@]}")
+  else
+    files=("$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc")
+  fi
+
+  # Extract alias definition with better parsing
+  local alias_def
+  alias_def="$(alias "$alias_name" 2>/dev/null)" || {
+    printf 'alias not found: %s\n' "$alias_name" >&2
+    return 1
+  }
+
+
+  # Extract right-hand side (more robust parsing)
+  local rhs
+  # Remove the alias name and equals sign from the beginning
+  rhs="${alias_def#*=}"
+
+  # Handle different quoting styles - simplified for consistent patterns
+  # This function normalizes the RHS to match how it appears in source files
+  normalize_rhs() {
+    local input="$1"
+    local result="$input"
+
+    # Primary case: Single-quoted string (now the standard pattern)
+    if [[ "$result" =~ ^\'.*\'$ ]]; then
+      # Remove outer single quotes
+      result="${result:1:-1}"
+      # Convert escaped single quotes '\'' back to single quotes '
+      result="${result//'\''/'}"
+
+    # Fallback case: Double-quoted string (legacy patterns)
+    elif [[ "$result" =~ ^\".*\"$ ]]; then
+      # Remove outer double quotes
+      result="${result:1:-1}"
+      # Convert escaped double quotes \" back to double quotes "
+      result="${result//\\\"/\"}"
+
+    # Simple case: Unquoted single word
+    elif [[ "$result" =~ ^[^[:space:]]+$ ]]; then
+      # No change needed for unquoted single words
+      :
+
+    # Edge case: Malformed quotes (try to salvage)
+    else
+      # Try to detect and fix malformed patterns
+      if [[ "$result" =~ ^\' ]]; then
+        # Starts with single quote but doesn't end properly
+        result="${result#\'}"
+        if [[ "$result" =~ \'$ ]]; then
+          result="${result%\'}"
+        fi
+        result="${result//'\''/'}"
+      elif [[ "$result" =~ ^\" ]]; then
+        # Starts with double quote but doesn't end properly
+        result="${result#\"}"
+        if [[ "$result" =~ \"$ ]]; then
+          result="${result%\"}"
+        fi
+        result="${result//\\\"/\"}"
+      else
+        # Completely unparseable
+        printf 'cannot parse alias definition: %s\n' "$alias_def" >&2
+        return 1
+      fi
+    fi
+
+    echo "$result"
+  }
+
+  # Normalize the RHS
+  rhs="$(normalize_rhs "$rhs")" || return 1
+
+  # Search for the alias definition
+  # First try exact match
+  grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "${files[@]}" 2>/dev/null
+
+  # If no exact match found, try searching for the alias name itself
+  # This handles cases where variables are expanded or special characters cause issues
+  if [[ $? -ne 0 ]]; then
+    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "${files[@]}" 2>/dev/null
+  fi
 }
 aliaswh() {
   grepalias "$1"
