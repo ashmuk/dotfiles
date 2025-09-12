@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(shellcheck:*)",
+      "Bash(bash:*)",
+      "Bash(make test-compat:*)"
     ],
     "deny": [],
     "ask": []
