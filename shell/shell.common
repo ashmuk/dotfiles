@@ -87,18 +87,20 @@ export grep_command
 du_options="-h"
 
 # Check if du supports GNU-style --max-depth option
-if du --max-depth=1 /tmp >/dev/null 2>&1; then
+# Use a safer test directory that should exist everywhere
+test_dir="${TMPDIR:-/tmp}"
+if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du
   du_command="du $du_options --max-depth=1"
-elif command -v gdu >/dev/null 2>&1 && gdu --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du as gdu
   alias du='gdu'
   du_command="gdu $du_options --max-depth=1"
-elif command -v /usr/local/bin/du >/dev/null 2>&1 && /usr/local/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /usr/local/bin
   alias du='/usr/local/bin/du'
   du_command="/usr/local/bin/du $du_options --max-depth=1"
-elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && /opt/homebrew/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /opt/homebrew/bin
   alias du='/opt/homebrew/bin/du'
   du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
@@ -113,22 +115,22 @@ export du_command
 # =============================================================================
 
 # Load performance utilities (lazy-loading framework)
-if [[ -f "$DOTFILES_DIR/shell/performance.sh" ]]; then
+if [ -n "$DOTFILES_DIR" ] && [ -f "$DOTFILES_DIR/shell/performance.sh" ]; then
   source "$DOTFILES_DIR/shell/performance.sh"
 fi
 
 # =============================================================================
 # Source Common Aliases
 # =============================================================================
-export DOTFILES_DIR=$HOME/dotfiles
+export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
 
 # Source common aliases (works for both bash and zsh)
-if [[ -f "$DOTFILES_DIR/shell/aliases.common" ]]; then
+if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
   source "$DOTFILES_DIR/shell/aliases.common"
 fi
 
 # Source shell-specific aliases (after grep_command is set)
-if [[ -f "$DOTFILES_DIR/shell/aliases.shell" ]]; then
+if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
   source "$DOTFILES_DIR/shell/aliases.shell"
 fi
 
@@ -180,34 +182,35 @@ grepalias() {
   shift || true
 
   # Determine search files
-  local -a files
   if [ "$#" -gt 0 ]; then
-    files=("$@")
-  elif [ -n "${config_files+set}" ]; then
-    # Parse config_files string into array (compatible with both bash and zsh)
+    # Use files provided as arguments
+    :
+  elif [ -n "${config_files:-}" ]; then
+    # Parse config_files string into positional parameters
     if [ -n "$BASH_VERSION" ]; then
-      # Bash: use read -a
-      local old_ifs="$IFS"
-      IFS=' ' read -ra files <<< "$config_files"
-      IFS="$old_ifs"
+      # Bash: use eval with proper quoting
+      eval "set -- $config_files"
     elif [ -n "$ZSH_VERSION" ]; then
-      # Zsh: use read -A
-      local old_ifs="$IFS"
-      IFS=' ' read -A files <<< "$config_files"
-      IFS="$old_ifs"
+      # Zsh: use word splitting
+      set -- ${=config_files}
     else
-      # Fallback: manual parsing
-      files=($(echo "$config_files"))
+      # Fallback: simple parsing
+      set -- $config_files
     fi
-
+    
     # Expand tilde in file paths
-    local -a expanded_files
-    for file in "${files[@]}"; do
-      expanded_files+=("${file/#\~/$HOME}")
+    local expanded_file
+    local temp_files=""
+    for file in "$@"; do
+      case "$file" in
+        \~/*) expanded_file="$HOME/${file#\~/}" ;;
+        *) expanded_file="$file" ;;
+      esac
+      temp_files="$temp_files $expanded_file"
     done
-    files=("${expanded_files[@]}")
+    eval "set -- $temp_files"
   else
-    files=("$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc")
+    set -- "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc"
   fi
 
   # Extract alias definition with better parsing
@@ -280,12 +283,12 @@ grepalias() {
 
   # Search for the alias definition
   # First try exact match
-  grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "${files[@]}" 2>/dev/null
+  grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null
 
   # If no exact match found, try searching for the alias name itself
   # This handles cases where variables are expanded or special characters cause issues
-  if [[ $? -ne 0 ]]; then
-    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "${files[@]}" 2>/dev/null
+  if [ $? -ne 0 ]; then
+    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "$@" 2>/dev/null
   fi
 }
 aliaswh() {
@@ -386,15 +389,11 @@ gvim() {
 
 # Load user-specific customizations (if exists)
 # This allows users to override settings without modifying the main dotfiles
-LOCAL_CONFIG_PATHS=(
-  "$HOME/.dotfiles-local"
-  "$HOME/.config/dotfiles/local"
-  "$DOTFILES_DIR/shell/local"
-  "$HOME/.dotfiles/shell/local"
-)
+# Use positional parameters instead of arrays for better compatibility
+set -- "$HOME/.dotfiles-local" "$HOME/.config/dotfiles/local" "$DOTFILES_DIR/shell/local" "$HOME/.dotfiles/shell/local"
 
-for local_config in "${LOCAL_CONFIG_PATHS[@]}"; do
-  if [[ -f "$local_config" && -r "$local_config" ]]; then
+for local_config in "$@"; do
+  if [ -f "$local_config" ] && [ -r "$local_config" ]; then
     source "$local_config"
     break
   fi
