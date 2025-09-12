@@ -61,26 +61,28 @@ jobs:
         brew install grep gnu-tar coreutils
     
     - name: Test shell configuration loading
-      shell: ${{ matrix.shell }}
       run: |
-        source shell/shell.common
-        echo "Shell configuration loaded successfully"
+        if [ "${{ matrix.shell }}" = "bash" ]; then
+          bash -c "source shell/shell.common && echo 'Shell configuration loaded successfully'"
+        else
+          zsh -c "source shell/shell.common && echo 'Shell configuration loaded successfully'"
+        fi
     
     - name: Test aliases
-      shell: ${{ matrix.shell }}
       run: |
-        source shell/shell.common
-        # Test basic aliases
-        alias | grep -E '^(g|du|\.\.)'
+        if [ "${{ matrix.shell }}" = "bash" ]; then
+          bash -c "source shell/shell.common && alias | grep -E '^(g|du|\.\..)'"
+        else
+          zsh -c "source shell/shell.common && alias | grep -E '^(g|du|\.\..)'"
+        fi
     
     - name: Test environment-aware features
-      shell: ${{ matrix.shell }}
       run: |
-        source shell/shell.common
-        # Check if grep_command is set
-        echo "grep_command: $grep_command"
-        # Check if du_command is set  
-        echo "du_command: $du_command"
+        if [ "${{ matrix.shell }}" = "bash" ]; then
+          bash -c "source shell/shell.common && echo 'grep_command: $grep_command' && echo 'du_command: $du_command'"
+        else
+          zsh -c "source shell/shell.common && echo 'grep_command: $grep_command' && echo 'du_command: $du_command'"
+        fi
 
   test-makefile:
     name: Test Makefile Targets
