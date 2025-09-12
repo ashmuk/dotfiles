@@ -25,6 +25,7 @@ shopt -s histappend
 shopt -s checkwinsize
 
 # Kiro integration
+# shellcheck disable=SC1090
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
 
 # =============================================================================
