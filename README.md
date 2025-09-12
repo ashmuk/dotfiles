@@ -46,7 +46,17 @@ dotfiles/
 │   ├── vimrc.terminal      # Terminal vim settings
 │   ├── vimrc.idea          # IntelliJ IDEA vim settings
 │   ├── mappings.common     # Common key mappings
-│   └── README_vim.md       # Vim configuration documentation
+│   ├── README_vim.md       # Vim configuration documentation
+│   └── vimfiles/           # Vim plugin files
+│       ├── colors/         # Color schemes
+│       │   └── solarized.vim
+│       ├── autoload/       # Vim autoload functions
+│       │   └── togglebg.vim
+│       ├── bitmaps/        # Bitmap files
+│       │   └── togglebg.png
+│       ├── doc/            # Vim documentation
+│       │   └── solarized.txt
+│       └── tmp/            # Temporary files
 ├── git/                    # Git configuration directory
 │   ├── setup_git.sh        # Git installation script
 │   ├── gitconfig.common    # Common git settings and aliases
@@ -67,16 +77,6 @@ dotfiles/
 │   └── mintty-colors-solarized/ # Mintty color schemes
 │       ├── sol.dark
 │       └── sol.light
-├── vimfiles/               # Vim plugin files
-│   ├── colors/             # Color schemes
-│   │   └── solarized.vim
-│   ├── autoload/           # Vim autoload functions
-│   │   └── togglebg.vim
-│   ├── bitmaps/            # Bitmap files
-│   │   └── togglebg.png
-│   ├── doc/                # Vim documentation
-│   │   └── solarized.txt
-│   └── tmp/                # Temporary files
 └── backup/                 # Backup directory for existing files
 ```
 
