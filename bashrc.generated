@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck disable=SC2148
+
 ###############################################################################
 #
 # Shell common configuration
@@ -33,8 +35,20 @@ export EDITOR=vim
 export VISUAL=vim
 
 # Language settings
-export LANG=ja_JP.UTF-8
-export LC_ALL=ja_JP.UTF-8
+# Set locale only if available to avoid warnings
+if locale -a 2>/dev/null | grep -q "ja_JP.UTF-8"; then
+    export LANG=ja_JP.UTF-8
+    export LC_ALL=ja_JP.UTF-8
+else
+    # Fallback to C.UTF-8 or en_US.UTF-8
+    if locale -a 2>/dev/null | grep -q "C.UTF-8"; then
+        export LANG=C.UTF-8
+        export LC_ALL=C.UTF-8
+    elif locale -a 2>/dev/null | grep -q "en_US.UTF-8"; then
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+    fi
+fi
 
 # =============================================================================
 # Grep Configuration
@@ -42,9 +56,9 @@ export LC_ALL=ja_JP.UTF-8
 
 # Common config files
 if [ -n "$BASH_VERSION" ]; then
-  config_files="~/dotfiles ~/.bashrc ~/.bash_profile ~/.profile ~/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+  config_files="$HOME/dotfiles $HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
 elif [ -n "$ZSH_VERSION" ]; then
-  config_files="~/dotfiles ~/.zshrc ~/.zshenv ~/.zprofile ~/.zlogin ~/.zlogout /etc/zsh* ~/.oh-my-zsh ~/.zsh ~/.zshrc.local"
+  config_files="$HOME/dotfiles $HOME/.zshrc $HOME/.zshenv $HOME/.zprofile $HOME/.zlogin $HOME/.zlogout /etc/zsh* $HOME/.oh-my-zsh $HOME/.zsh $HOME/.zshrc.local"
 else
   config_files=""
 fi
@@ -76,18 +90,20 @@ export grep_command
 du_options="-h"
 
 # Check if du supports GNU-style --max-depth option
-if du --max-depth=1 /tmp >/dev/null 2>&1; then
+# Use a safer test directory that should exist everywhere
+test_dir="${TMPDIR:-/tmp}"
+if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du
   du_command="du $du_options --max-depth=1"
-elif command -v gdu >/dev/null 2>&1 && gdu --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du as gdu
   alias du='gdu'
   du_command="gdu $du_options --max-depth=1"
-elif command -v /usr/local/bin/du >/dev/null 2>&1 && /usr/local/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /usr/local/bin
   alias du='/usr/local/bin/du'
   du_command="/usr/local/bin/du $du_options --max-depth=1"
-elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && /opt/homebrew/bin/du --max-depth=1 /tmp >/dev/null 2>&1; then
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /opt/homebrew/bin
   alias du='/opt/homebrew/bin/du'
   du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
@@ -102,22 +118,25 @@ export du_command
 # =============================================================================
 
 # Load performance utilities (lazy-loading framework)
-if [[ -f "$DOTFILES_DIR/shell/performance.sh" ]]; then
+if [ -n "$DOTFILES_DIR" ] && [ -f "$DOTFILES_DIR/shell/performance.sh" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/performance.sh"
 fi
 
 # =============================================================================
 # Source Common Aliases
 # =============================================================================
-export DOTFILES_DIR=$HOME/dotfiles
+export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
 
 # Source common aliases (works for both bash and zsh)
-if [[ -f "$DOTFILES_DIR/shell/aliases.common" ]]; then
+if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/aliases.common"
 fi
 
 # Source shell-specific aliases (after grep_command is set)
-if [[ -f "$DOTFILES_DIR/shell/aliases.shell" ]]; then
+if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
+  # shellcheck disable=SC1091
   source "$DOTFILES_DIR/shell/aliases.shell"
 fi
 
@@ -129,17 +148,17 @@ fi
 extract() {
   if [[ -f $1 ]]; then
     case $1 in
-      *.tar.bz2)   tar xjf $1     ;;
-      *.tar.gz)    tar xzf $1     ;;
-      *.bz2)       bunzip2 $1     ;;
-      *.rar)       unrar e $1     ;;
-      *.gz)        gunzip $1      ;;
-      *.tar)       tar xf $1      ;;
-      *.tbz2)      tar xjf $1     ;;
-      *.tgz)       tar xzf $1     ;;
-      *.zip)       unzip $1       ;;
-      *.Z)         uncompress $1  ;;
-      *.7z)        7z x $1        ;;
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar e "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
       *)           echo "'$1' cannot be extracted via extract()" ;;
     esac
   else
@@ -149,7 +168,7 @@ extract() {
 
 # Function to create directory and cd into it
 mkcd() {
-  mkdir -p "$1" && cd "$1"
+  mkdir -p "$1" && cd "$1" || return 1
 }
 
 # Function to show directory history
@@ -169,34 +188,37 @@ grepalias() {
   shift || true
 
   # Determine search files
-  local -a files
   if [ "$#" -gt 0 ]; then
-    files=("$@")
-  elif [ -n "${config_files+set}" ]; then
-    # Parse config_files string into array (compatible with both bash and zsh)
+    # Use files provided as arguments
+    :
+  elif [ -n "${config_files:-}" ]; then
+    # Parse config_files string into positional parameters
     if [ -n "$BASH_VERSION" ]; then
-      # Bash: use read -a
-      local old_ifs="$IFS"
-      IFS=' ' read -ra files <<< "$config_files"
-      IFS="$old_ifs"
+      # Bash: use eval with proper quoting
+      eval "set -- $config_files"
     elif [ -n "$ZSH_VERSION" ]; then
-      # Zsh: use read -A
-      local old_ifs="$IFS"
-      IFS=' ' read -A files <<< "$config_files"
-      IFS="$old_ifs"
+      # Zsh: use word splitting (intentional for this shell)
+      # shellcheck disable=SC2086
+      set -- ${=config_files}
     else
-      # Fallback: manual parsing
-      files=($(echo "$config_files"))
+      # Fallback: simple parsing (word splitting is intentional)
+      # shellcheck disable=SC2086
+      set -- $config_files
     fi
-
+    
     # Expand tilde in file paths
-    local -a expanded_files
-    for file in "${files[@]}"; do
-      expanded_files+=("${file/#\~/$HOME}")
+    local expanded_file
+    local temp_files=""
+    for file in "$@"; do
+      case "$file" in
+        \~/*) expanded_file="$HOME/${file#\~/}" ;;
+        *) expanded_file="$file" ;;
+      esac
+      temp_files="$temp_files $expanded_file"
     done
-    files=("${expanded_files[@]}")
+    eval "set -- $temp_files"
   else
-    files=("$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc")
+    set -- "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc"
   fi
 
   # Extract alias definition with better parsing
@@ -223,6 +245,7 @@ grepalias() {
       # Remove outer single quotes
       result="${result:1:-1}"
       # Convert escaped single quotes '\'' back to single quotes '
+      # shellcheck disable=SC1003
       result="${result//'\''/'}"
 
     # Fallback case: Double-quoted string (legacy patterns)
@@ -246,6 +269,7 @@ grepalias() {
         if [[ "$result" =~ \'$ ]]; then
           result="${result%\'}"
         fi
+        # shellcheck disable=SC1003
         result="${result//'\''/'}"
       elif [[ "$result" =~ ^\" ]]; then
         # Starts with double quote but doesn't end properly
@@ -269,12 +293,10 @@ grepalias() {
 
   # Search for the alias definition
   # First try exact match
-  grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "${files[@]}" 2>/dev/null
-
-  # If no exact match found, try searching for the alias name itself
-  # This handles cases where variables are expanded or special characters cause issues
-  if [[ $? -ne 0 ]]; then
-    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "${files[@]}" 2>/dev/null
+  if ! grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null; then
+    # If no exact match found, try searching for the alias name itself
+    # This handles cases where variables are expanded or special characters cause issues
+    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "$@" 2>/dev/null
   fi
 }
 aliaswh() {
@@ -287,9 +309,10 @@ grepal() {
 # Function to jump to directory by number
 j() {
   if [[ $1 =~ ^[0-9]+$ ]]; then
-    local dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
+    local dir
+    dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
     if [[ -n $dir ]]; then
-      cd "$dir"
+      cd "$dir" || return 1
     else
       echo "Directory not found"
     fi
@@ -375,15 +398,12 @@ gvim() {
 
 # Load user-specific customizations (if exists)
 # This allows users to override settings without modifying the main dotfiles
-LOCAL_CONFIG_PATHS=(
-  "$HOME/.dotfiles-local"
-  "$HOME/.config/dotfiles/local"
-  "$DOTFILES_DIR/shell/local"
-  "$HOME/.dotfiles/shell/local"
-)
+# Use positional parameters instead of arrays for better compatibility
+set -- "$HOME/.dotfiles-local" "$HOME/.config/dotfiles/local" "$DOTFILES_DIR/shell/local" "$HOME/.dotfiles/shell/local"
 
-for local_config in "${LOCAL_CONFIG_PATHS[@]}"; do
-  if [[ -f "$local_config" && -r "$local_config" ]]; then
+for local_config in "$@"; do
+  if [ -f "$local_config" ] && [ -r "$local_config" ]; then
+    # shellcheck disable=SC1090
     source "$local_config"
     break
   fi
@@ -402,8 +422,10 @@ done
 
 # Enable programmable completion
 if [[ -f /usr/local/etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
   source /usr/local/etc/bash_completion
 elif [[ -f /etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
   source /etc/bash_completion
 fi
 
@@ -415,6 +437,7 @@ shopt -s histappend
 shopt -s checkwinsize
 
 # Kiro integration
+# shellcheck disable=SC1090
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
 
 # =============================================================================
