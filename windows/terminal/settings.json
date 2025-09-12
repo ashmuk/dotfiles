@@ -1,0 +1,238 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": [
+        {
+            "command": {
+                "action": "copy",
+                "singleLine": false
+            },
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": "find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+d"
+        },
+        {
+            "command": "newTab",
+            "keys": "ctrl+shift+t"
+        },
+        {
+            "command": "closeTab",
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "down"
+            },
+            "keys": "alt+down"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "left"
+            },
+            "keys": "alt+left"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "keys": "alt+right"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "keys": "alt+up"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "down"
+            },
+            "keys": "alt+shift+down"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "left"
+            },
+            "keys": "alt+shift+left"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "right"
+            },
+            "keys": "alt+shift+right"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "up"
+            },
+            "keys": "alt+shift+up"
+        },
+        {
+            "command": "toggleFocusMode",
+            "keys": "f11"
+        },
+        {
+            "command": "toggleFullscreen",
+            "keys": "alt+enter"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    "newTabMenu": [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": {
+        "defaults": {
+            "bellStyle": "none",
+            "colorScheme": "Solarized Dark",
+            "cursorShape": "vintage",
+            "font": {
+                "face": "Cascadia Code PL",
+                "size": 11,
+                "weight": "normal"
+            },
+            "historySize": 10000,
+            "padding": "8, 8, 8, 8",
+            "scrollbarState": "visible",
+            "snapOnInput": true,
+            "startingDirectory": "%USERPROFILE%",
+            "useAcrylic": false
+        },
+        "list": [
+            {
+                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "hidden": false,
+                "name": "PowerShell",
+                "source": "Windows.Terminal.PowershellCore",
+                "commandline": "pwsh.exe",
+                "icon": "ms-appx:///ProfileIcons/{574e775e-4f2a-5b96-ac1e-a2962a402336}.png"
+            },
+            {
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "name": "Windows PowerShell",
+                "commandline": "powershell.exe",
+                "hidden": false,
+                "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png"
+            },
+            {
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "Command Prompt",
+                "commandline": "cmd.exe",
+                "hidden": false,
+                "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png"
+            },
+            {
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl",
+                "colorScheme": "Solarized Light"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            }
+        ]
+    },
+    "schemes": [
+        {
+            "name": "Solarized Dark",
+            "black": "#002b36",
+            "red": "#dc322f",
+            "green": "#859900",
+            "yellow": "#b58900",
+            "blue": "#268bd2",
+            "purple": "#d33682",
+            "cyan": "#2aa198",
+            "white": "#eee8d5",
+            "brightBlack": "#073642",
+            "brightRed": "#cb4b16",
+            "brightGreen": "#586e75",
+            "brightYellow": "#657b83",
+            "brightBlue": "#839496",
+            "brightPurple": "#6c71c4",
+            "brightCyan": "#93a1a1",
+            "brightWhite": "#fdf6e3",
+            "background": "#002b36",
+            "foreground": "#839496",
+            "cursorColor": "#93a1a1",
+            "selectionBackground": "#073642"
+        },
+        {
+            "name": "Solarized Light",
+            "black": "#eee8d5",
+            "red": "#dc322f",
+            "green": "#859900",
+            "yellow": "#b58900",
+            "blue": "#268bd2",
+            "purple": "#d33682",
+            "cyan": "#2aa198",
+            "white": "#002b36",
+            "brightBlack": "#fdf6e3",
+            "brightRed": "#cb4b16",
+            "brightGreen": "#93a1a1",
+            "brightYellow": "#839496",
+            "brightBlue": "#657b83",
+            "brightPurple": "#6c71c4",
+            "brightCyan": "#586e75",
+            "brightWhite": "#073642",
+            "background": "#fdf6e3",
+            "foreground": "#657b83",
+            "cursorColor": "#586e75",
+            "selectionBackground": "#eee8d5"
+        },
+        {
+            "name": "Campbell",
+            "black": "#0c0c0c",
+            "red": "#c50f1f",
+            "green": "#13a10e",
+            "yellow": "#c19c00",
+            "blue": "#0037da",
+            "purple": "#881798",
+            "cyan": "#3a96dd",
+            "white": "#cccccc",
+            "brightBlack": "#767676",
+            "brightRed": "#e74856",
+            "brightGreen": "#16c60c",
+            "brightYellow": "#f9f1a5",
+            "brightBlue": "#3b78ff",
+            "brightPurple": "#b4009e",
+            "brightCyan": "#61d6d6",
+            "brightWhite": "#f2f2f2",
+            "background": "#0c0c0c",
+            "foreground": "#cccccc",
+            "cursorColor": "#ffffff",
+            "selectionBackground": "#ffffff"
+        }
+    ],
+    "startupActions": "new-tab -p \"PowerShell\"",
+    "theme": "system",
+    "themes": []
+}

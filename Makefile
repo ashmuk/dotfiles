@@ -23,28 +23,71 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(BLUE)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 .PHONY: install
-install: install-shell install-vim install-git ## Install all dotfiles
+install: validate install-shell install-vim install-git ## Install all dotfiles
 
 .PHONY: install-shell
-install-shell: ## Install shell configuration
+install-shell: validate ## Install shell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing shell configuration..."
 	@chmod +x $(DOTFILES_DIR)/shell/setup_shell.sh
 	@$(DOTFILES_DIR)/shell/setup_shell.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration installed"
 
 .PHONY: install-vim
-install-vim: ## Install vim configuration
+install-vim: validate ## Install vim configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing vim configuration..."
 	@chmod +x $(DOTFILES_DIR)/vim/setup_vimrc.sh
 	@$(DOTFILES_DIR)/vim/setup_vimrc.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Vim configuration installed"
 
 .PHONY: install-git
-install-git: ## Install git configuration
+install-git: validate ## Install git configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing git configuration..."
 	@chmod +x $(DOTFILES_DIR)/git/setup_git.sh
 	@$(DOTFILES_DIR)/git/setup_git.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Git configuration installed"
+
+.PHONY: install-windows
+install-windows: validate ## Install Windows PowerShell configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing Windows configuration..."
+	@if command -v powershell.exe >/dev/null 2>&1; then \
+		powershell.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
+	elif command -v pwsh.exe >/dev/null 2>&1; then \
+		pwsh.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
+	else \
+		echo "$(RED)[ERROR]$(NC) PowerShell not found. Please install PowerShell or PowerShell Core."; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Windows configuration installed"
+
+.PHONY: validate
+validate: ## Validate dotfiles directory and dependencies
+	@echo "$(BLUE)[INFO]$(NC) Validating dotfiles environment..."
+	@if [ ! -f "$(DOTFILES_DIR)/lib/common.sh" ]; then \
+		echo "$(RED)[ERROR]$(NC) Common functions library missing. Run 'make bootstrap' first."; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(DOTFILES_DIR)/shell" ]; then \
+		echo "$(RED)[ERROR]$(NC) Shell configuration directory missing."; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(DOTFILES_DIR)/vim" ]; then \
+		echo "$(RED)[ERROR]$(NC) Vim configuration directory missing."; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(DOTFILES_DIR)/git" ]; then \
+		echo "$(RED)[ERROR]$(NC) Git configuration directory missing."; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Validation completed"
+
+.PHONY: bootstrap
+bootstrap: ## Bootstrap the dotfiles environment (create lib directory if needed)
+	@echo "$(BLUE)[INFO]$(NC) Bootstrapping dotfiles environment..."
+	@mkdir -p $(DOTFILES_DIR)/lib
+	@if [ ! -f "$(DOTFILES_DIR)/lib/common.sh" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Common functions library missing. Please ensure lib/common.sh exists."; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Bootstrap completed"
 
 .PHONY: backup
 backup: ## Create backup of existing dotfiles
@@ -77,7 +120,7 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"
 
 .PHONY: status
-status: ## Show status of installed dotfiles
+status: validate ## Show status of installed dotfiles
 	@echo "$(BLUE)[INFO]$(NC) Checking dotfiles status..."
 	@echo ""
 	@echo "Shell Configuration:"
@@ -183,12 +226,25 @@ update: ## Update dotfiles from repository
 	@echo "$(GREEN)[SUCCESS]$(NC) Dotfiles updated"
 
 .PHONY: test
-test: ## Test shell configuration
+test: validate ## Test shell configuration syntax
 	@echo "$(BLUE)[INFO]$(NC) Testing shell configuration..."
-	@bash -n $(DOTFILES_DIR)/shell/shell.common
-	@bash -n $(DOTFILES_DIR)/shell/shell.bash
-	@zsh -n $(DOTFILES_DIR)/shell/shell.zsh
+	@if [ -f "$(DOTFILES_DIR)/lib/common.sh" ]; then \
+		bash -n $(DOTFILES_DIR)/lib/common.sh || exit 1; \
+	fi
+	@bash -n $(DOTFILES_DIR)/shell/shell.common || exit 1
+	@bash -n $(DOTFILES_DIR)/shell/shell.bash || exit 1
+	@zsh -n $(DOTFILES_DIR)/shell/shell.zsh || exit 1
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
+
+.PHONY: lint
+lint: validate ## Lint shell scripts with shellcheck (if available)
+	@echo "$(BLUE)[INFO]$(NC) Linting shell scripts..."
+	@if command -v shellcheck >/dev/null 2>&1; then \
+		find $(DOTFILES_DIR) -name "*.sh" -type f -exec shellcheck {} \; || exit 1; \
+		echo "$(GREEN)[SUCCESS]$(NC) Shell scripts passed linting"; \
+	else \
+		echo "$(YELLOW)[WARNING]$(NC) shellcheck not found, skipping linting"; \
+	fi
 
 .PHONY: info
 info: ## Show information about this dotfiles project
@@ -201,5 +257,12 @@ info: ## Show information about this dotfiles project
 	@echo "Available configurations:"
 	@echo "  - Shell (bash/zsh) with aliases and functions"
 	@echo "  - Vim with multiple configurations"
+	@echo "  - Git with common settings"
+	@echo "  - Windows PowerShell (with install-windows)"
+	@echo ""
+	@echo "Platform support:"
+	@echo "  - macOS (darwin)"
+	@echo "  - Linux"
+	@echo "  - Windows (WSL/MSYS/Cygwin/Native PowerShell)"
 	@echo ""
 	@echo "Use 'make help' to see all available commands"
