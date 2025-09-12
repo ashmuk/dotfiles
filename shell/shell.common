@@ -339,8 +339,27 @@ gvim() {
 
   # WSL (Windows Subsystem for Linux)
   if grep -qi microsoft /proc/version 2>/dev/null; then
-    local win_gvim="/mnt/c/Program Files/vim/gvim.exe"
-    if [[ -x "$win_gvim" ]]; then
+    # Try multiple common Vim installation paths
+    local win_gvim=""
+    local vim_candidates=(
+      "/mnt/c/Program Files/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files (x86)/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files/vim/gvim.exe"
+      "/mnt/c/vim/gvim.exe"
+    )
+    
+    # Find the first existing gvim.exe
+    for candidate in "${vim_candidates[@]}"; do
+      # Use glob expansion to handle version directories like vim91
+      for path in $candidate; do
+        if [[ -x "$path" ]]; then
+          win_gvim="$path"
+          break 2
+        fi
+      done
+    done
+    
+    if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
       local args=()
       if command -v wslpath >/dev/null 2>&1; then
         for a in "$@"; do
@@ -362,8 +381,27 @@ gvim() {
   # MSYS/Cygwin on Windows
   case "$OSTYPE" in
     msys*|cygwin*)
-      local win_gvim="/c/Program Files/vim/gvim.exe"
-      if [[ -x "$win_gvim" ]]; then
+      # Try multiple common Vim installation paths for MSYS/Cygwin
+      local win_gvim=""
+      local vim_candidates=(
+        "/c/Program Files/Vim/vim*/gvim.exe"
+        "/c/Program Files (x86)/Vim/vim*/gvim.exe"
+        "/c/Program Files/vim/gvim.exe"
+        "/c/vim/gvim.exe"
+      )
+      
+      # Find the first existing gvim.exe
+      for candidate in "${vim_candidates[@]}"; do
+        # Use glob expansion to handle version directories like vim91
+        for path in $candidate; do
+          if [[ -x "$path" ]]; then
+            win_gvim="$path"
+            break 2
+          fi
+        done
+      done
+      
+      if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
         local args=()
         if command -v cygpath >/dev/null 2>&1; then
           for a in "$@"; do
