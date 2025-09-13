@@ -26,13 +26,13 @@ if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
   " Call the font auto-selection function
   if exists('*gui_font#Apply')
     silent! call gui_font#Apply()
-    " Only show message in actual GUI mode, not terminal
-    if has('gui_running')
+    " Only show message if explicitly enabled via g:show_font_messages
+    if get(g:, 'show_font_messages', 0)
       echo "Font auto-selection applied"
     endif
   else
-    " Only show error in actual GUI mode, not terminal
-    if has('gui_running')
+    " Only show error if explicitly enabled via g:show_font_messages
+    if get(g:, 'show_font_messages', 0)
       echo "gui_font#Apply function not found - using fallback fonts"
     endif
     " Fallback font settings
