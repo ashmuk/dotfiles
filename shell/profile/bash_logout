@@ -1,6 +1,40 @@
-# 実際には、.bashrc の最後尾に同処理をexitコマンドにtrapしている
-## ~/.bash_logout の末尾に追記（例：bash ログアウト後にも、ちゃんとzsh向け設定に戻す）
-#if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
-#  source "$HOME/etc/mintty-colors-solarized/sol.light"
-#fi
+# ~/.bash_logout
+# 
+# Bash logout script - executed when bash login shell exits
+# This file is sourced automatically when a bash login shell terminates
+#
+
+# =============================================================================
+# Bash Logout Configuration
+# =============================================================================
+
+# Reset terminal colors to default on logout (optional)
+# Uncomment if you want to ensure clean terminal state on logout
+# Useful when switching between bash and zsh sessions
+# if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
+#   source "$HOME/etc/mintty-colors-solarized/sol.light"
+# fi
+
+# Clear sensitive data from history if needed (uncomment if desired)
+# history -c
+
+# Display logout message (optional)
+# echo "Goodbye from bash session!"
+
+# =============================================================================
+# User Local Logout Configuration
+# =============================================================================
+
+# Load user-specific logout customizations (if exists)
+# This allows users to add personal logout actions without modifying this file
+# Use POSIX-compatible approach for consistency
+set -- "$HOME/.dotfiles-logout" "$HOME/.config/dotfiles/logout" "$DOTFILES_DIR/shell/logout.local" "$HOME/.dotfiles/shell/logout.local"
+
+for local_logout in "$@"; do
+  if [ -f "$local_logout" ] && [ -r "$local_logout" ]; then
+    # shellcheck disable=SC1090
+    source "$local_logout"
+    break
+  fi
+done
 

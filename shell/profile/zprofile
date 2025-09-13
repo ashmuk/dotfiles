@@ -1,7 +1,73 @@
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# ~/.zprofile
+#
+# Zsh login shell initialization
+# This file is sourced for login shells (similar to ~/.bash_profile for bash)
+# For interactive non-login shells, ~/.zshrc is sourced instead
+#
 
-# Setting PATH for Python 3.12
-# The original version is saved in .zprofile.pysave
-PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:${PATH}"
-export PATH
+# =============================================================================
+# Zsh Profile Configuration
+# =============================================================================
+
+# Homebrew setup (macOS - detect both Intel and Apple Silicon)
+if [[ "$OSTYPE" == darwin* ]]; then
+  # Apple Silicon Macs (M1/M2/M3)
+  if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  # Intel Macs
+  elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+fi
+
+# =============================================================================
+# Development Environment Setup
+# =============================================================================
+
+# Python Framework PATH (macOS)
+# Detect and add Python Framework paths dynamically
+if [[ "$OSTYPE" == darwin* ]] && [[ -d "/Library/Frameworks/Python.framework/Versions" ]]; then
+  # Find the latest Python version
+  for python_version in /Library/Frameworks/Python.framework/Versions/*/bin; do
+    if [[ -d "$python_version" ]]; then
+      # Add to PATH if not already present
+      case ":$PATH:" in
+        *":$python_version:"*) ;;
+        *) PATH="$python_version:$PATH" ;;
+      esac
+    fi
+  done
+  export PATH
+fi
+
+# =============================================================================
+# Login Shell Specific Configuration
+# =============================================================================
+
+# Add any login-shell specific settings here
+# These are executed only once per login session
+
+# Example: Display login message
+# echo "Welcome to $(hostname)! Shell: zsh $ZSH_VERSION"
+
+# Example: Check for system updates (macOS)
+# if [[ "$OSTYPE" == darwin* ]] && command -v softwareupdate >/dev/null 2>&1; then
+#   softwareupdate -l 2>/dev/null | grep -q "Software Update found" && echo "System updates available"
+# fi
+
+# =============================================================================
+# User Local Profile Configuration
+# =============================================================================
+
+# Load user-specific profile customizations (if exists)
+# This allows users to add personal login actions without modifying this file
+set -- "$HOME/.zprofile.local" "$HOME/.config/dotfiles/profile.local" "$DOTFILES_DIR/shell/profile.local" "$HOME/.dotfiles/shell/profile.local"
+
+for local_profile in "$@"; do
+  if [[ -f "$local_profile" && -r "$local_profile" ]]; then
+    # shellcheck disable=SC1090
+    source "$local_profile"
+    break
+  fi
+done

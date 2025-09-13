@@ -26,14 +26,10 @@
 
 # Load user-specific logout customizations (if exists)
 # This allows users to add personal logout actions without modifying this file
-LOCAL_LOGOUT_PATHS=(
-  "$HOME/.dotfiles-logout"
-  "$HOME/.config/dotfiles/logout"
-  "$DOTFILES_DIR/shell/logout.local"
-  "$HOME/.dotfiles/shell/logout.local"
-)
+# Use consistent approach with bash_logout for better maintainability
+set -- "$HOME/.dotfiles-logout" "$HOME/.config/dotfiles/logout" "$DOTFILES_DIR/shell/logout.local" "$HOME/.dotfiles/shell/logout.local"
 
-for local_logout in "${LOCAL_LOGOUT_PATHS[@]}"; do
+for local_logout in "$@"; do
   if [[ -f "$local_logout" && -r "$local_logout" ]]; then
     # shellcheck disable=SC1090
     source "$local_logout"

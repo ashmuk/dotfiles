@@ -1,3 +1,47 @@
-if [ -e ~/.bashrc ] ; then
+# ~/.bash_profile
+#
+# Bash login shell initialization
+# This file is sourced for login shells (e.g., when logging in via terminal, ssh)
+# For interactive non-login shells, ~/.bashrc is sourced instead
+#
+
+# =============================================================================
+# Bash Profile Configuration
+# =============================================================================
+
+# Source bashrc for interactive shells
+# This ensures consistent behavior across login and non-login shells
+if [ -f ~/.bashrc ]; then
   source ~/.bashrc
 fi
+
+# =============================================================================
+# Login Shell Specific Configuration
+# =============================================================================
+
+# Add any login-shell specific settings here
+# These are executed only once per login session
+
+# Example: Display login message
+# echo "Welcome to $(hostname)! Shell: $0"
+
+# Example: Check for system updates (macOS)
+# if [[ "$OSTYPE" == darwin* ]] && command -v softwareupdate >/dev/null 2>&1; then
+#   softwareupdate -l 2>/dev/null | grep -q "Software Update found" && echo "System updates available"
+# fi
+
+# =============================================================================
+# User Local Profile Configuration  
+# =============================================================================
+
+# Load user-specific profile customizations (if exists)
+# This allows users to add personal login actions without modifying this file
+set -- "$HOME/.bash_profile.local" "$HOME/.config/dotfiles/profile.local" "$DOTFILES_DIR/shell/profile.local" "$HOME/.dotfiles/shell/profile.local"
+
+for local_profile in "$@"; do
+  if [ -f "$local_profile" ] && [ -r "$local_profile" ]; then
+    # shellcheck disable=SC1090
+    source "$local_profile"
+    break
+  fi
+done
