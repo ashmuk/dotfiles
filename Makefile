@@ -161,7 +161,7 @@ _suggest_installation:
 	@tools="$(TOOLS)"; \
 	echo "$(BLUE)[INFO]$(NC) Installation suggestions:"; \
 	\
-	if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+	if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$${WSL_DISTRO_NAME:-}" ]; then \
 		echo "$(YELLOW)[WSL DETECTED]$(NC) Windows Subsystem for Linux"; \
 		echo "  Ubuntu/Debian: sudo apt update && sudo apt install $$tools"; \
 		echo "  Alpine: sudo apk add $$tools"; \
@@ -252,7 +252,7 @@ install-git: validate ## Install git configuration
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 	@echo "$(BLUE)[INFO]$(NC) Setting up WSL-Windows bridge for dotfiles..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$${WSL_DISTRO_NAME:-}" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
 		$(MAKE) -s _create_windows_junction; \
 	else \
 		echo "$(RED)[ERROR]$(NC) This command is only for WSL or MSYS2 environments"; \
@@ -263,7 +263,7 @@ setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 .PHONY: setup-windows-bridge
 setup-windows-bridge: ## Create WSL symlink to Windows dotfiles (for Windows-first users)
 	@echo "$(BLUE)[INFO]$(NC) Setting up Windows-WSL bridge (Windows-first)..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$${WSL_DISTRO_NAME:-}" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
 		$(MAKE) -s _create_windows_symlink; \
 	else \
 		echo "$(RED)[ERROR]$(NC) This command is only for WSL or MSYS2 environments"; \
@@ -393,7 +393,7 @@ _setup_wsl_bridge_auto:
 .PHONY: install-windows
 install-windows: validate ## Install Windows PowerShell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing Windows configuration..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$${WSL_DISTRO_NAME:-}" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
 		echo "$(BLUE)[INFO]$(NC) WSL/MSYS2 detected - determining dotfiles layout..."; \
 		$(MAKE) -s _setup_wsl_bridge_auto; \
 	fi
