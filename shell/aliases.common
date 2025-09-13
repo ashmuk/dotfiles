@@ -47,6 +47,7 @@ alias findmbd='LC_ALL=C find . -name "*[^ -~]*" -type d'
 # 基本コマンド (Basic commands)
 alias g='git' # also defined in Oh!MyZsh
 alias gs='git status' # git status --short is defined by Oh!MyZsh instead
+alias gss='git status --short' # short status format
 alias ga='git add' # also defined in Oh!MyZsh
 alias gaa='git add .'
 alias gc='git commit' # also defined in Oh!MyZsh
