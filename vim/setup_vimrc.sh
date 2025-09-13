@@ -48,16 +48,24 @@ backup_existing_files() {
     local backup_dir="$HOME/dotfiles/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
-    # Backup vim configuration files
-    for file in .vimrc .gvimrc .ideavimrc; do
-        if [[ -f "$HOME/$file" ]]; then
-            cp "$HOME/$file" "$backup_dir/"
-            print_info "Backed up $file to $backup_dir"
-        fi
-    done
-    
-    # Backup vim directories (environment-aware)
-    local vim_dir=""
+    # Backup vim configuration files (platform-aware)
+    if [[ "$PLATFORM" == "win" ]]; then
+        # Windows-style filenames
+        for file in _vimrc _gvimrc _ideavimrc; do
+            if [[ -f "$HOME/$file" ]]; then
+                cp "$HOME/$file" "$backup_dir/"
+                print_info "Backed up $file to $backup_dir"
+            fi
+        done
+    else
+        # Unix-style filenames
+        for file in .vimrc .gvimrc .ideavimrc; do
+            if [[ -f "$HOME/$file" ]]; then
+                cp "$HOME/$file" "$backup_dir/"
+                print_info "Backed up $file to $backup_dir"
+            fi
+        done
+    fi
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
         vim_dir="$HOME/vimfiles"
     else
@@ -88,10 +96,19 @@ print_info "Detected platform: $PLATFORM"
 create_symlinks() {
     print_info "Creating Symbolic links in home directory..."
 
-    # home ディレクトリ直下にシンボリックリンクを作成
-    ln -sf "$DOTFILES_DIR/vimrc.$PLATFORM" "$HOME/.vimrc"
-    ln -sf "$DOTFILES_DIR/gvimrc.$PLATFORM" "$HOME/.gvimrc"
-    ln -sf "$DOTFILES_DIR/ideavimrc.$PLATFORM" "$HOME/.ideavimrc"
+    # Windows では _vimrc, _gvimrc を使用
+    if [[ "$PLATFORM" == "win" ]]; then
+        ln -sf "$DOTFILES_DIR/vimrc.$PLATFORM" "$HOME/_vimrc"
+        ln -sf "$DOTFILES_DIR/gvimrc.$PLATFORM" "$HOME/_gvimrc"
+        ln -sf "$DOTFILES_DIR/ideavimrc.$PLATFORM" "$HOME/_ideavimrc"
+        print_info "Created Windows-style symlinks: _vimrc, _gvimrc, _ideavimrc"
+    else
+        # Unix/macOS/Linux では .vimrc, .gvimrc を使用
+        ln -sf "$DOTFILES_DIR/vimrc.$PLATFORM" "$HOME/.vimrc"
+        ln -sf "$DOTFILES_DIR/gvimrc.$PLATFORM" "$HOME/.gvimrc"
+        ln -sf "$DOTFILES_DIR/ideavimrc.$PLATFORM" "$HOME/.ideavimrc"
+        print_info "Created Unix-style symlinks: .vimrc, .gvimrc, .ideavimrc"
+    fi
 
     print_success "Symbolic links created in home directory"
 }
