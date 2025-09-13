@@ -352,6 +352,17 @@ This dotfiles system provides comprehensive Windows integration through two work
 - Seamless WSL integration via symlinks
 - Single source of truth for both systems
 
+#### Prerequisites
+```powershell
+# 1. Install Scoop package manager (recommended)
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iwr -useb get.scoop.sh | iex
+
+# 2. Install essential tools
+scoop install make ripgrep fd bat
+```
+
+#### Setup
 ```powershell
 # 1. Clone to Windows (PowerShell)
 git clone <repo-url> "$env:USERPROFILE\dotfiles"

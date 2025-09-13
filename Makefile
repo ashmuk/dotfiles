@@ -49,7 +49,7 @@ _check_essential_tools:
 	done; \
 	if [ -n "$$missing_tools" ]; then \
 		echo "$(RED)[ERROR]$(NC) Missing essential tools:$$missing_tools"; \
-		$(MAKE) -s _suggest_installation "$$missing_tools"; \
+		$(MAKE) -s _suggest_installation TOOLS="$$missing_tools"; \
 		exit 1; \
 	fi
 
@@ -57,7 +57,7 @@ _check_essential_tools:
 _check_optional_tools:
 	@echo "$(BLUE)[INFO]$(NC) Checking optional tools..."
 	@missing_optional=""; \
-	for tool in zsh vim shellcheck; do \
+	for tool in zsh vim shellcheck rg fd bat; do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
 			missing_optional="$$missing_optional $$tool"; \
 		fi; \
@@ -65,42 +65,63 @@ _check_optional_tools:
 	if [ -n "$$missing_optional" ]; then \
 		echo "$(YELLOW)[WARNING]$(NC) Optional tools not found:$$missing_optional"; \
 		echo "$(YELLOW)[WARNING]$(NC) Some features may not work optimally"; \
-		$(MAKE) -s _suggest_installation "$$missing_optional"; \
+		$(MAKE) -s _suggest_installation TOOLS="$$missing_optional"; \
 	fi
 
 .PHONY: _suggest_installation
 _suggest_installation:
-	@tools="$(filter-out _suggest_installation,$(MAKECMDGOALS))"; \
-	if [ -z "$$tools" ]; then tools="$$1"; fi; \
+	@tools="$(TOOLS)"; \
 	echo "$(BLUE)[INFO]$(NC) Installation suggestions:"; \
 	\
 	if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
 		echo "$(YELLOW)[WSL DETECTED]$(NC) Windows Subsystem for Linux"; \
-		echo "  Ubuntu/Debian: sudo apt update && sudo apt install$$tools"; \
-		echo "  Alpine: sudo apk add$$tools"; \
-		echo "  CentOS/RHEL: sudo yum install$$tools"; \
+		echo "  Ubuntu/Debian: sudo apt update && sudo apt install $$tools"; \
+		echo "  Alpine: sudo apk add $$tools"; \
+		echo "  CentOS/RHEL: sudo yum install $$tools"; \
 	elif [ -f /etc/debian_version ]; then \
 		echo "$(YELLOW)[DEBIAN/UBUNTU]$(NC)"; \
-		echo "  sudo apt update && sudo apt install$$tools"; \
+		echo "  sudo apt update && sudo apt install $$tools"; \
 	elif [ -f /etc/redhat-release ]; then \
 		echo "$(YELLOW)[REDHAT/CENTOS]$(NC)"; \
-		echo "  sudo yum install$$tools"; \
+		echo "  sudo yum install $$tools"; \
 	elif [ -f /etc/alpine-release ]; then \
 		echo "$(YELLOW)[ALPINE]$(NC)"; \
-		echo "  sudo apk add$$tools"; \
+		echo "  sudo apk add $$tools"; \
 	elif [ -f /etc/arch-release ]; then \
 		echo "$(YELLOW)[ARCH LINUX]$(NC)"; \
-		echo "  sudo pacman -S$$tools"; \
+		echo "  sudo pacman -S $$tools"; \
 	elif [[ "$$OSTYPE" == darwin* ]]; then \
 		echo "$(YELLOW)[MACOS]$(NC)"; \
-		echo "  brew install$$tools"; \
+		echo "  brew install $$tools"; \
 		echo "  Note: Install Homebrew first: /bin/bash -c \"\$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
-	elif [[ "$$OSTYPE" =~ ^(msys|cygwin) ]]; then \
-		echo "$(YELLOW)[WINDOWS MSYS/CYGWIN]$(NC)"; \
-		echo "  Use package manager or install Git for Windows"; \
+	elif [[ "$$OSTYPE" =~ ^(msys|cygwin) ]] || command -v powershell.exe >/dev/null 2>&1; then \
+		echo "$(YELLOW)[WINDOWS]$(NC) Git for Windows/MSYS2/Cygwin detected"; \
+		echo "  Recommended: Install Scoop package manager first:"; \
+		echo "    powershell.exe -Command \"Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iwr -useb get.scoop.sh | iex\""; \
+		echo "  Then install tools with Scoop:"; \
+		scoop_tools=""; \
+		for tool in $$tools; do \
+			case $$tool in \
+				make) scoop_tools="$$scoop_tools make" ;; \
+				git) scoop_tools="$$scoop_tools git" ;; \
+				bash) echo "    bash: Already available in Git for Windows" ;; \
+				zsh) scoop_tools="$$scoop_tools zsh" ;; \
+				vim) scoop_tools="$$scoop_tools vim" ;; \
+				shellcheck) scoop_tools="$$scoop_tools shellcheck" ;; \
+				rg) scoop_tools="$$scoop_tools ripgrep" ;; \
+				fd) scoop_tools="$$scoop_tools fd" ;; \
+				bat) scoop_tools="$$scoop_tools bat" ;; \
+				*) scoop_tools="$$scoop_tools $$tool" ;; \
+			esac; \
+		done; \
+		if [ -n "$$scoop_tools" ]; then \
+			echo "    powershell.exe -Command \"scoop install$$scoop_tools\""; \
+		fi; \
+		echo "  Alternative: Use MSYS2 package manager:"; \
+		echo "    pacman -S $$tools"; \
 	else \
 		echo "$(YELLOW)[UNKNOWN PLATFORM]$(NC)"; \
-		echo "  Please install manually:$$tools"; \
+		echo "  Please install manually: $$tools"; \
 	fi; \
 	echo ""
 

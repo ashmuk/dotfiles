@@ -47,10 +47,33 @@ make install-shell install-vim install-git
 ## Detailed Workflow
 
 ### Prerequisites
-- Windows 11 with WSL2 installed
-- PowerShell 5.1+ or PowerShell Core
-- WSL distribution (Ubuntu recommended)
-- Git for Windows
+
+#### Essential (Windows)
+- **Windows 10/11** with WSL2 installed
+- **PowerShell 5.1+** or PowerShell Core
+- **Git for Windows** (provides bash, git, and basic Unix tools)
+
+#### Recommended Package Manager (Windows)
+Install **Scoop** for easy tool management:
+```powershell
+# Install Scoop package manager
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iwr -useb get.scoop.sh | iex
+```
+
+#### Additional Tools (Windows)
+Install essential tools via Scoop:
+```powershell
+# Essential tools for full dotfiles functionality
+scoop install make ripgrep fd bat
+
+# Optional but recommended
+scoop install zsh vim shellcheck
+```
+
+#### WSL Prerequisites
+- **WSL distribution** (Ubuntu recommended)
+- Standard Linux tools (usually pre-installed)
 
 ### Step-by-Step Setup
 
