@@ -1,5 +1,7 @@
 # Makefile for dotfiles project
 # This Makefile provides easy installation and management of dotfiles
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
 
 # Variables
 DOTFILES_DIR := $(shell pwd)
@@ -128,7 +130,7 @@ _check_fonts:
 		else \
 			echo "$(GREEN)[SUCCESS]$(NC) Programming fonts available ($$fonts_found/4)"; \
 		fi; \
-	else if [[ "$(PLATFORM)" == "mac" ]]; then \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
 		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
 			if command -v fc-list >/dev/null 2>&1 && fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
 				fonts_found=$$((fonts_found + 1)); \
@@ -164,23 +166,23 @@ _suggest_installation:
 		echo "  Ubuntu/Debian: sudo apt update && sudo apt install $$tools"; \
 		echo "  Alpine: sudo apk add $$tools"; \
 		echo "  CentOS/RHEL: sudo yum install $$tools"; \
-	else if [ -f /etc/debian_version ]; then \
+	elif [ -f /etc/debian_version ]; then \
 		echo "$(YELLOW)[DEBIAN/UBUNTU]$(NC)"; \
 		echo "  sudo apt update && sudo apt install $$tools"; \
-	else if [ -f /etc/redhat-release ]; then \
+	elif [ -f /etc/redhat-release ]; then \
 		echo "$(YELLOW)[REDHAT/CENTOS]$(NC)"; \
 		echo "  sudo yum install $$tools"; \
-	else if [ -f /etc/alpine-release ]; then \
+	elif [ -f /etc/alpine-release ]; then \
 		echo "$(YELLOW)[ALPINE]$(NC)"; \
 		echo "  sudo apk add $$tools"; \
-	else if [ -f /etc/arch-release ]; then \
+	elif [ -f /etc/arch-release ]; then \
 		echo "$(YELLOW)[ARCH LINUX]$(NC)"; \
 		echo "  sudo pacman -S $$tools"; \
-	else if [[ "$$OSTYPE" == darwin* ]]; then \
+	elif [[ "$$OSTYPE" == darwin* ]]; then \
 		echo "$(YELLOW)[MACOS]$(NC)"; \
 		echo "  brew install $$tools"; \
 		echo "  Note: Install Homebrew first: /bin/bash -c \"\$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
-	else if [[ "$$OSTYPE" =~ ^(msys|cygwin) ]] || command -v powershell.exe >/dev/null 2>&1; then \
+	elif [[ "$$OSTYPE" =~ ^(msys|cygwin) ]] || command -v powershell.exe >/dev/null 2>&1; then \
 		echo "$(YELLOW)[WINDOWS]$(NC) Git for Windows/MSYS2/Cygwin detected"; \
 		echo "  Recommended: Install Scoop package manager first:"; \
 		echo "    powershell.exe -Command \"Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iwr -useb get.scoop.sh | iex\""; \
@@ -379,7 +381,7 @@ _setup_wsl_bridge_auto:
 		if [ -d "$$windows_path" ] && [ ! -L "$$HOME/dotfiles" ]; then \
 			echo "$(BLUE)[INFO]$(NC) Windows-first layout detected - creating WSL symlink"; \
 			$(MAKE) -s _create_windows_symlink; \
-		else if [ -d "$$wsl_path" ] && [ "$$wsl_path" = "$$HOME/dotfiles" ]; then \
+		elif [ -d "$$wsl_path" ] && [ "$$wsl_path" = "$$HOME/dotfiles" ]; then \
 			echo "$(BLUE)[INFO]$(NC) WSL-first layout detected - creating Windows junction"; \
 			$(MAKE) -s _create_windows_junction; \
 		else \
@@ -397,7 +399,7 @@ install-windows: validate ## Install Windows PowerShell configuration
 	fi
 	@if command -v powershell.exe >/dev/null 2>&1; then \
 		powershell.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
-	else if command -v pwsh.exe >/dev/null 2>&1; then \
+	elif command -v pwsh.exe >/dev/null 2>&1; then \
 		pwsh.exe -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/windows/setup_windows.ps1"; \
 	else \
 		echo "$(RED)[ERROR]$(NC) PowerShell not found. Please install PowerShell or PowerShell Core."; \
@@ -472,7 +474,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in shell.common; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -481,14 +483,14 @@ status: validate ## Show status of installed dotfiles
 	@for file in shell.bash.* shell.zsh.* aliases.shell.*; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		fi; \
 	done
 	@for file in aliases.common; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -498,7 +500,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in shell.common shell.bash shell.zsh aliases.common aliases.shell; do \
 		if [ -L $(HOME_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(HOME_DIR)/$$file ]; then \
+		elif [ -f $(HOME_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -510,7 +512,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in vimrc.common mappings.common; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -519,7 +521,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in vimrc.gui.* vimrc.terminal.* vimrc.idea.*; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		fi; \
 	done
@@ -527,7 +529,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in .vimrc _vimrc _gvimrc .ideavimrc vimrc.common mappings.common; do \
 		if [ -L $(HOME_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(HOME_DIR)/$$file ]; then \
+		elif [ -f $(HOME_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -536,7 +538,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in vimrc.gui.* vimrc.terminal.* vimrc.idea.*; do \
 		if [ -L $(HOME_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(HOME_DIR)/$$file ]; then \
+		elif [ -f $(HOME_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		fi; \
 	done
@@ -546,7 +548,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in gitconfig.common gitignore.common gitattributes.common; do \
 		if [ -L $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(DOTFILES_DIR)/$$file ]; then \
+		elif [ -f $(DOTFILES_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -556,7 +558,7 @@ status: validate ## Show status of installed dotfiles
 	@for file in .gitconfig .gitignore .gitattributes gitconfig.common gitignore.common gitattributes.common; do \
 		if [ -L $(HOME_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
-		else if [ -f $(HOME_DIR)/$$file ]; then \
+		elif [ -f $(HOME_DIR)/$$file ]; then \
 			echo "    $(YELLOW)⚠$(NC) $$file (file)"; \
 		else \
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
@@ -688,7 +690,7 @@ install-fonts: ## Install programming fonts for gvim (cross-platform)
 		else \
 			echo "$(YELLOW)[WARNING]$(NC) PowerShell not found. Please run fonts/install_fonts.ps1 manually."; \
 		fi; \
-	else if [[ "$(PLATFORM)" == "mac" ]]; then \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
 		if command -v brew >/dev/null 2>&1; then \
 			bash "$(DOTFILES_DIR)/fonts/install_fonts.sh"; \
 		else \
@@ -731,7 +733,7 @@ check-fonts: ## Check if recommended fonts are installed
 			fi; \
 		done; \
 		echo "Found $$fonts_found/4 recommended fonts"; \
-	else if [[ "$(PLATFORM)" == "mac" ]]; then \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
 		echo "Checking macOS fonts..."; \
 		fonts_found=0; \
 		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
