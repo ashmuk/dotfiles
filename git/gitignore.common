@@ -242,7 +242,7 @@ docs/_build/
 site/
 
 # Generated files
-*.generated.*
+*.generated
 *.min.*
 *.bundle.*
 

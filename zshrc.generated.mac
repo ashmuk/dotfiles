@@ -1,0 +1,670 @@
+#!/bin/zsh
+
+# shellcheck disable=SC2148
+
+###############################################################################
+#
+# Shell common configuration
+# This file contains common shell settings that work for both bash and zsh
+#
+###############################################################################
+
+# =============================================================================
+# Path Settings
+# =============================================================================
+
+# Add common paths
+export PATH="/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+# Homebrew (Intel/macOS 用) 調整
+if [[ -d /opt/homebrew/bin ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+fi
+
+# =============================================================================
+# Basic Shell Settings
+# =============================================================================
+
+# History settings
+export HISTSIZE=10000
+export SAVEHIST=10000
+export HISTFILESIZE=20000
+export HISTCONTROL=ignoreboth:erasedups
+
+# Editor settings
+export EDITOR=vim
+export VISUAL=vim
+
+# Language settings
+# Set locale only if available to avoid warnings
+if locale -a 2>/dev/null | grep -q "ja_JP.UTF-8"; then
+    export LANG=ja_JP.UTF-8
+    export LC_ALL=ja_JP.UTF-8
+else
+    # Fallback to C.UTF-8 or en_US.UTF-8
+    if locale -a 2>/dev/null | grep -q "C.UTF-8"; then
+        export LANG=C.UTF-8
+        export LC_ALL=C.UTF-8
+    elif locale -a 2>/dev/null | grep -q "en_US.UTF-8"; then
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+    fi
+fi
+
+# =============================================================================
+# Grep Configuration
+# =============================================================================
+
+# Common config files
+if [ -n "$BASH_VERSION" ]; then
+  config_files="$HOME/dotfiles $HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+elif [ -n "$ZSH_VERSION" ]; then
+  config_files="$HOME/dotfiles $HOME/.zshrc $HOME/.zshenv $HOME/.zprofile $HOME/.zlogin $HOME/.zlogout /etc/zsh* $HOME/.oh-my-zsh $HOME/.zsh $HOME/.zshrc.local"
+else
+  config_files=""
+fi
+export config_files
+
+# Build grep command with options
+grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
+
+# Determine which grep to use and build the command
+if command -v ggrep >/dev/null 2>&1; then
+  alias grep='ggrep'
+  grep_command="ggrep $grep_options"
+elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
+  alias grep='/usr/local/bin/grep'
+  grep_command="/usr/local/bin/grep $grep_options"
+elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
+  alias grep='/opt/homebrew/bin/grep'
+  grep_command="/opt/homebrew/bin/grep $grep_options"
+else
+  grep_command="grep $grep_options"
+fi
+export grep_command
+
+# =============================================================================
+# Du Configuration
+# =============================================================================
+
+# Determine which du to use and build the command
+du_options="-h"
+
+# Check if du supports GNU-style --max-depth option
+# Use a safer test directory that should exist everywhere
+test_dir="${TMPDIR:-/tmp}"
+if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du
+  du_command="du $du_options --max-depth=1"
+elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du as gdu
+  alias du='gdu'
+  du_command="gdu $du_options --max-depth=1"
+elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du in /usr/local/bin
+  alias du='/usr/local/bin/du'
+  du_command="/usr/local/bin/du $du_options --max-depth=1"
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du in /opt/homebrew/bin
+  alias du='/opt/homebrew/bin/du'
+  du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
+else
+  # BSD du (fallback)
+  du_command="du $du_options -d 1"
+fi
+export du_command
+
+# =============================================================================
+# Performance Optimizations
+# =============================================================================
+
+# Load performance utilities (lazy-loading framework)
+if [ -n "$DOTFILES_DIR" ] && [ -f "$DOTFILES_DIR/shell/performance.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/performance.sh"
+fi
+
+# =============================================================================
+# Source Common Aliases
+# =============================================================================
+export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
+
+# Source common aliases (works for both bash and zsh)
+if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/aliases.common"
+fi
+
+# Source shell-specific aliases (after grep_command is set)
+if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/aliases.shell"
+fi
+
+# =============================================================================
+# Commoon Functions
+# =============================================================================
+
+# Function to extract archives
+extract() {
+  if [[ -f $1 ]]; then
+    case $1 in
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar e "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Function to create directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1" || return 1
+}
+
+# Function to show directory history
+dh() {
+  dirs -v
+}
+
+# Function to show where an alias is defined
+grepalias() {
+  # Input validation
+  if [ $# -eq 0 ]; then
+    echo "Usage: grepalias <alias_name> [file1] [file2] ..." >&2
+    return 1
+  fi
+
+  local alias_name="$1"
+  shift || true
+
+  # Determine search files
+  if [ "$#" -gt 0 ]; then
+    # Use files provided as arguments
+    :
+  elif [ -n "${config_files:-}" ]; then
+    # Parse config_files string into positional parameters
+    if [ -n "$BASH_VERSION" ]; then
+      # Bash: use eval with proper quoting
+      eval "set -- $config_files"
+    elif [ -n "$ZSH_VERSION" ]; then
+      # Zsh: use word splitting (intentional for this shell)
+      # shellcheck disable=SC2086
+      set -- ${=config_files}
+    else
+      # Fallback: simple parsing (word splitting is intentional)
+      # shellcheck disable=SC2086
+      set -- $config_files
+    fi
+    
+    # Expand tilde in file paths
+    local expanded_file
+    local temp_files=""
+    for file in "$@"; do
+      case "$file" in
+        \~/*) expanded_file="$HOME/${file#\~/}" ;;
+        *) expanded_file="$file" ;;
+      esac
+      temp_files="$temp_files $expanded_file"
+    done
+    eval "set -- $temp_files"
+  else
+    set -- "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc"
+  fi
+
+  # Extract alias definition with better parsing
+  local alias_def
+  alias_def="$(alias "$alias_name" 2>/dev/null)" || {
+    printf 'alias not found: %s\n' "$alias_name" >&2
+    return 1
+  }
+
+
+  # Extract right-hand side (more robust parsing)
+  local rhs
+  # Remove the alias name and equals sign from the beginning
+  rhs="${alias_def#*=}"
+
+  # Handle different quoting styles - simplified for consistent patterns
+  # This function normalizes the RHS to match how it appears in source files
+  normalize_rhs() {
+    local input="$1"
+    local result="$input"
+
+    # Primary case: Single-quoted string (now the standard pattern)
+    if [[ "$result" =~ ^\'.*\'$ ]]; then
+      # Remove outer single quotes
+      result="${result:1:-1}"
+      # Convert escaped single quotes '\'' back to single quotes '
+      # shellcheck disable=SC1003
+      result="${result//'\''/'}"
+
+    # Fallback case: Double-quoted string (legacy patterns)
+    elif [[ "$result" =~ ^\".*\"$ ]]; then
+      # Remove outer double quotes
+      result="${result:1:-1}"
+      # Convert escaped double quotes \" back to double quotes "
+      result="${result//\\\"/\"}"
+
+    # Simple case: Unquoted single word
+    elif [[ "$result" =~ ^[^[:space:]]+$ ]]; then
+      # No change needed for unquoted single words
+      :
+
+    # Edge case: Malformed quotes (try to salvage)
+    else
+      # Try to detect and fix malformed patterns
+      if [[ "$result" =~ ^\' ]]; then
+        # Starts with single quote but doesn't end properly
+        result="${result#\'}"
+        if [[ "$result" =~ \'$ ]]; then
+          result="${result%\'}"
+        fi
+        # shellcheck disable=SC1003
+        result="${result//'\''/'}"
+      elif [[ "$result" =~ ^\" ]]; then
+        # Starts with double quote but doesn't end properly
+        result="${result#\"}"
+        if [[ "$result" =~ \"$ ]]; then
+          result="${result%\"}"
+        fi
+        result="${result//\\\"/\"}"
+      else
+        # Completely unparseable
+        printf 'cannot parse alias definition: %s\n' "$alias_def" >&2
+        return 1
+      fi
+    fi
+
+    echo "$result"
+  }
+
+  # Normalize the RHS
+  rhs="$(normalize_rhs "$rhs")" || return 1
+
+  # Search for the alias definition
+  # First try exact match
+  if ! grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null; then
+    # If no exact match found, try searching for the alias name itself
+    # This handles cases where variables are expanded or special characters cause issues
+    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "$@" 2>/dev/null
+  fi
+}
+aliaswh() {
+  grepalias "$1"
+}
+grepal() {
+  grepalias "$1"
+}
+
+# Function to jump to directory by number
+j() {
+  if [[ $1 =~ ^[0-9]+$ ]]; then
+    local dir
+    dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
+    if [[ -n $dir ]]; then
+      cd "$dir" || return 1
+    else
+      echo "Directory not found"
+    fi
+  else
+    echo "Usage: j <number>"
+  fi
+}
+
+gvim() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if command -v mvim >/dev/null 2>&1; then
+      command mvim "$@"
+    elif [[ -x "/Applications/MacVim.app/Contents/bin/mvim" ]]; then
+      "/Applications/MacVim.app/Contents/bin/mvim" "$@"
+    else
+      if command -v open >/dev/null 2>&1; then
+        open -a "MacVim" --args "$@"
+      else
+        vim -g "$@"
+      fi
+    fi
+    return
+  fi
+
+  # WSL (Windows Subsystem for Linux)
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    # Try multiple common Vim installation paths
+    # Prioritize Scoop installations over traditional vim directories
+    local win_gvim=""
+    local vim_candidates=(
+      "/mnt/c/Users/*/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/ProgramData/scoop/apps/vim/*/gvim.exe" 
+      "/mnt/c/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/Program Files/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files (x86)/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files/vim/gvim.exe"
+      "/mnt/c/vim/gvim.exe"
+    )
+    
+    # Find the first existing gvim.exe
+    for candidate in "${vim_candidates[@]}"; do
+      # Use glob expansion to handle version directories like vim91
+      for path in $candidate; do
+        if [[ -x "$path" ]]; then
+          win_gvim="$path"
+          break 2
+        fi
+      done
+    done
+    
+    if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
+      local args=()
+      if command -v wslpath >/dev/null 2>&1; then
+        for a in "$@"; do
+          if [[ -e "$a" || "$a" == /* ]]; then
+            args+=("$(wslpath -w -- "$a")")
+          else
+            args+=("$a")
+          fi
+        done
+      else
+        args=("$@")
+      fi
+      "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+      disown
+      return
+    fi
+  fi
+
+  # MSYS/Cygwin on Windows
+  case "$OSTYPE" in
+    msys*|cygwin*)
+      # Try multiple common Vim installation paths for MSYS/Cygwin
+      # Prioritize Scoop installations over traditional vim directories
+      local win_gvim=""
+      local vim_candidates=(
+        "/c/Users/*/scoop/apps/vim/*/gvim.exe"
+        "/c/ProgramData/scoop/apps/vim/*/gvim.exe"
+        "/c/scoop/apps/vim/*/gvim.exe"
+        "/c/Program Files/Vim/vim*/gvim.exe"
+        "/c/Program Files (x86)/Vim/vim*/gvim.exe"
+        "/c/Program Files/vim/gvim.exe"
+        "/c/vim/gvim.exe"
+      )
+      
+      # Find the first existing gvim.exe
+      for candidate in "${vim_candidates[@]}"; do
+        # Use glob expansion to handle version directories like vim91
+        for path in $candidate; do
+          if [[ -x "$path" ]]; then
+            win_gvim="$path"
+            break 2
+          fi
+        done
+      done
+      
+      if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
+        local args=()
+        if command -v cygpath >/dev/null 2>&1; then
+          for a in "$@"; do
+            if [[ -e "$a" || "$a" == /* ]]; then
+              args+=("$(cygpath -w -- "$a")")
+            else
+              args+=("$a")
+            fi
+          done
+        else
+          args=("$@")
+        fi
+        "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+        disown
+        return
+      fi
+      ;;
+  esac
+
+  # Fallbacks: native gvim or terminal GUI mode
+  if command -v gvim >/dev/null 2>&1; then
+    command gvim "$@" & disown
+  else
+    vim -g "$@"
+  fi
+}
+
+# =============================================================================
+# User Local Configuration
+# =============================================================================
+
+# Load user-specific customizations (if exists)
+# This allows users to override settings without modifying the main dotfiles
+# Use positional parameters instead of arrays for better compatibility
+set -- "$HOME/.dotfiles-local" "$HOME/.config/dotfiles/local" "$DOTFILES_DIR/shell/local" "$HOME/.dotfiles/shell/local"
+
+for local_config in "$@"; do
+  if [ -f "$local_config" ] && [ -r "$local_config" ]; then
+    # shellcheck disable=SC1090
+    source "$local_config"
+    break
+  fi
+done
+
+# shellcheck disable=SC2148
+
+###############################################################################
+#
+# Zsh-specific configuration
+# This file contains zsh-specific settings and functions
+#
+###############################################################################
+
+# =============================================================================
+# Zsh-specific Settings
+# =============================================================================
+
+# History setting
+export HISTFILE=~/.zsh_history
+
+# Zsh options
+setopt AUTO_CD
+#setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt CORRECT
+setopt NO_BEEP
+setopt INTERACTIVE_COMMENTS
+
+# =============================================================================
+# Auto completion
+# =============================================================================
+
+# Enable auto completion
+autoload -Uz compinit
+compinit
+
+# Show auto completion like 'menu'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# Kiro integration
+# shellcheck disable=SC1090
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+
+# =============================================================================
+# Zsh specific
+# =============================================================================
+# to be defined if any applicable
+# shellcheck disable=SC2148  # Shebang added in generated files
+###############################################################################
+#
+# Oh-my-zsh
+#
+###############################################################################
+
+# Added by Mukai
+# Enable plugins installed by homebrew ... -> This is not really necessary as installed by git clone instead
+# See the installation in the folder: $HOME/.oh-my-zsh/custom/plugins
+#source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+#source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# shellcheck disable=SC2034  # ZSH_THEME is used by Oh My Zsh
+ZSH_THEME="robbyrussell"
+
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+#plugins=(git)
+# Added by Mukai
+# shellcheck disable=SC2034  # plugins array is used by Oh My Zsh
+plugins=(
+  git
+  z
+  docker
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+
+# shellcheck disable=SC1091  # Oh My Zsh script is external dependency
+source "$ZSH/oh-my-zsh.sh"
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# FIXME: this could be improved better while writing in another file
+# =============================================================================
+# Prompt
+# =============================================================================
+
+# zsh prompt (colored / 2-line)
+ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
+# shellcheck disable=SC2034  # PROMPT_BASE is used in zsh prompt system
+PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n %F{green}%~%f"$'\n'"%# "
+# shellcheck disable=SC2034  # PROMPT is used by zsh
+PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
+
+# Enable vi mode
+bindkey -v
+
+# Display indicator of vi mode in prompt
+# shellcheck disable=SC2034  # PROMPT is used by zsh prompt system in case branches
+function zle-keymap-select {
+  case $KEYMAP in
+    vicmd) PROMPT="%F{red}[NORMAL]%f $PROMPT_BASE" ;;
+    main|viins) PROMPT="%F{green}[INSERT]%f $PROMPT_BASE" ;;
+  esac
+  zle reset-prompt
+}
+zle -N zle-keymap-select
+
+# =============================================================================
+# Theme
+# =============================================================================
+
+# FIXME: this could be clarified if really needed
+# Adding this at the end of ~/.zshrc (e.g. get the setting back even after logout bash)
+# Actually, this is trapped at the end of .bashrc...
+if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
+  # shellcheck disable=SC1091  # Optional theme file may not exist
+  source "$HOME/etc/mintty-colors-solarized/sol.light"
+fi

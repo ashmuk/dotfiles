@@ -35,9 +35,9 @@ create_symlinks() {
     print_status "Creating symbolic links in home directory..."
 
     # Create symlinks to platform-specific generated files
-    ln -sf "$DOTFILES_DIR/bashrc.generated" "$HOME/.bashrc"
-    ln -sf "$DOTFILES_DIR/zshrc.generated" "$HOME/.zshrc"
-    
+    ln -sf "$DOTFILES_DIR/bashrc.generated.$PLATFORM" "$HOME/.bashrc"
+    ln -sf "$DOTFILES_DIR/zshrc.generated.$PLATFORM" "$HOME/.zshrc"
+
     # Create symlinks to profile files
     print_status "Creating profile file symlinks..."
     ln -sf "$DOTFILES_DIR/shell/profile/bash_logout" "$HOME/.bash_logout"
@@ -59,7 +59,7 @@ backup_existing_files() {
     for file in "${files[@]}"; do
         backup_file "$HOME/$file" "$backup_dir" "$file"
     done
-    
+
     return 0
 }
 
@@ -69,7 +69,7 @@ create_platform_files() {
 
     local temp_files=()
 
-    # Create bashrc.generated
+    # Create bashrc.generated.$PLATFORM
     local bashrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.bash")
     for file in "${bashrc_files[@]}"; do
         if [[ ! -f "$file" ]]; then
@@ -77,11 +77,11 @@ create_platform_files() {
             return 1
         fi
     done
-    
-    concatenate_files_with_shebang "$DOTFILES_DIR/bashrc.generated" "#!/bin/bash" "${bashrc_files[@]}" || return 1
-    temp_files+=("$DOTFILES_DIR/bashrc.generated")
 
-    # Create zshrc.generated
+    concatenate_files_with_shebang "$DOTFILES_DIR/bashrc.generated.$PLATFORM" "#!/bin/bash" "${bashrc_files[@]}" || return 1
+    temp_files+=("$DOTFILES_DIR/bashrc.generated.$PLATFORM")
+
+    # Create zshrc.generated.$PLATFORM
     local zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.zsh" "$DOTFILES_DIR/shell/shell.ohmy.zsh")
     for file in "${zshrc_files[@]}"; do
         if [[ ! -f "$file" ]]; then
@@ -89,9 +89,9 @@ create_platform_files() {
             return 1
         fi
     done
-    
-    concatenate_files_with_shebang "$DOTFILES_DIR/zshrc.generated" "#!/bin/zsh" "${zshrc_files[@]}" || return 1
-    temp_files+=("$DOTFILES_DIR/zshrc.generated")
+
+    concatenate_files_with_shebang "$DOTFILES_DIR/zshrc.generated.$PLATFORM" "#!/bin/zsh" "${zshrc_files[@]}" || return 1
+    temp_files+=("$DOTFILES_DIR/zshrc.generated.$PLATFORM")
 
     print_success "Platform-dependent files created in dotfiles directory"
     return 0
@@ -100,16 +100,16 @@ create_platform_files() {
 # Check and restore generated files if no actual changes
 check_generated_files() {
     print_status "Checking for actual changes in generated files..."
-    
+
     local files_restored=0
-    local files=("bashrc.generated" "zshrc.generated")
-    
+    local files=("bashrc.generated.$PLATFORM" "zshrc.generated.$PLATFORM")
+
     for file in "${files[@]}"; do
         if restore_git_file_if_no_changes "$DOTFILES_DIR/$file" "$DOTFILES_DIR"; then
             files_restored=$((files_restored + 1))
         fi
     done
-    
+
     if [[ $files_restored -gt 0 ]]; then
         print_success "Restored $files_restored generated file(s) with no actual differences"
     else
@@ -122,19 +122,19 @@ main() {
     print_status "Starting shell configuration setup..."
 
     # All validation is done at the top of the script now
-    
+
     if ! backup_existing_files; then
         print_error "Failed to backup existing files"
         return 1
     fi
-    
+
     if ! create_platform_files; then
         print_error "Failed to create platform files"
         return 1
     fi
-    
+
     check_generated_files
-    
+
     if ! create_symlinks; then
         print_error "Failed to create symlinks"
         return 1
@@ -150,7 +150,7 @@ main() {
     print_status "  - $HOME/.zprofile"
     print_status "  - $HOME/.zlogout"
     print_status ""
-    
+
     return 0
 }
 
