@@ -67,21 +67,41 @@ export config_files
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
 export grep_options
 
+# Debug: Print that we're setting up grep_command
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Setting up grep_command..." >&2
+
 # Initialize grep_command with a default value (defensive approach)
 grep_command="grep ${grep_options:-}"
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Initial grep_command='$grep_command'" >&2
 
 # Determine which grep to use and build the command
 if command -v ggrep >/dev/null 2>&1; then
   alias grep='ggrep'
   grep_command="ggrep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using ggrep, grep_command='$grep_command'" >&2
 elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
   alias grep='/usr/local/bin/grep'
   grep_command="/usr/local/bin/grep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/grep, grep_command='$grep_command'" >&2
 elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
   alias grep='/opt/homebrew/bin/grep'
   grep_command="/opt/homebrew/bin/grep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/grep, grep_command='$grep_command'" >&2
+else
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using default grep, grep_command='$grep_command'" >&2
 fi
+
+# Ensure the variable is exported and verify it
 export grep_command
+
+# Final safety check - if grep_command is still empty, set a basic fallback
+if [[ -z "${grep_command:-}" ]]; then
+  grep_command="grep"
+  export grep_command
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: FALLBACK: Set grep_command='$grep_command'" >&2
+fi
+
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Final grep_command='$grep_command' (exported)" >&2
 
 # =============================================================================
 # Du Configuration
@@ -91,8 +111,12 @@ export grep_command
 du_options="-h"
 export du_options
 
+# Debug: Print that we're setting up du_command
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Setting up du_command..." >&2
+
 # Initialize du_command with a default value (defensive approach)
 du_command="du ${du_options:-} -d 1"
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Initial du_command='$du_command'" >&2
 
 # Check if du supports GNU-style --max-depth option
 # Use a safer test directory that should exist everywhere
@@ -100,20 +124,37 @@ test_dir="${TMPDIR:-/tmp}"
 if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du
   du_command="du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using GNU du, du_command='$du_command'" >&2
 elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du as gdu
   alias du='gdu'
   du_command="gdu ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using gdu, du_command='$du_command'" >&2
 elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /usr/local/bin
   alias du='/usr/local/bin/du'
   du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/du, du_command='$du_command'" >&2
 elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /opt/homebrew/bin
   alias du='/opt/homebrew/bin/du'
   du_command="/opt/homebrew/bin/du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/du, du_command='$du_command'" >&2
+else
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using default du, du_command='$du_command'" >&2
 fi
+
+# Ensure the variable is exported and verify it
 export du_command
+
+# Final safety check - if du_command is still empty, set a basic fallback
+if [[ -z "${du_command:-}" ]]; then
+  du_command="du -h"
+  export du_command
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: FALLBACK: Set du_command='$du_command'" >&2
+fi
+
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Final du_command='$du_command' (exported)" >&2
 
 # =============================================================================
 # Performance Optimizations

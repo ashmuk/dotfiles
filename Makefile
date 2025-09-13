@@ -664,11 +664,11 @@ test-compat: validate ## Test cross-platform compatibility
 	@echo "$(BLUE)[INFO]$(NC) Testing platform compatibility..."
 	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'Shell configuration loaded successfully'" || exit 1
 	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && alias | head -3 >/dev/null" || exit 1
-	@bash -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $$grep_command' && echo 'du_command: $$du_command'" || exit 1
+	@bash -c "DEBUG_SHELL_COMMON=1 source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $${grep_command:-not set}' && echo 'du_command: $${du_command:-not set}'" || exit 1
 	@if command -v zsh >/dev/null 2>&1; then \
 		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'Shell configuration loaded successfully'" || exit 1; \
 		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && alias | head -3 >/dev/null" || exit 1; \
-		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $$grep_command' && echo 'du_command: $$du_command'" || exit 1; \
+		zsh -c "source $(DOTFILES_DIR)/shell/shell.common && echo 'grep_command: $${grep_command:-not set}' && echo 'du_command: $${du_command:-not set}'" || exit 1; \
 	else \
 		echo "$(YELLOW)[WARNING]$(NC) zsh not found, skipping zsh compatibility tests"; \
 	fi
