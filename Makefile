@@ -694,6 +694,24 @@ install-fonts: ## Install programming fonts for gvim (cross-platform)
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Font installation completed"
 
+.PHONY: install-vim-plug
+install-vim-plug: ## Install vim-plug plugin manager (cross-platform)
+	@echo "$(BLUE)[INFO]$(NC) Installing vim-plug plugin manager..."
+	@if [[ "$(PLATFORM)" == "win" ]]; then \
+		if command -v powershell >/dev/null 2>&1; then \
+			powershell -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/vim/install_vim_plug.ps1"; \
+		else \
+			bash "$(DOTFILES_DIR)/vim/install_vim_plug.sh"; \
+		fi; \
+	else \
+		bash "$(DOTFILES_DIR)/vim/install_vim_plug.sh"; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) vim-plug installation completed"
+	@echo "$(BLUE)[INFO]$(NC) Next steps:"
+	@echo "  1. Open vim/gvim"
+	@echo "  2. Run :PlugInstall to install plugins"
+	@echo "  3. Restart vim/gvim to load plugins"
+
 .PHONY: check-fonts
 check-fonts: ## Check if recommended fonts are installed
 	@echo "$(BLUE)[INFO]$(NC) Checking font availability..."
@@ -746,6 +764,7 @@ info: ## Show information about this dotfiles project
 	@echo "  - Git with common settings"
 	@echo "  - Windows PowerShell (with install-windows)"
 	@echo "  - Programming fonts (with install-fonts)"
+	@echo "  - vim-plug plugin manager (with install-vim-plug)"
 	@echo ""
 	@echo "Platform support:"
 	@echo "  - macOS (darwin)"

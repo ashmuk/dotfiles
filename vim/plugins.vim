@@ -9,13 +9,39 @@
 if empty(glob('~/.vim/autoload/plug.vim')) && empty(glob('~/vimfiles/autoload/plug.vim'))
   " Auto-install vim-plug if not found
   if has('win32') || has('win64')
-    " Windows
-    silent execute '!curl -fLo ~/vimfiles/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    " Windows - try multiple methods
+    let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    let s:plug_dir = expand('~/vimfiles/autoload')
+    let s:plug_file = s:plug_dir . '/plug.vim'
+    
+    " Create directory if it doesn't exist
+    if !isdirectory(s:plug_dir)
+      call mkdir(s:plug_dir, 'p')
+    endif
+    
+    " Try to download vim-plug
+    if executable('curl')
+      silent execute '!curl -fLo ' . s:plug_file . ' ' . s:plug_url
+    elseif executable('wget')
+      silent execute '!wget -O ' . s:plug_file . ' ' . s:plug_url
+    elseif executable('powershell')
+      " Use PowerShell as fallback
+      silent execute '!powershell -Command "Invoke-WebRequest -Uri ' . s:plug_url . ' -OutFile ' . s:plug_file . '"'
+    else
+      echoerr 'vim-plug installation failed: curl, wget, or PowerShell not available'
+      echoerr 'Please manually install vim-plug from: https://github.com/junegunn/vim-plug'
+    endif
+    
+    " Verify installation and reload if successful
+    if filereadable(s:plug_file)
+      source s:plug_file
+      echo 'vim-plug installed successfully. Run :PlugInstall to install plugins.'
+    endif
   else
     " Unix/macOS
     silent execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
   endif
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " Determine plugin directory based on platform
