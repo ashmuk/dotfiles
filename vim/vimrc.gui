@@ -15,7 +15,7 @@ set background=dark
 " ---- GUI font auto selection (Windows/macOS/Linux) ----
 if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
   " Ensure autoload function is available
-  if !exists('*GuiFont#Apply')
+  if !exists('*gui_font#Apply')
     " Try to source the autoload file directly
     let s:autoload_file = expand('~/dotfiles/vim/vimfiles/autoload/gui_font.vim')
     if filereadable(s:autoload_file)
@@ -24,11 +24,11 @@ if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
   endif
   
   " Call the font auto-selection function
-  if exists('*GuiFont#Apply')
-    silent! call GuiFont#Apply()
+  if exists('*gui_font#Apply')
+    silent! call gui_font#Apply()
     echo "Font auto-selection applied"
   else
-    echo "GuiFont#Apply function not found - using fallback fonts"
+    echo "gui_font#Apply function not found - using fallback fonts"
     " Fallback font settings
     if has('win32') || has('win64')
       set guifont=Consolas:h12

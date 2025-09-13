@@ -1,7 +1,7 @@
 " Cross-platform GUI font chooser for Vim/gVim/MacVim/Neovim-GUI
-" Usage: call GuiFont#Apply()
-if exists('*GuiFont#Apply') == 0
-  function! GuiFont#Apply() abort
+" Usage: call gui_font#Apply()
+if exists('*gui_font#Apply') == 0
+  function! gui_font#Apply() abort
     " Only when GUI is available
     if !exists('+guifont')
       return
