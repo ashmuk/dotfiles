@@ -12,28 +12,31 @@ set background=dark
 "---------------------------------------------------------------------------
 " フォント設定:
 "
-if has('win32')
-  " Windows用フォント設定
-  set guifont=MyricaM_M:h12:cSHIFTJIS:qDRAFT
-  if &guifont == ''
-    set guifont=MS_Gothic:h12:cSHIFTJIS
+" ---- GUI font auto selection (Windows/macOS/Linux) ----
+if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
+  " Ensure autoload function is available
+  if !exists('*GuiFont#Apply')
+    " Try to source the autoload file directly
+    let s:autoload_file = expand('~/dotfiles/vim/vimfiles/autoload/gui_font.vim')
+    if filereadable(s:autoload_file)
+      execute 'source ' . s:autoload_file
+    endif
   endif
-  " 行間隔の設定
-  set linespace=1
-  " 一部のUCS文字の幅を自動計測して決める
-  if has('kaoriya')
-    set ambiwidth=auto
-  endif
-elseif has('mac')
-  " macOS用フォント設定
-  set guifont=Menlo:h14
-  if &guifont == ''
-    set guifont=Monaco:h14
-  endif
-elseif has('xfontset')
-  " UNIX用 (xfontsetを使用)
-  if &guifontset == ''
-    set guifontset=a14,r14,k14
+  
+  " Call the font auto-selection function
+  if exists('*GuiFont#Apply')
+    silent! call GuiFont#Apply()
+    echo "Font auto-selection applied"
+  else
+    echo "GuiFont#Apply function not found - using fallback fonts"
+    " Fallback font settings
+    if has('win32') || has('win64')
+      set guifont=Consolas:h12
+    elseif has('mac')
+      set guifont=Menlo:h13
+    else
+      set guifont=DejaVuSansMono:h12
+    endif
   endif
 endif
 
