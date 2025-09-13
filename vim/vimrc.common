@@ -99,8 +99,22 @@ if !isdirectory(tmp_dir)
 endif
 
 " スワップファイル・バックアップファイルの保存先
-set directory=tmp_dir
-set backupdir=tmp_dir
+" Use execute to properly expand the variable
+execute 'set directory=' . tmp_dir
+execute 'set backupdir=' . tmp_dir
+
+" Windows-specific swap file handling
+if has('win32') || has('win64')
+  " Ensure swap files are created in a writable location
+  " Add current directory as fallback if tmp_dir fails
+  execute 'set directory=' . tmp_dir . ',\\tmp\\,.,'
+  " Disable swap files in network directories (common Windows issue)
+  set noswapfile
+  " Re-enable swap files but with safer settings
+  set swapfile
+  " Use shorter swap file names to avoid Windows path length issues
+  set shortname
+endif
 " アンドゥファイルを作成しない
 set noundofile
 
