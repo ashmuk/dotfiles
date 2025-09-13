@@ -105,6 +105,24 @@ sudo apt install shellcheck jq tree htop
 
 Run `make check-prereqs` to check which tools you have and get installation suggestions for your platform.
 
+## ⚡ Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `make install` | Install all dotfiles (shell + vim + git) |
+| `make check-prereqs` | Check tools and show installation commands |
+| `make test` | Run complete test suite |
+| `make status` | Show installation status |
+| `make clean` | Remove installed dotfiles |
+| `make setup-wsl-bridge` | WSL-first: Create Windows junction |
+| `make setup-windows-bridge` | Windows-first: Create WSL symlink |
+| `make install-windows` | Install Windows PowerShell config |
+
+**Platform-Specific Quick Start:**
+- **macOS**: `brew install make git bash vim zsh ripgrep fd bat fzf`
+- **Windows**: `scoop install make vim zsh ripgrep fd bat fzf exa`
+- **Linux**: `sudo apt install make git bash vim zsh ripgrep fd-find bat`
+
 ## 📁 Project Structure
 
 ```
@@ -217,15 +235,16 @@ dotfiles/
 ## 🎯 Features
 
 ### Shell Configuration
-- **Multi-shell support**: Works with both bash and zsh
-- **Environment-aware grep**: Prioritizes GNU grep over BSD grep
+- **Multi-shell support**: Works with both bash and zsh with complete profile coverage
+- **Environment-aware tools**: Prioritizes GNU grep over BSD grep, intelligent tool detection
 - **Comprehensive aliases**: Git shortcuts, directory navigation, multibyte character search
-- **Utility functions**: Archive extraction, directory management
-- **Modular design**: Common and shell-specific configurations
-- **Performance monitoring**: Built-in shell startup performance tracking
-- **Reference profiles**: Comprehensive bash/zsh profile configurations for advanced users
+- **Smart utility functions**: Archive extraction, directory management, enhanced gvim integration
+- **Modular design**: Common and shell-specific configurations with local customization support
+- **Performance monitoring**: Built-in shell startup performance tracking with lazy-loading
+- **Complete profile system**: Enhanced bash_profile, zprofile, zlogout with consistent structure
 - **ShellCheck compliance**: All shell code passes static analysis for best practices
-- **Cross-platform compatibility**: Tested on macOS, Linux, and WSL environments
+- **Cross-platform compatibility**: Comprehensive support for macOS, Linux, WSL, and Windows
+- **Modern tool integration**: Native support for ripgrep, fd, bat, fzf, and other modern CLI tools
 
 ### Vim Configuration
 - **Multiple environments**: GUI, terminal, IDE-specific settings
@@ -234,6 +253,23 @@ dotfiles/
 - **Plugin ecosystem**: vim-plug integration with curated essential plugins
 - **Git integration**: vim-fugitive for advanced git operations
 - **Enhanced completion**: Improved TAB completion and command-line completion
+- **Smart Windows integration**: Dynamic gvim detection with Scoop prioritization
+
+### Windows & WSL Integration
+- **Dual workflow support**: Windows-first and WSL-first approaches
+- **Intelligent path detection**: Automatic Windows Vim installation discovery
+- **Scoop package manager**: Native support with smart tool mapping
+- **PowerShell orchestration**: Automated WSL setup from Windows
+- **Seamless file sharing**: Symlinks and junctions for unified dotfiles access
+- **Cross-environment compatibility**: Works in WSL, MSYS2, Cygwin, and native Windows
+
+### Advanced CLI Tool Management
+- **Tiered tool categorization**: Essential, Core, Modern, and Development tools
+- **Automated prerequisite checking**: `make check-prereqs` with platform-specific suggestions
+- **Intelligent package mapping**: Tool name mapping across different package managers
+- **Cross-platform installation**: Homebrew, Scoop, apt, yum, pacman support
+- **Modern tool adoption**: First-class support for ripgrep, fd, bat, fzf, exa
+- **Development workflow**: Integrated shellcheck, jq, yq, tree, htop support
 
 ### Multibyte Character Search
 - **File names**: Find files with multibyte characters in names
@@ -406,16 +442,65 @@ brew install grep coreutils
 # Or manually set aliases in your local config
 ```
 
+#### Windows & Scoop Issues
+
+**Issue**: Missing tools after installing via Scoop
+```powershell
+# Check if Scoop is in PATH
+scoop --version
+
+# Refresh PATH if needed
+refreshenv
+
+# Verify tool installation
+scoop list | grep -E "vim|make|ripgrep"
+```
+
+**Issue**: gvim not finding Scoop-installed vim
+```bash
+# Check if function finds correct vim path
+type gvim
+
+# Manually verify Scoop vim location
+ls /mnt/c/Users/$USER/scoop/apps/vim/*/gvim.exe
+```
+
+**Issue**: WSL bridge not working
+```bash
+# For Windows-first layout
+ls -la ~/dotfiles  # should be symlink to /mnt/c/Users/username/dotfiles
+
+# For WSL-first layout  
+ls -la "/mnt/c/Users/$USER/dotfiles"  # should be junction to WSL
+```
+
+**Issue**: PowerShell execution policy errors
+```powershell
+# Check current execution policy
+Get-ExecutionPolicy
+
+# Set policy for current user
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 ### Validation and Testing
 
 Before reporting issues, run the validation checks:
 
 ```bash
-# Validate configuration
+# Check prerequisites and get installation suggestions
+make check-prereqs
+
+# Validate configuration and dependencies
 make validate
 
-# Test configuration syntax
+# Run comprehensive test suite (syntax + shellcheck + compatibility)
 make test
+
+# Test individual components
+make test-syntax      # Shell syntax only
+make test-shellcheck  # ShellCheck analysis only
+make test-compat      # Cross-platform compatibility only
 
 # Check installation status
 make status
