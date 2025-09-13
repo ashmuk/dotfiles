@@ -67,19 +67,19 @@ export config_files
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
 export grep_options
 
-# Initialize grep_command with a default value
-grep_command="grep $grep_options"
+# Initialize grep_command with a default value (defensive approach)
+grep_command="grep ${grep_options:-}"
 
 # Determine which grep to use and build the command
 if command -v ggrep >/dev/null 2>&1; then
   alias grep='ggrep'
-  grep_command="ggrep $grep_options"
+  grep_command="ggrep ${grep_options:-}"
 elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
   alias grep='/usr/local/bin/grep'
-  grep_command="/usr/local/bin/grep $grep_options"
+  grep_command="/usr/local/bin/grep ${grep_options:-}"
 elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
   alias grep='/opt/homebrew/bin/grep'
-  grep_command="/opt/homebrew/bin/grep $grep_options"
+  grep_command="/opt/homebrew/bin/grep ${grep_options:-}"
 fi
 export grep_command
 
@@ -91,27 +91,27 @@ export grep_command
 du_options="-h"
 export du_options
 
-# Initialize du_command with a default value
-du_command="du $du_options -d 1"
+# Initialize du_command with a default value (defensive approach)
+du_command="du ${du_options:-} -d 1"
 
 # Check if du supports GNU-style --max-depth option
 # Use a safer test directory that should exist everywhere
 test_dir="${TMPDIR:-/tmp}"
 if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du
-  du_command="du $du_options --max-depth=1"
+  du_command="du ${du_options:-} --max-depth=1"
 elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du as gdu
   alias du='gdu'
-  du_command="gdu $du_options --max-depth=1"
+  du_command="gdu ${du_options:-} --max-depth=1"
 elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /usr/local/bin
   alias du='/usr/local/bin/du'
-  du_command="/usr/local/bin/du $du_options --max-depth=1"
+  du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
 elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # GNU du in /opt/homebrew/bin
   alias du='/opt/homebrew/bin/du'
-  du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
+  du_command="/opt/homebrew/bin/du ${du_options:-} --max-depth=1"
 fi
 export du_command
 
