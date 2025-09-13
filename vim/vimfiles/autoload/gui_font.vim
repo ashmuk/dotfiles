@@ -51,8 +51,8 @@ if exists('*gui_font#Apply') == 0
           if exists('+guifontwide') && has('gui_running')
             try | execute 'set guifontwide=' . s:wide | catch | endtry
           endif
-          break
         endif
+        break
       catch
         " try next candidate
       endtry

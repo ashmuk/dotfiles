@@ -22,13 +22,19 @@ if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
       execute 'source ' . s:autoload_file
     endif
   endif
-  
+
   " Call the font auto-selection function
   if exists('*gui_font#Apply')
     silent! call gui_font#Apply()
-    echo "Font auto-selection applied"
+    " Only show message in actual GUI mode, not terminal
+    if has('gui_running')
+      echo "Font auto-selection applied"
+    endif
   else
-    echo "gui_font#Apply function not found - using fallback fonts"
+    " Only show error in actual GUI mode, not terminal
+    if has('gui_running')
+      echo "gui_font#Apply function not found - using fallback fonts"
+    endif
     " Fallback font settings
     if has('win32') || has('win64')
       set guifont=Consolas:h12
@@ -151,9 +157,3 @@ function! s:GetHighlight(hi)
   let hl = substitute(hl, 'xxx', '', '')
   return hl
 endfunction
-
-" ---- GUI font auto selection (Windows/macOS/Linux) ----
-if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
-  " autoload/gui_font.vim の GuiFont#Apply() を呼ぶ
-  silent! call GuiFont#Apply()
-endif
