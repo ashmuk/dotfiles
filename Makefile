@@ -250,10 +250,10 @@ install-git: validate ## Install git configuration
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 	@echo "$(BLUE)[INFO]$(NC) Setting up WSL-Windows bridge for dotfiles..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
 		$(MAKE) -s _create_windows_junction; \
 	else \
-		echo "$(RED)[ERROR]$(NC) This command is only for WSL environments"; \
+		echo "$(RED)[ERROR]$(NC) This command is only for WSL or MSYS2 environments"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) WSL-Windows bridge created"
@@ -261,10 +261,10 @@ setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 .PHONY: setup-windows-bridge
 setup-windows-bridge: ## Create WSL symlink to Windows dotfiles (for Windows-first users)
 	@echo "$(BLUE)[INFO]$(NC) Setting up Windows-WSL bridge (Windows-first)..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
 		$(MAKE) -s _create_windows_symlink; \
 	else \
-		echo "$(RED)[ERROR]$(NC) This command is only for WSL environments"; \
+		echo "$(RED)[ERROR]$(NC) This command is only for WSL or MSYS2 environments"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Windows-WSL bridge created"
@@ -366,10 +366,15 @@ _setup_wsl_bridge_auto:
 		echo "$(YELLOW)[WARNING]$(NC) Could not detect Windows username, using WSL-first approach"; \
 		$(MAKE) -s _create_windows_junction; \
 	else \
-		windows_path="/mnt/c/Users/$$username/dotfiles"; \
+		# Handle both WSL (/mnt/c) and MSYS2 (/c) path formats \
+		if [[ "$$OSTYPE" == "msys" ]] || [[ "$$MSYSTEM" =~ ^MINGW ]]; then \
+			windows_path="/c/Users/$$username/dotfiles"; \
+		else \
+			windows_path="/mnt/c/Users/$$username/dotfiles"; \
+		fi; \
 		wsl_path="$(DOTFILES_DIR)"; \
 		echo "$(BLUE)[INFO]$(NC) Checking for Windows dotfiles at: $$windows_path"; \
-		echo "$(BLUE)[INFO]$(NC) Current WSL dotfiles at: $$wsl_path"; \
+		echo "$(BLUE)[INFO]$(NC) Current WSL/MSYS2 dotfiles at: $$wsl_path"; \
 		\
 		if [ -d "$$windows_path" ] && [ ! -L "$$HOME/dotfiles" ]; then \
 			echo "$(BLUE)[INFO]$(NC) Windows-first layout detected - creating WSL symlink"; \
@@ -386,8 +391,8 @@ _setup_wsl_bridge_auto:
 .PHONY: install-windows
 install-windows: validate ## Install Windows PowerShell configuration
 	@echo "$(BLUE)[INFO]$(NC) Installing Windows configuration..."
-	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
-		echo "$(BLUE)[INFO]$(NC) WSL detected - determining dotfiles layout..."; \
+	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ] || [[ "$$MSYSTEM" =~ ^MINGW ]] || [[ "$$OSTYPE" == "msys" ]]; then \
+		echo "$(BLUE)[INFO]$(NC) WSL/MSYS2 detected - determining dotfiles layout..."; \
 		$(MAKE) -s _setup_wsl_bridge_auto; \
 	fi
 	@if command -v powershell.exe >/dev/null 2>&1; then \
