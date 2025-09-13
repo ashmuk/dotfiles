@@ -33,12 +33,12 @@ function Test-WindowsEnvironment {
         Write-Error "This script is designed for Windows PowerShell environments"
         return $false
     }
-    
+
     if (-not (Test-Path $DotfilesPath)) {
         Write-Error "Dotfiles directory not found: $DotfilesPath"
         return $false
     }
-    
+
     return $true
 }
 
@@ -46,7 +46,7 @@ function Test-WindowsEnvironment {
 function New-BackupDirectory($BackupType) {
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
     $backupDir = Join-Path $DotfilesPath "backup" ".${BackupType}_backup_$timestamp"
-    
+
     try {
         New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
         Write-Status "Created backup directory: $backupDir"
@@ -63,7 +63,7 @@ function Backup-ExistingFile($SourcePath, $BackupDir) {
     if (Test-Path $SourcePath) {
         $fileName = Split-Path $SourcePath -Leaf
         $backupPath = Join-Path $BackupDir $fileName
-        
+
         try {
             Copy-Item $SourcePath $backupPath -Force
             Write-Status "Backed up $fileName to backup directory"
@@ -83,7 +83,7 @@ function New-SymbolicLink($Source, $Target, $Name, $BackupDir) {
         Write-Error "Source file does not exist: $Source"
         return $false
     }
-    
+
     # Handle existing target
     if (Test-Path $Target) {
         if ((Get-Item $Target).LinkType -eq "SymbolicLink") {
@@ -107,20 +107,20 @@ function New-SymbolicLink($Source, $Target, $Name, $BackupDir) {
             }
         }
     }
-    
+
     # Create target directory if needed
     $targetDir = Split-Path $Target -Parent
     if (-not (Test-Path $targetDir)) {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
-    
+
     # Create symbolic link
     try {
         if ($WhatIf) {
             Write-Host "What if: Would create symlink $Target -> $Source"
             return $true
         }
-        
+
         New-Item -ItemType SymbolicLink -Path $Target -Value $Source -Force | Out-Null
         Write-Success "$Name symlink created: $Target -> $Source"
         return $true
@@ -135,9 +135,9 @@ function New-SymbolicLink($Source, $Target, $Name, $BackupDir) {
 # Setup PowerShell profile
 function Setup-PowerShellProfile {
     Write-Status "Setting up PowerShell profile..."
-    
+
     $backupDir = New-BackupDirectory "powershell"
-    
+
     # PowerShell profiles for different hosts
     $profiles = @(
         @{
@@ -151,7 +151,7 @@ function Setup-PowerShellProfile {
             Source = Join-Path $DotfilesPath "windows" "Microsoft.PowerShell_profile_host.ps1"
         }
     )
-    
+
     foreach ($profile in $profiles) {
         if (Test-Path $profile.Source) {
             New-SymbolicLink $profile.Source $profile.Path $profile.Name $backupDir
@@ -165,24 +165,24 @@ function Setup-PowerShellProfile {
 # Setup Windows Terminal configuration
 function Setup-WindowsTerminal {
     Write-Status "Setting up Windows Terminal configuration..."
-    
+
     $backupDir = New-BackupDirectory "terminal"
-    
+
     # Windows Terminal settings
     $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
     $wtSourcePath = Join-Path $DotfilesPath "windows" "terminal" "settings.json"
-    
+
     if (Test-Path $wtSourcePath) {
         New-SymbolicLink $wtSourcePath $wtSettingsPath "Windows Terminal Settings" $backupDir
     }
     else {
         Write-Warning "Windows Terminal settings source not found: $wtSourcePath"
     }
-    
+
     # Windows Terminal themes (if directory exists)
     $wtThemesDir = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\themes"
     $wtThemesSource = Join-Path $DotfilesPath "windows" "terminal" "themes"
-    
+
     if (Test-Path $wtThemesSource) {
         New-SymbolicLink $wtThemesSource $wtThemesDir "Windows Terminal Themes" $backupDir
     }
@@ -191,9 +191,9 @@ function Setup-WindowsTerminal {
 # Setup Git configuration for Windows
 function Setup-GitWindows {
     Write-Status "Setting up Git configuration for Windows..."
-    
+
     $backupDir = New-BackupDirectory "git_windows"
-    
+
     # Git configuration files
     $gitConfigs = @(
         @{
@@ -212,7 +212,7 @@ function Setup-GitWindows {
             Name = "Git Attributes"
         }
     )
-    
+
     foreach ($config in $gitConfigs) {
         if (Test-Path $config.Source) {
             New-SymbolicLink $config.Source $config.Target $config.Name $backupDir
@@ -226,23 +226,23 @@ function Setup-GitWindows {
 # Setup Vim configuration for Windows
 function Setup-VimWindows {
     Write-Status "Setting up Vim configuration for Windows..."
-    
+
     $backupDir = New-BackupDirectory "vim_windows"
-    
+
     # Vim configuration files
     $vimConfigs = @(
         @{
-            Source = Join-Path $DotfilesPath "vim" "vimrc.win"
+            Source = Join-Path $DotfilesPath "vimrc.win"
             Target = "$env:USERPROFILE\_vimrc"
             Name = "Vim Config"
         },
         @{
-            Source = Join-Path $DotfilesPath "vim" "gvimrc.win"
+            Source = Join-Path $DotfilesPath "gvimrc.win"
             Target = "$env:USERPROFILE\_gvimrc"
             Name = "GVim Config"
         }
     )
-    
+
     foreach ($config in $vimConfigs) {
         if (Test-Path $config.Source) {
             New-SymbolicLink $config.Source $config.Target $config.Name $backupDir
@@ -251,11 +251,11 @@ function Setup-VimWindows {
             Write-Warning "Vim config source not found: $($config.Source)"
         }
     }
-    
+
     # Vim runtime directory
     $vimRuntimeSource = Join-Path $DotfilesPath "vim" "vimfiles"
     $vimRuntimeTarget = "$env:USERPROFILE\vimfiles"
-    
+
     if (Test-Path $vimRuntimeSource) {
         New-SymbolicLink $vimRuntimeSource $vimRuntimeTarget "Vim Runtime" $backupDir
     }
@@ -265,30 +265,30 @@ function Setup-VimWindows {
 function Start-DotfilesSetup {
     Write-Status "Starting Windows dotfiles setup..."
     Write-Status "Dotfiles directory: $DotfilesPath"
-    
+
     if (-not (Test-WindowsEnvironment)) {
         exit 1
     }
-    
+
     try {
         # Check if running as administrator for symbolic links
         $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-        
+
         if (-not $isAdmin) {
             Write-Warning "Not running as administrator. Symbolic links may fail on older Windows versions."
             Write-Status "Consider running as administrator or enabling Developer Mode in Windows Settings."
         }
-        
+
         Setup-PowerShellProfile
         Setup-WindowsTerminal
         Setup-GitWindows
         Setup-VimWindows
-        
+
         Write-Success "Windows dotfiles setup completed!"
         Write-Status ""
         Write-Status "Configuration files have been symlinked."
         Write-Status "Restart PowerShell and Windows Terminal to apply changes."
-        
+
         if (-not $isAdmin) {
             Write-Status ""
             Write-Status "Note: If symbolic links failed, try:"

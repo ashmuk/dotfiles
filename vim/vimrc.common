@@ -60,9 +60,17 @@ set title
 "---------------------------------------------------------------------------
 " ファイル形式・エンコーディング設定:
 "
-" ファイル形式の設定
-set fileformat=unix
-set fileformats=unix,dos
+" プラットフォーム固有のファイル形式設定
+if has('win32') || has('win64')
+  " Windows固有設定
+  set fileformat=dos
+  set fileformats=dos,unix
+else
+  " Unix/macOS/Linux固有設定
+  set fileformat=unix
+  set fileformats=unix,dos
+endif
+
 " ファイルエンコーディング
 set fileencoding=utf-8
 " ファイルエンコーディングの候補
@@ -71,16 +79,28 @@ set fileencodings=utf-8,cp932
 "---------------------------------------------------------------------------
 " バックアップ・スワップファイル設定:
 "
-" スワップファイル・バックアップファイルの保存先
+" プラットフォーム固有のディレクトリ設定
+if has('win32') || has('win64')
+  " Windows固有設定
+  let vim_dir = expand('~/vimfiles')
+  let tmp_dir = expand('~/vimfiles/tmp')
+else
+  " Unix/macOS/Linux固有設定
+  let vim_dir = expand('~/.vim')
+  let tmp_dir = expand('~/.vim/tmp')
+endif
+
 " ディレクトリが存在しない場合は作成
-if !isdirectory($HOME . '/.vim')
-  call mkdir($HOME . '/.vim', 'p')
+if !isdirectory(vim_dir)
+  call mkdir(vim_dir, 'p')
 endif
-if !isdirectory($HOME . '/.vim/tmp')
-  call mkdir($HOME . '/.vim/tmp', 'p')
+if !isdirectory(tmp_dir)
+  call mkdir(tmp_dir, 'p')
 endif
-set directory=$HOME/.vim/tmp
-set backupdir=$HOME/.vim/tmp
+
+" スワップファイル・バックアップファイルの保存先
+set directory=tmp_dir
+set backupdir=tmp_dir
 " アンドゥファイルを作成しない
 set noundofile
 
@@ -115,6 +135,17 @@ set hlsearch
 "
 if filereadable(expand('~/dotfiles/vim/plugins.vim'))
   source ~/dotfiles/vim/plugins.vim
+endif
+
+"---------------------------------------------------------------------------
+" プラットフォーム固有のランタイムパス設定:
+"
+" Windows固有のランタイムパス設定
+if has('win32') || has('win64')
+  " Windows用のランタイムパス設定
+  set runtimepath+=~/vimfiles
+  set runtimepath+=~/vimfiles/after
+  set runtimepath+=~/vimfiles/plugged
 endif
 
 "---------------------------------------------------------------------------
