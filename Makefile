@@ -164,23 +164,23 @@ _suggest_installation:
 		echo "  Ubuntu/Debian: sudo apt update && sudo apt install $$tools"; \
 		echo "  Alpine: sudo apk add $$tools"; \
 		echo "  CentOS/RHEL: sudo yum install $$tools"; \
-	elif [ -f /etc/debian_version ]; then \
+	else if [ -f /etc/debian_version ]; then \
 		echo "$(YELLOW)[DEBIAN/UBUNTU]$(NC)"; \
 		echo "  sudo apt update && sudo apt install $$tools"; \
-	elif [ -f /etc/redhat-release ]; then \
+	else if [ -f /etc/redhat-release ]; then \
 		echo "$(YELLOW)[REDHAT/CENTOS]$(NC)"; \
 		echo "  sudo yum install $$tools"; \
-	elif [ -f /etc/alpine-release ]; then \
+	else if [ -f /etc/alpine-release ]; then \
 		echo "$(YELLOW)[ALPINE]$(NC)"; \
 		echo "  sudo apk add $$tools"; \
-	elif [ -f /etc/arch-release ]; then \
+	else if [ -f /etc/arch-release ]; then \
 		echo "$(YELLOW)[ARCH LINUX]$(NC)"; \
 		echo "  sudo pacman -S $$tools"; \
-	elif [[ "$$OSTYPE" == darwin* ]]; then \
+	else if [[ "$$OSTYPE" == darwin* ]]; then \
 		echo "$(YELLOW)[MACOS]$(NC)"; \
 		echo "  brew install $$tools"; \
 		echo "  Note: Install Homebrew first: /bin/bash -c \"\$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
-	elif [[ "$$OSTYPE" =~ ^(msys|cygwin) ]] || command -v powershell.exe >/dev/null 2>&1; then \
+	else if [[ "$$OSTYPE" =~ ^(msys|cygwin) ]] || command -v powershell.exe >/dev/null 2>&1; then \
 		echo "$(YELLOW)[WINDOWS]$(NC) Git for Windows/MSYS2/Cygwin detected"; \
 		echo "  Recommended: Install Scoop package manager first:"; \
 		echo "    powershell.exe -Command \"Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iwr -useb get.scoop.sh | iex\""; \
