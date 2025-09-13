@@ -6,7 +6,35 @@
 " vim-plug initialization
 "
 " Ensure vim-plug is installed
-if empty(glob('~/.vim/autoload/plug.vim')) && empty(glob('~/vimfiles/autoload/plug.vim'))
+" Check multiple possible locations for vim-plug
+let s:plug_locations = [
+  \ expand('~/.vim/autoload/plug.vim'),
+  \ expand('~/vimfiles/autoload/plug.vim'),
+  \ expand('~/dotfiles/vim/vimfiles/autoload/plug.vim')
+  \ ]
+
+let s:plug_found = 0
+for s:plug_path in s:plug_locations
+  if filereadable(s:plug_path)
+    execute 'source ' . s:plug_path
+    let s:plug_found = 1
+    " Debug: show which vim-plug file was loaded
+    if get(g:, 'debug_plugins', 0)
+      echo 'vim-plug loaded from: ' . s:plug_path
+    endif
+    break
+  endif
+endfor
+
+" Debug: show all checked paths if vim-plug not found
+if !s:plug_found && get(g:, 'debug_plugins', 0)
+  echo 'vim-plug not found in any of these locations:'
+  for s:plug_path in s:plug_locations
+    echo '  ' . s:plug_path . ' (exists: ' . (filereadable(s:plug_path) ? 'yes' : 'no') . ')'
+  endfor
+endif
+
+if !s:plug_found
   " Auto-install vim-plug if not found
   if has('win32') || has('win64')
     " Windows - try multiple methods
