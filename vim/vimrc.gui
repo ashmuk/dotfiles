@@ -148,3 +148,9 @@ function! s:GetHighlight(hi)
   let hl = substitute(hl, 'xxx', '', '')
   return hl
 endfunction
+
+" ---- GUI font auto selection (Windows/macOS/Linux) ----
+if has('gui_running') || exists('g:neovide') || exists('g:GuiLoaded')
+  " autoload/gui_font.vim の GuiFont#Apply() を呼ぶ
+  silent! call GuiFont#Apply()
+endif
