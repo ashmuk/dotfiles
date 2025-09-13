@@ -28,7 +28,7 @@ help: ## Show this help message
 	@echo ""
 	@echo "WSL Integration:"
 	@echo "  $(BLUE)setup-wsl-bridge$(NC)    WSL-first: Create Windows junction (WSL -> Windows)"
-	@echo "  $(BLUE)setup-windows-bridge$(NC) Windows-first: Create WSL symlink (Windows -> WSL)"  
+	@echo "  $(BLUE)setup-windows-bridge$(NC) Windows-first: Create WSL symlink (Windows -> WSL)"
 	@echo "  $(BLUE)install-windows$(NC)      Install Windows config (auto-detects layout)"
 
 .PHONY: check-prereqs
@@ -139,7 +139,7 @@ setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) WSL-Windows bridge created"
 
-.PHONY: setup-windows-bridge  
+.PHONY: setup-windows-bridge
 setup-windows-bridge: ## Create WSL symlink to Windows dotfiles (for Windows-first users)
 	@echo "$(BLUE)[INFO]$(NC) Setting up Windows-WSL bridge (Windows-first)..."
 	@if grep -qi microsoft /proc/version 2>/dev/null || [ -n "$$WSL_DISTRO_NAME" ]; then \
@@ -330,9 +330,7 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)[INFO]$(NC) Removing shell configuration..."
 	@rm -f $(HOME_DIR)/.bashrc $(HOME_DIR)/.zshrc
-	@rm -f $(HOME_DIR)/.bash_logout $(HOME_DIR)/.bash_profile $(HOME_DIR)/.zprofile
-	@rm -f $(HOME_DIR)/shell.common $(HOME_DIR)/shell.bash $(HOME_DIR)/shell.zsh
-	@rm -f $(HOME_DIR)/aliases.common $(HOME_DIR)/aliases.shell
+	@rm -f $(HOME_DIR)/.bash_logout $(HOME_DIR)/.bash_profile $(HOME_DIR)/.zprofile $(HOME_DIR)/.zlogout
 	@echo "$(BLUE)[INFO]$(NC) Removing vim configuration..."
 	@rm -f $(HOME_DIR)/.vimrc $(HOME_DIR)/_vimrc $(HOME_DIR)/_gvimrc $(HOME_DIR)/.ideavimrc
 	@if [ -L "$(HOME_DIR)/.vim" ]; then rm "$(HOME_DIR)/.vim"; fi

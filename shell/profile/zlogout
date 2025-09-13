@@ -1,0 +1,42 @@
+# ~/.zlogout
+# 
+# Zsh logout script - executed when zsh session ends
+# This file is sourced automatically when a zsh login shell exits
+#
+
+# =============================================================================
+# Zsh Logout Configuration
+# =============================================================================
+
+# Reset terminal colors to default on logout (optional)
+# Uncomment if you want to ensure clean terminal state on logout
+# if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
+#   source "$HOME/etc/mintty-colors-solarized/sol.light"
+# fi
+
+# Clear history if desired (uncomment if needed)
+# history -c
+
+# Display logout message (optional)
+# echo "Goodbye from zsh session!"
+
+# =============================================================================
+# User Local Logout Configuration
+# =============================================================================
+
+# Load user-specific logout customizations (if exists)
+# This allows users to add personal logout actions without modifying this file
+LOCAL_LOGOUT_PATHS=(
+  "$HOME/.dotfiles-logout"
+  "$HOME/.config/dotfiles/logout"
+  "$DOTFILES_DIR/shell/logout.local"
+  "$HOME/.dotfiles/shell/logout.local"
+)
+
+for local_logout in "${LOCAL_LOGOUT_PATHS[@]}"; do
+  if [[ -f "$local_logout" && -r "$local_logout" ]]; then
+    # shellcheck disable=SC1090
+    source "$local_logout"
+    break
+  fi
+done

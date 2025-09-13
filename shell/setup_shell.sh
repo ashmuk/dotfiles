@@ -43,6 +43,7 @@ create_symlinks() {
     ln -sf "$DOTFILES_DIR/shell/profile/bash_logout" "$HOME/.bash_logout"
     ln -sf "$DOTFILES_DIR/shell/profile/bash_profile" "$HOME/.bash_profile"
     ln -sf "$DOTFILES_DIR/shell/profile/zprofile" "$HOME/.zprofile"
+    ln -sf "$DOTFILES_DIR/shell/profile/zlogout" "$HOME/.zlogout"
 
     print_success "Symbolic links created in home directory"
 }
@@ -54,7 +55,7 @@ backup_existing_files() {
     local backup_dir=$(create_backup_dir "shell")
     [[ $? -ne 0 ]] && return 1
 
-    local files=(.bashrc .zshrc .bash_logout .bash_profile .zprofile)
+    local files=(.bashrc .zshrc .bash_logout .bash_profile .zprofile .zlogout)
     for file in "${files[@]}"; do
         backup_file "$HOME/$file" "$backup_dir" "$file"
     done
@@ -147,6 +148,7 @@ main() {
     print_status "  - $HOME/.bash_logout"
     print_status "  - $HOME/.bash_profile"
     print_status "  - $HOME/.zprofile"
+    print_status "  - $HOME/.zlogout"
     print_status ""
     
     return 0

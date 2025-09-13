@@ -14,6 +14,7 @@ This directory contains comprehensive shell profile configurations for both Bash
 - **`bash_profile`** - Simple existing bash profile
 - **`zprofile`** - Existing zsh profile with Homebrew setup
 - **`bash_logout`** - Bash logout script
+- **`zlogout`** - Zsh logout script
 
 ## 🚀 Features
 

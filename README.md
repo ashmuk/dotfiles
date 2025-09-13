@@ -200,6 +200,7 @@ The shell setup creates symlinks to:
 - `~/.bash_logout` → Bash logout configuration
 - `~/.bash_profile` → Bash profile configuration
 - `~/.zprofile` → Zsh profile configuration
+- `~/.zlogout` → Zsh logout configuration
 
 Generated files combine modular components:
 - `bashrc.generated` = `shell.common` + `shell.bash`
