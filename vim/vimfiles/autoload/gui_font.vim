@@ -47,7 +47,8 @@ if exists('*gui_font#Apply') == 0
       try
         execute 'set guifont=' . font
         " If set succeeded, optionally set wide font (ignore errors)
-        if !has('mac')
+        " Only set guifontwide on systems that support it (Linux/Unix, not Windows or macOS)
+        if !has('mac') && !has('win32') && !has('win64')
           if exists('+guifontwide') && has('gui_running')
             try | execute 'set guifontwide=' . s:wide | catch | endtry
           endif
