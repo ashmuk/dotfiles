@@ -1,0 +1,16 @@
+set nocompatible
+
+" 共通設定を読み込み
+if filereadable(expand('~/dotfiles/vim/vimrc.common'))
+  source ~/dotfiles/vim/vimrc.common
+endif
+
+" IdeaVim専用設定を読み込み
+if filereadable(expand('~/dotfiles/vim/vimrc.idea'))
+  source ~/dotfiles/vim/vimrc.idea
+endif
+
+" 共通キーマップを読み込み
+if filereadable(expand('~/dotfiles/vim/mappings.common'))
+  source ~/dotfiles/vim/mappings.common
+endif

@@ -1,0 +1,543 @@
+#!/bin/bash
+
+# shellcheck disable=SC2148
+
+###############################################################################
+#
+# Shell common configuration
+# This file contains common shell settings that work for both bash and zsh
+#
+###############################################################################
+
+# =============================================================================
+# Path Settings
+# =============================================================================
+
+# Add common paths
+export PATH="/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+# Homebrew (Intel/macOS 用) 調整
+if [[ -d /opt/homebrew/bin ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+fi
+
+# =============================================================================
+# Basic Shell Settings
+# =============================================================================
+
+# History settings
+export HISTSIZE=10000
+export SAVEHIST=10000
+export HISTFILESIZE=20000
+export HISTCONTROL=ignoreboth:erasedups
+
+# Editor settings
+export EDITOR=vim
+export VISUAL=vim
+
+# Language settings
+# Set locale only if available to avoid warnings
+if locale -a 2>/dev/null | grep -q "ja_JP.UTF-8"; then
+    export LANG=ja_JP.UTF-8
+    export LC_ALL=ja_JP.UTF-8
+else
+    # Fallback to C.UTF-8 or en_US.UTF-8
+    if locale -a 2>/dev/null | grep -q "C.UTF-8"; then
+        export LANG=C.UTF-8
+        export LC_ALL=C.UTF-8
+    elif locale -a 2>/dev/null | grep -q "en_US.UTF-8"; then
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+    fi
+fi
+
+# =============================================================================
+# Grep Configuration
+# =============================================================================
+
+# Common config files
+if [ -n "$BASH_VERSION" ]; then
+  config_files="$HOME/dotfiles $HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.bash_login /etc/bash.bashrc /etc/profile /etc/bash_completion"
+elif [ -n "$ZSH_VERSION" ]; then
+  config_files="$HOME/dotfiles $HOME/.zshrc $HOME/.zshenv $HOME/.zprofile $HOME/.zlogin $HOME/.zlogout /etc/zsh* $HOME/.oh-my-zsh $HOME/.zsh $HOME/.zshrc.local"
+else
+  config_files=""
+fi
+export config_files
+
+# Build grep command with options
+grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
+export grep_options
+
+# Debug: Print that we're setting up grep_command
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Setting up grep_command..." >&2
+
+# Initialize grep_command with a default value (defensive approach)
+grep_command="grep ${grep_options:-}"
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Initial grep_command='$grep_command'" >&2
+
+# Determine which grep to use and build the command
+if command -v ggrep >/dev/null 2>&1; then
+  alias grep='ggrep'
+  grep_command="ggrep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using ggrep, grep_command='$grep_command'" >&2
+elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
+  alias grep='/usr/local/bin/grep'
+  grep_command="/usr/local/bin/grep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/grep, grep_command='$grep_command'" >&2
+elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
+  alias grep='/opt/homebrew/bin/grep'
+  grep_command="/opt/homebrew/bin/grep ${grep_options:-}"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/grep, grep_command='$grep_command'" >&2
+else
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using default grep, grep_command='$grep_command'" >&2
+fi
+
+# Ensure the variable is exported and verify it
+export grep_command
+
+# Final safety check - if grep_command is still empty, set a basic fallback
+if [[ -z "${grep_command:-}" ]]; then
+  grep_command="grep"
+  export grep_command
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: FALLBACK: Set grep_command='$grep_command'" >&2
+fi
+
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Final grep_command='$grep_command' (exported)" >&2
+
+# =============================================================================
+# Du Configuration
+# =============================================================================
+
+# Determine which du to use and build the command
+du_options="-h"
+export du_options
+
+# Debug: Print that we're setting up du_command
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Setting up du_command..." >&2
+
+# Initialize du_command with a default value (defensive approach)
+du_command="du ${du_options:-} -d 1"
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Initial du_command='$du_command'" >&2
+
+# Check if du supports GNU-style --max-depth option
+# Use a safer test directory that should exist everywhere
+test_dir="${TMPDIR:-/tmp}"
+if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du
+  du_command="du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using GNU du, du_command='$du_command'" >&2
+elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du as gdu
+  alias du='gdu'
+  du_command="gdu ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using gdu, du_command='$du_command'" >&2
+elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du in /usr/local/bin
+  alias du='/usr/local/bin/du'
+  du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/du, du_command='$du_command'" >&2
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # GNU du in /opt/homebrew/bin
+  alias du='/opt/homebrew/bin/du'
+  du_command="/opt/homebrew/bin/du ${du_options:-} --max-depth=1"
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/du, du_command='$du_command'" >&2
+else
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using default du, du_command='$du_command'" >&2
+fi
+
+# Ensure the variable is exported and verify it
+export du_command
+
+# Final safety check - if du_command is still empty, set a basic fallback
+if [[ -z "${du_command:-}" ]]; then
+  du_command="du -h"
+  export du_command
+  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: FALLBACK: Set du_command='$du_command'" >&2
+fi
+
+[[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Final du_command='$du_command' (exported)" >&2
+
+# =============================================================================
+# Performance Optimizations
+# =============================================================================
+
+# Load performance utilities (lazy-loading framework)
+if [ -n "$DOTFILES_DIR" ] && [ -f "$DOTFILES_DIR/shell/performance.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/performance.sh"
+fi
+
+# =============================================================================
+# Source Common Aliases
+# =============================================================================
+export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
+
+# Source common aliases (works for both bash and zsh)
+if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/aliases.common"
+fi
+
+# Source shell-specific aliases (after grep_command is set)
+if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
+  # shellcheck disable=SC1091
+  source "$DOTFILES_DIR/shell/aliases.shell"
+fi
+
+# =============================================================================
+# Commoon Functions
+# =============================================================================
+
+# Function to extract archives
+extract() {
+  if [[ -f $1 ]]; then
+    case $1 in
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar e "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Function to create directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1" || return 1
+}
+
+# Function to show directory history
+dh() {
+  dirs -v
+}
+
+# Function to show where an alias is defined
+grepalias() {
+  # Input validation
+  if [ $# -eq 0 ]; then
+    echo "Usage: grepalias <alias_name> [file1] [file2] ..." >&2
+    return 1
+  fi
+
+  local alias_name="$1"
+  shift || true
+
+  # Determine search files
+  if [ "$#" -gt 0 ]; then
+    # Use files provided as arguments
+    :
+  elif [ -n "${config_files:-}" ]; then
+    # Parse config_files string into positional parameters
+    if [ -n "$BASH_VERSION" ]; then
+      # Bash: use eval with proper quoting
+      eval "set -- $config_files"
+    elif [ -n "$ZSH_VERSION" ]; then
+      # Zsh: use word splitting (intentional for this shell)
+      # shellcheck disable=SC2086
+      set -- ${=config_files}
+    else
+      # Fallback: simple parsing (word splitting is intentional)
+      # shellcheck disable=SC2086
+      set -- $config_files
+    fi
+
+    # Expand tilde in file paths
+    local expanded_file
+    local temp_files=""
+    for file in "$@"; do
+      case "$file" in
+        \~/*) expanded_file="$HOME/${file#\~/}" ;;
+        *) expanded_file="$file" ;;
+      esac
+      temp_files="$temp_files $expanded_file"
+    done
+    eval "set -- $temp_files"
+  else
+    set -- "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "/etc/zshrc" "/etc/bashrc"
+  fi
+
+  # Extract alias definition with better parsing
+  local alias_def
+  alias_def="$(alias "$alias_name" 2>/dev/null)" || {
+    printf 'alias not found: %s\n' "$alias_name" >&2
+    return 1
+  }
+
+
+  # Extract right-hand side (more robust parsing)
+  local rhs
+  # Remove the alias name and equals sign from the beginning
+  rhs="${alias_def#*=}"
+
+  # Handle different quoting styles - simplified for consistent patterns
+  # This function normalizes the RHS to match how it appears in source files
+  normalize_rhs() {
+    local input="$1"
+    local result="$input"
+
+    # Primary case: Single-quoted string (now the standard pattern)
+    if [[ "$result" =~ ^\'.*\'$ ]]; then
+      # Remove outer single quotes
+      result="${result:1:-1}"
+      # Convert escaped single quotes '\'' back to single quotes '
+      # shellcheck disable=SC1003
+      result="${result//'\''/'}"
+
+    # Fallback case: Double-quoted string (legacy patterns)
+    elif [[ "$result" =~ ^\".*\"$ ]]; then
+      # Remove outer double quotes
+      result="${result:1:-1}"
+      # Convert escaped double quotes \" back to double quotes "
+      result="${result//\\\"/\"}"
+
+    # Simple case: Unquoted single word
+    elif [[ "$result" =~ ^[^[:space:]]+$ ]]; then
+      # No change needed for unquoted single words
+      :
+
+    # Edge case: Malformed quotes (try to salvage)
+    else
+      # Try to detect and fix malformed patterns
+      if [[ "$result" =~ ^\' ]]; then
+        # Starts with single quote but doesn't end properly
+        result="${result#\'}"
+        if [[ "$result" =~ \'$ ]]; then
+          result="${result%\'}"
+        fi
+        # shellcheck disable=SC1003
+        result="${result//'\''/'}"
+      elif [[ "$result" =~ ^\" ]]; then
+        # Starts with double quote but doesn't end properly
+        result="${result#\"}"
+        if [[ "$result" =~ \"$ ]]; then
+          result="${result%\"}"
+        fi
+        result="${result//\\\"/\"}"
+      else
+        # Completely unparseable
+        printf 'cannot parse alias definition: %s\n' "$alias_def" >&2
+        return 1
+      fi
+    fi
+
+    echo "$result"
+  }
+
+  # Normalize the RHS
+  rhs="$(normalize_rhs "$rhs")" || return 1
+
+  # Search for the alias definition
+  # First try exact match
+  if ! grep --color=auto --exclude="*.md" -R -nH -F -- "$rhs" "$@" 2>/dev/null; then
+    # If no exact match found, try searching for the alias name itself
+    # This handles cases where variables are expanded or special characters cause issues
+    grep --color=always --exclude="*.md" -R -nH -E -- "alias $alias_name=" "$@" 2>/dev/null
+  fi
+}
+aliaswh() {
+  grepalias "$1"
+}
+grepal() {
+  grepalias "$1"
+}
+
+# Function to jump to directory by number
+j() {
+  if [[ $1 =~ ^[0-9]+$ ]]; then
+    local dir
+    dir=$(dirs -l | sed -n "${1}p" | cut -d' ' -f2-)
+    if [[ -n $dir ]]; then
+      cd "$dir" || return 1
+    else
+      echo "Directory not found"
+    fi
+  else
+    echo "Usage: j <number>"
+  fi
+}
+
+gvim() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if command -v mvim >/dev/null 2>&1; then
+      command mvim "$@"
+    elif [[ -x "/Applications/MacVim.app/Contents/bin/mvim" ]]; then
+      "/Applications/MacVim.app/Contents/bin/mvim" "$@"
+    else
+      if command -v open >/dev/null 2>&1; then
+        open -a "MacVim" --args "$@"
+      else
+        vim -g "$@"
+      fi
+    fi
+    return
+  fi
+
+  # WSL (Windows Subsystem for Linux)
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    # Try multiple common Vim installation paths
+    # Prioritize Scoop installations over traditional vim directories
+    local win_gvim=""
+    local vim_candidates=(
+      "/mnt/c/Users/*/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/ProgramData/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/Program Files/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files (x86)/Vim/vim*/gvim.exe"
+      "/mnt/c/Program Files/vim/gvim.exe"
+      "/mnt/c/vim/gvim.exe"
+    )
+
+    # Find the first existing gvim.exe
+    for candidate in "${vim_candidates[@]}"; do
+      # Use glob expansion to handle version directories like vim91
+      for path in $candidate; do
+        if [[ -x "$path" ]]; then
+          win_gvim="$path"
+          break 2
+        fi
+      done
+    done
+
+    if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
+      local args=()
+      if command -v wslpath >/dev/null 2>&1; then
+        for a in "$@"; do
+          if [[ -e "$a" || "$a" == /* ]]; then
+            args+=("$(wslpath -w -- "$a")")
+          else
+            args+=("$a")
+          fi
+        done
+      else
+        args=("$@")
+      fi
+      "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+      disown
+      return
+    fi
+  fi
+
+  # MSYS/Cygwin on Windows
+  case "$OSTYPE" in
+    msys*|cygwin*)
+      # Try multiple common Vim installation paths for MSYS/Cygwin
+      # Prioritize Scoop installations over traditional vim directories
+      local win_gvim=""
+      local vim_candidates=(
+        "/c/Users/*/scoop/apps/vim/*/gvim.exe"
+        "/c/ProgramData/scoop/apps/vim/*/gvim.exe"
+        "/c/scoop/apps/vim/*/gvim.exe"
+        "/c/Program Files/Vim/vim*/gvim.exe"
+        "/c/Program Files (x86)/Vim/vim*/gvim.exe"
+        "/c/Program Files/vim/gvim.exe"
+        "/c/vim/gvim.exe"
+      )
+
+      # Find the first existing gvim.exe
+      for candidate in "${vim_candidates[@]}"; do
+        # Use glob expansion to handle version directories like vim91
+        for path in $candidate; do
+          if [[ -x "$path" ]]; then
+            win_gvim="$path"
+            break 2
+          fi
+        done
+      done
+
+      if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
+        local args=()
+        if command -v cygpath >/dev/null 2>&1; then
+          for a in "$@"; do
+            if [[ -e "$a" || "$a" == /* ]]; then
+              args+=("$(cygpath -w -- "$a")")
+            else
+              args+=("$a")
+            fi
+          done
+        else
+          args=("$@")
+        fi
+        "$win_gvim" "${args[@]}" >/dev/null 2>&1 &
+        disown
+        return
+      fi
+      ;;
+  esac
+
+  # Fallbacks: native gvim or terminal GUI mode
+  if command -v gvim >/dev/null 2>&1; then
+    command gvim "$@" & disown
+  else
+    vim -g "$@"
+  fi
+}
+
+# =============================================================================
+# User Local Configuration
+# =============================================================================
+
+# Load user-specific customizations (if exists)
+# This allows users to override settings without modifying the main dotfiles
+# Use positional parameters instead of arrays for better compatibility
+set -- "$HOME/.dotfiles-local" "$HOME/.config/dotfiles/local" "$DOTFILES_DIR/shell/local" "$HOME/.dotfiles/shell/local"
+
+for local_config in "$@"; do
+  if [ -f "$local_config" ] && [ -r "$local_config" ]; then
+    # shellcheck disable=SC1090
+    source "$local_config"
+    break
+  fi
+done
+
+###############################################################################
+#
+# Bash-specific configuration
+# This file contains bash-specific settings and functions
+#
+###############################################################################
+
+# =============================================================================
+# Bash-specific Settings
+# =============================================================================
+
+# Enable programmable completion
+if [[ -f /usr/local/etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
+  source /usr/local/etc/bash_completion
+elif [[ -f /etc/bash_completion ]]; then
+  # shellcheck disable=SC1091
+  source /etc/bash_completion
+fi
+
+# Bash prompt customization (colored, distinct from zsh style)
+# Color definitions - using different colors to distinguish from zsh
+if [[ -n "$TERM" && "$TERM" != "dumb" ]]; then
+  # Enable colors - bash version in magenta to distinguish from zsh cyan
+  export PS1='\[\033[35m\]bash-${BASH_VERSION%%[^0-9.]*} \[\033[32m\]\u@\h \[\033[34m\]\w\[\033[0m\]\n\[\033[1;35m\]❯\[\033[0m\] '
+else
+  # Fallback for terminals without color support
+  export PS1='bash-${BASH_VERSION%%[^0-9.]*} \u@\h \w\n❯ '
+fi
+
+# Bash history settings
+shopt -s histappend
+shopt -s checkwinsize
+
+# Kiro integration
+# shellcheck disable=SC1090
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
+
+# =============================================================================
+# Bash Functions
+# =============================================================================
+# to be defined if any applicable
