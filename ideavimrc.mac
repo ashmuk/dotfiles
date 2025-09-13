@@ -1,3 +1,5 @@
+set nocompatible
+
 " 共通設定を読み込み
 if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common

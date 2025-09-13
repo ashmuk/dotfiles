@@ -71,7 +71,7 @@ backup_existing_files() {
     else
         vim_dir="$HOME/.vim"
     fi
-    
+
     if [[ -d "$vim_dir" && ! -L "$vim_dir" ]]; then
         print_info "Backing up existing vim directory: $vim_dir"
         cp -r "$vim_dir" "$backup_dir/$(basename "$vim_dir")"
@@ -119,6 +119,8 @@ create_platform_files() {
 
     # .vimrc の作成
     cat > "$DOTFILES_DIR/vimrc.$PLATFORM" << 'EOF'
+set nocompatible
+
 " 共通設定を読み込み
 if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common
@@ -157,6 +159,8 @@ EOF
 
     # .gvimrc の作成
     cat > "$DOTFILES_DIR/gvimrc.$PLATFORM" << 'EOF'
+set nocompatible
+
 " 共通設定を読み込み
 if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common
@@ -175,6 +179,8 @@ EOF
 
     # .ideavimrc の作成
     cat > "$DOTFILES_DIR/ideavimrc.$PLATFORM" << 'EOF'
+set nocompatible
+
 " 共通設定を読み込み
 if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common
@@ -197,14 +203,14 @@ EOF
 # Create vimfiles symlink (environment-aware)
 create_vimfiles_symlink() {
     print_info "Setting up vim plugin directory symlink..."
-    
+
     local vim_dir=""
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
         vim_dir="$HOME/vimfiles"
     else
         vim_dir="$HOME/.vim"
     fi
-    
+
     # If existing directory is a symlink pointing to our dotfiles, skip
     if [[ -L "$vim_dir" ]]; then
         local link_target=$(readlink "$vim_dir")
@@ -216,28 +222,28 @@ create_vimfiles_symlink() {
             rm "$vim_dir"
         fi
     fi
-    
+
     # If existing directory exists, integrate content
     if [[ -d "$vim_dir" ]]; then
         print_info "Integrating existing vim directory content..."
-        
+
         # Copy user content to dotfiles vim/vimfiles, avoiding conflicts
         local integration_needed=false
-        
+
         for subdir in autoload colors pack ftplugin syntax plugin; do
             if [[ -d "$vim_dir/$subdir" ]]; then
                 print_info "Found existing $subdir directory"
                 if [[ ! -d "$DOTFILES_DIR/vim/vimfiles/$subdir" ]]; then
                     mkdir -p "$DOTFILES_DIR/vim/vimfiles/$subdir"
                 fi
-                
+
                 # Copy files that don't conflict
                 local files_copied=0
                 for file in "$vim_dir/$subdir"/*; do
                     if [[ -f "$file" ]]; then
                         local filename=$(basename "$file")
                         local dest_file="$DOTFILES_DIR/vim/vimfiles/$subdir/$filename"
-                        
+
                         if [[ ! -f "$dest_file" ]]; then
                             cp "$file" "$dest_file"
                             files_copied=$((files_copied + 1))
@@ -247,40 +253,40 @@ create_vimfiles_symlink() {
                         fi
                     fi
                 done
-                
+
                 if [[ $files_copied -gt 0 ]]; then
                     integration_needed=true
                 fi
             fi
         done
-        
+
         # Preserve user's tmp directory structure
         if [[ -d "$vim_dir/tmp" && ! -d "$DOTFILES_DIR/vim/vimfiles/tmp" ]]; then
             mkdir -p "$DOTFILES_DIR/vim/vimfiles/tmp"
         fi
-        
+
         # Remove old directory after integration
         print_info "Removing old vim directory: $vim_dir"
         rm -rf "$vim_dir"
-        
+
         if [[ $integration_needed == true ]]; then
             print_success "Successfully integrated existing vim plugins and configurations"
         fi
     fi
-    
+
     # Create the symlink
     print_info "Creating symlink: $vim_dir -> $DOTFILES_DIR/vim/vimfiles"
     ln -sf "$DOTFILES_DIR/vim/vimfiles" "$vim_dir"
-    
+
     print_success "Vim plugin directory symlink created"
 }
 
 # Check and restore generated vim files if no actual changes
 check_generated_vim_files() {
     print_info "Checking for actual changes in generated vim files..."
-    
+
     local files_restored=0
-    
+
     for file in "vimrc.$PLATFORM" "gvimrc.$PLATFORM" "ideavimrc.$PLATFORM"; do
         if [[ -f "$DOTFILES_DIR/$file" ]]; then
             # Check if file is tracked by git and has changes
@@ -299,7 +305,7 @@ check_generated_vim_files() {
             fi
         fi
     done
-    
+
     if [[ $files_restored -gt 0 ]]; then
         print_success "Restored $files_restored generated vim file(s) with no actual differences"
     else
