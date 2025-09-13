@@ -6,12 +6,23 @@ DOTFILES_DIR := $(shell pwd)
 HOME_DIR := $(HOME)
 BACKUP_DIR := $(HOME_DIR)/.dotfiles_backup
 
-# Colors for output
-RED := \033[0;31m
-GREEN := \033[0;32m
-YELLOW := \033[1;33m
-BLUE := \033[0;34m
-NC := \033[0m
+# Colors for output (with Windows Git Bash compatibility)
+# Check if colors are supported - use a more robust method
+ifeq ($(shell test -t 1 && echo "yes" || echo "no"),yes)
+    # Color support available (terminal supports colors)
+    RED := \033[0;31m
+    GREEN := \033[0;32m
+    YELLOW := \033[1;33m
+    BLUE := \033[0;34m
+    NC := \033[0m
+else
+    # No color support
+    RED := 
+    GREEN := 
+    YELLOW := 
+    BLUE := 
+    NC := 
+endif
 
 # Default target
 .PHONY: help
@@ -119,7 +130,7 @@ _check_fonts:
 		fi; \
 	elif [[ "$(PLATFORM)" == "mac" ]]; then \
 		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
-			if fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
+			if command -v fc-list >/dev/null 2>&1 && fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
 				fonts_found=$$((fonts_found + 1)); \
 			fi; \
 		done; \
@@ -131,7 +142,7 @@ _check_fonts:
 		fi; \
 	else \
 		for font in "JetBrainsMono" "FiraCode" "DejaVuSansMono" "UbuntuMono"; do \
-			if fc-list | grep -i "$$font" >/dev/null 2>&1; then \
+			if command -v fc-list >/dev/null 2>&1 && fc-list | grep -i "$$font" >/dev/null 2>&1; then \
 				fonts_found=$$((fonts_found + 1)); \
 			fi; \
 		done; \
@@ -389,8 +400,8 @@ install-windows: validate ## Install Windows PowerShell configuration
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Windows configuration installed"
 
-.PHONY: validate
-validate: ## Validate dotfiles directory and dependencies
+.PHONY: validate-env
+validate-env: ## Validate dotfiles directory and dependencies
 	@echo "$(BLUE)[INFO]$(NC) Validating dotfiles environment..."
 	@if [ ! -f "$(DOTFILES_DIR)/lib/common.sh" ]; then \
 		echo "$(RED)[ERROR]$(NC) Common functions library missing. Run 'make bootstrap' first."; \
@@ -701,7 +712,7 @@ check-fonts: ## Check if recommended fonts are installed
 		echo "Checking macOS fonts..."; \
 		fonts_found=0; \
 		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
-			if fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
+			if command -v fc-list >/dev/null 2>&1 && fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
 				echo "  ✓ $$font"; fonts_found=$$((fonts_found + 1)); \
 			else \
 				echo "  ✗ $$font"; \
@@ -712,7 +723,7 @@ check-fonts: ## Check if recommended fonts are installed
 		echo "Checking Linux fonts..."; \
 		fonts_found=0; \
 		for font in "JetBrainsMono" "FiraCode" "DejaVuSansMono" "UbuntuMono"; do \
-			if fc-list | grep -i "$$font" >/dev/null 2>&1; then \
+			if command -v fc-list >/dev/null 2>&1 && fc-list | grep -i "$$font" >/dev/null 2>&1; then \
 				echo "  ✓ $$font"; fonts_found=$$((fonts_found + 1)); \
 			else \
 				echo "  ✗ $$font"; \
