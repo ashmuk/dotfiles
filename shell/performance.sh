@@ -11,7 +11,7 @@
 lazy_alias() {
     local alias_name="$1"
     local real_command="$2"
-    
+
     # Create a wrapper function that replaces itself
     eval "
     $alias_name() {
@@ -26,7 +26,7 @@ lazy_alias() {
 lazy_load_file() {
     local func_name="$1"
     local file_path="$2"
-    
+
     if [[ -f "$file_path" ]]; then
         eval "
         $func_name() {
@@ -48,7 +48,7 @@ lazy_command() {
     local alias_name="$1"
     local real_command="$2"
     local install_hint="$3"
-    
+
     eval "
     $alias_name() {
         if command -v ${real_command%% *} >/dev/null 2>&1; then
@@ -74,7 +74,7 @@ benchmark() {
         echo "Usage: benchmark <command>" >&2
         return 1
     fi
-    
+
     echo "Benchmarking: $cmd"
     time eval "$cmd"
 }
@@ -83,13 +83,13 @@ benchmark() {
 profile_startup() {
     local shell_type="${1:-$SHELL}"
     local config_file
-    
+
     case "$(basename "$shell_type")" in
         bash) config_file="$HOME/.bashrc" ;;
         zsh)  config_file="$HOME/.zshrc" ;;
         *)    config_file="$HOME/.profile" ;;
     esac
-    
+
     if [[ -f "$config_file" ]]; then
         echo "Profiling startup time for $(basename "$shell_type")..."
         time "$shell_type" -c "source '$config_file'; exit"
@@ -113,21 +113,23 @@ cache_command() {
     local cache_duration="${2:-3600}" # Default 1 hour
     shift 2
     local cmd="$*"
-    
+
     local cache_file="$CACHE_DIR/$cache_key"
     local cache_time_file="$cache_file.time"
-    
+
     # Check if cache exists and is still valid
     if [[ -f "$cache_file" ]] && [[ -f "$cache_time_file" ]]; then
-        local cache_time=$(cat "$cache_time_file" 2>/dev/null || echo 0)
-        local current_time=$(date +%s)
-        
+        local cache_time
+        cache_time=$(cat "$cache_time_file" 2>/dev/null || echo 0)
+        local current_time
+        current_time=$(date +%s)
+
         if (( current_time - cache_time < cache_duration )); then
             cat "$cache_file"
             return 0
         fi
     fi
-    
+
     # Execute command and cache result
     if eval "$cmd" > "$cache_file" 2>/dev/null; then
         date +%s > "$cache_time_file"
@@ -143,10 +145,10 @@ cache_command() {
 clear_cache() {
     local pattern="${1:-*}"
     if [[ "$pattern" == "all" ]]; then
-        rm -rf "$CACHE_DIR"/*
+        rm -rf "${CACHE_DIR:?}"/*
         echo "All cache cleared"
     else
-        rm -f "$CACHE_DIR"/$pattern*
+        rm -f "$CACHE_DIR"/"$pattern"*
         echo "Cache cleared for pattern: $pattern"
     fi
 }
@@ -162,12 +164,12 @@ fi
 
 # Lazy-load rbenv if available
 if [[ -d "$HOME/.rbenv" ]]; then
-    lazy_alias rbenv 'export PATH="$HOME/.rbenv/bin:$PATH" && eval "$(rbenv init -)"'
+    lazy_alias rbenv "export PATH=\"$HOME/.rbenv/bin:$PATH\" && eval \"$(rbenv init -)\""
 fi
 
 # Lazy-load pyenv if available
 if [[ -d "$HOME/.pyenv" ]]; then
-    lazy_alias pyenv 'export PATH="$HOME/.pyenv/bin:$PATH" && eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"'
+    lazy_alias pyenv "export PATH=\"$HOME/.pyenv/bin:$PATH\" && eval \"$(pyenv init -)\" && eval \"$(pyenv virtualenv-init -)\""
 fi
 
 # Lazy-load Docker completion
@@ -220,7 +222,7 @@ if [[ -n "$ZSH_VERSION" ]]; then
             compinit -C
         fi
     }
-    
+
     # Defer compinit loading
     lazy_alias compinit 'lazy_load_completion'
 fi
@@ -233,7 +235,8 @@ fi
 if [[ -z "$PATH_DEDUPE_DONE" ]]; then
     # Remove duplicate PATH entries
     if [[ -n "$ZSH_VERSION" ]]; then
-        typeset -aU path
+        # shellcheck disable=SC2034  # path is automatically synchronized with PATH in zsh
+        typeset -aU path  # This is used by zsh for PATH deduplication
     else
         # Bash PATH deduplication
         PATH=$(echo "$PATH" | awk -v RS=':' '!a[$1]++ { if (NR > 1) printf ":"; printf $1 }')

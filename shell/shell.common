@@ -65,6 +65,7 @@ export config_files
 
 # Build grep command with options
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
+export grep_options
 
 # Determine which grep to use and build the command
 if command -v ggrep >/dev/null 2>&1; then
@@ -87,6 +88,7 @@ export grep_command
 
 # Determine which du to use and build the command
 du_options="-h"
+export du_options
 
 # Check if du supports GNU-style --max-depth option
 # Use a safer test directory that should exist everywhere
@@ -204,7 +206,7 @@ grepalias() {
       # shellcheck disable=SC2086
       set -- $config_files
     fi
-    
+
     # Expand tilde in file paths
     local expanded_file
     local temp_files=""
@@ -344,14 +346,14 @@ gvim() {
     local win_gvim=""
     local vim_candidates=(
       "/mnt/c/Users/*/scoop/apps/vim/*/gvim.exe"
-      "/mnt/c/ProgramData/scoop/apps/vim/*/gvim.exe" 
+      "/mnt/c/ProgramData/scoop/apps/vim/*/gvim.exe"
       "/mnt/c/scoop/apps/vim/*/gvim.exe"
       "/mnt/c/Program Files/Vim/vim*/gvim.exe"
       "/mnt/c/Program Files (x86)/Vim/vim*/gvim.exe"
       "/mnt/c/Program Files/vim/gvim.exe"
       "/mnt/c/vim/gvim.exe"
     )
-    
+
     # Find the first existing gvim.exe
     for candidate in "${vim_candidates[@]}"; do
       # Use glob expansion to handle version directories like vim91
@@ -362,7 +364,7 @@ gvim() {
         fi
       done
     done
-    
+
     if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
       local args=()
       if command -v wslpath >/dev/null 2>&1; then
@@ -397,7 +399,7 @@ gvim() {
         "/c/Program Files/vim/gvim.exe"
         "/c/vim/gvim.exe"
       )
-      
+
       # Find the first existing gvim.exe
       for candidate in "${vim_candidates[@]}"; do
         # Use glob expansion to handle version directories like vim91
@@ -408,7 +410,7 @@ gvim() {
           fi
         done
       done
-      
+
       if [[ -n "$win_gvim" && -x "$win_gvim" ]]; then
         local args=()
         if command -v cygpath >/dev/null 2>&1; then

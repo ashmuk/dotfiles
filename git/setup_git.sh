@@ -71,7 +71,8 @@ print_status "Detected platform: $PLATFORM"
 backup_existing_files() {
     print_status "Backing up existing files..."
 
-    local backup_dir="$HOME/dotfiles/backup/.git_backup_$(date +%Y%m%d_%H%M%S)"
+    local backup_dir
+    backup_dir="$HOME/dotfiles/backup/.git_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
     for file in .gitignore .gitconfig .gitattributes ; do

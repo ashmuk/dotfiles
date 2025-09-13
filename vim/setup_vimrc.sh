@@ -45,7 +45,8 @@ create_directories() {
 backup_existing_files() {
     print_info "Backing up existing files..."
 
-    local backup_dir="$HOME/dotfiles/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
+    local backup_dir
+    backup_dir="$HOME/dotfiles/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
     # Backup vim configuration files (platform-aware)
@@ -213,7 +214,8 @@ create_vimfiles_symlink() {
 
     # If existing directory is a symlink pointing to our dotfiles, skip
     if [[ -L "$vim_dir" ]]; then
-        local link_target=$(readlink "$vim_dir")
+        local link_target
+        link_target=$(readlink "$vim_dir")
         if [[ "$link_target" == "$DOTFILES_DIR/vim/vimfiles" ]]; then
             print_info "Vim plugin directory already correctly symlinked"
             return 0
@@ -241,7 +243,8 @@ create_vimfiles_symlink() {
                 local files_copied=0
                 for file in "$vim_dir/$subdir"/*; do
                     if [[ -f "$file" ]]; then
-                        local filename=$(basename "$file")
+                        local filename
+                        filename=$(basename "$file")
                         local dest_file="$DOTFILES_DIR/vim/vimfiles/$subdir/$filename"
 
                         if [[ ! -f "$dest_file" ]]; then
@@ -294,7 +297,8 @@ check_generated_vim_files() {
                 # File is tracked, check for actual content differences
                 if ! git -C "$DOTFILES_DIR" diff --quiet "$file" 2>/dev/null; then
                     # File has changes, check if they are meaningful
-                    local temp_diff=$(git -C "$DOTFILES_DIR" diff --ignore-space-change --ignore-blank-lines "$file" 2>/dev/null)
+                    local temp_diff
+                    temp_diff=$(git -C "$DOTFILES_DIR" diff --ignore-space-change --ignore-blank-lines "$file" 2>/dev/null)
                     if [[ -z "$temp_diff" ]]; then
                         # No meaningful differences, restore the file
                         print_info "No actual differences in $file, restoring..."

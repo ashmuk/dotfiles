@@ -17,7 +17,7 @@ else
 fi
 
 # Set up error handling
-setup_error_handling
+setup_error_handling "$@"
 
 print_status "Setting up shell configuration..."
 print_status "Dotfiles directory: $DOTFILES_DIR"
@@ -52,8 +52,10 @@ create_symlinks() {
 backup_existing_files() {
     print_status "Backing up existing files..."
 
-    local backup_dir=$(create_backup_dir "shell")
-    [[ $? -ne 0 ]] && return 1
+    local backup_dir
+    if ! backup_dir=$(create_backup_dir "shell"); then
+        return 1
+    fi
 
     local files=(.bashrc .zshrc .bash_logout .bash_profile .zprofile .zlogout)
     for file in "${files[@]}"; do

@@ -18,7 +18,7 @@ echo
 
 echo "2. Path Conversion:"
 echo "   - WSL path: /home/user/dotfiles"
-echo "   - Windows path: \\\\wsl\$\\Ubuntu\\home\\user\\dotfiles"
+printf "   - Windows path: \\\\wsl\$\\Ubuntu\\home\\user\\dotfiles\n"
 echo "   - Target junction: C:\\Users\\user\\dotfiles"
 echo
 
