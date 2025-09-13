@@ -17,12 +17,12 @@
     "workbench.colorCustomizations": {
         "editor.findMatchHighlight": "rgba(255, 235, 59, 0.5)",
         "editor.findMatchHighlightBorder": "rgba(0, 0, 0, 1.0)",
-        
+
         "editor.wordHighlight": "rgba(255, 235, 59, 0.5)",
         "editor.wordHighlightBorder": "rgba(0, 0, 0, 1.0)",
         "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
         "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
-        
+
         "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)"
     },
 
@@ -66,5 +66,6 @@
         "**/bower_components": true,
         "**/*.pyc": true,
         "**/__pycache__": true
-    }
+    },
+    "diffEditor.ignoreTrimWhitespace": false
 }

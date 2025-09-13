@@ -17,11 +17,11 @@ ifeq ($(shell test -t 1 && echo "yes" || echo "no"),yes)
     NC := \033[0m
 else
     # No color support
-    RED := 
-    GREEN := 
-    YELLOW := 
-    BLUE := 
-    NC := 
+    RED :=
+    GREEN :=
+    YELLOW :=
+    BLUE :=
+    NC :=
 endif
 
 # Default target
