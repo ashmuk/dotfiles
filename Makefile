@@ -458,7 +458,7 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@rm -f $(HOME_DIR)/.bashrc $(HOME_DIR)/.zshrc
 	@rm -f $(HOME_DIR)/.bash_logout $(HOME_DIR)/.bash_profile $(HOME_DIR)/.zprofile $(HOME_DIR)/.zlogout
 	@echo "$(BLUE)[INFO]$(NC) Removing vim configuration..."
-	@rm -f $(HOME_DIR)/.vimrc $(HOME_DIR)/_vimrc $(HOME_DIR)/_gvimrc $(HOME_DIR)/.ideavimrc
+	@rm -f $(HOME_DIR)/.vimrc $(HOME_DIR)/_vimrc $(HOME_DIR)/.gvimrc $(HOME_DIR)/_gvimrc $(HOME_DIR)/.ideavimrc $(HOME_DIR)/_ideavimrc
 	@if [ -L "$(HOME_DIR)/.vim" ]; then rm "$(HOME_DIR)/.vim"; fi
 	@if [ -L "$(HOME_DIR)/vimfiles" ]; then rm "$(HOME_DIR)/vimfiles"; fi
 	@echo "$(BLUE)[INFO]$(NC) Removing git configuration..."
