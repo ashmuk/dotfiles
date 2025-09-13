@@ -10,12 +10,7 @@ if exists('*gui_font#Apply') == 0
     " OS detection
     if has('win32') || has('win64')
       let s:candidates = [
-            \ 'JetBrainsMono Nerd Font:h12',
-            \ 'JetBrains Mono:h12',
-            \ 'FiraCode Nerd Font Mono:h12',
-            \ 'Fira Code:h12',
-            \ 'Cascadia Code PL:h12',
-            \ 'Cascadia Mono PL:h12',
+            \ 'Consolas:h11:cANSI:qDRAFT',
             \ 'Consolas:h12'
             \ ]
       " Wide font for CJK on Windows (preinstalled)
