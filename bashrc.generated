@@ -341,8 +341,12 @@ gvim() {
   # WSL (Windows Subsystem for Linux)
   if grep -qi microsoft /proc/version 2>/dev/null; then
     # Try multiple common Vim installation paths
+    # Prioritize Scoop installations over traditional vim directories
     local win_gvim=""
     local vim_candidates=(
+      "/mnt/c/Users/*/scoop/apps/vim/*/gvim.exe"
+      "/mnt/c/ProgramData/scoop/apps/vim/*/gvim.exe" 
+      "/mnt/c/scoop/apps/vim/*/gvim.exe"
       "/mnt/c/Program Files/Vim/vim*/gvim.exe"
       "/mnt/c/Program Files (x86)/Vim/vim*/gvim.exe"
       "/mnt/c/Program Files/vim/gvim.exe"
@@ -383,8 +387,12 @@ gvim() {
   case "$OSTYPE" in
     msys*|cygwin*)
       # Try multiple common Vim installation paths for MSYS/Cygwin
+      # Prioritize Scoop installations over traditional vim directories
       local win_gvim=""
       local vim_candidates=(
+        "/c/Users/*/scoop/apps/vim/*/gvim.exe"
+        "/c/ProgramData/scoop/apps/vim/*/gvim.exe"
+        "/c/scoop/apps/vim/*/gvim.exe"
         "/c/Program Files/Vim/vim*/gvim.exe"
         "/c/Program Files (x86)/Vim/vim*/gvim.exe"
         "/c/Program Files/vim/gvim.exe"
