@@ -37,12 +37,22 @@ make install
 
 # Install only vim configuration
 make install-vim
+
+# Install programming fonts for gvim (optional but recommended)
+make install-fonts
+
+# Check if fonts are installed
+make check-fonts
 ```
 
 ### Manual Installation
 ```bash
 # Run the vim setup script
 ./vim/setup_vimrc.sh
+
+# Install fonts manually (cross-platform)
+# Windows: powershell -ExecutionPolicy Bypass -File fonts/install_fonts.ps1
+# macOS/Linux: bash fonts/install_fonts.sh
 ```
 
 ## 🎯 Configuration Files
@@ -116,7 +126,58 @@ make install-vim
 - **Screen-line movement**: `j`/`k` move by screen lines, `gj`/`gk` move by actual lines
 - **Git operations**: `<leader>gs` (git status), `<leader>gd` (git diff), `<leader>gc` (git commit)
 - **File navigation**: `<F2>` toggles NERDTree, `<C-p>` opens file finder
-- **Plugin shortcuts**: `<C-f>` for ripgrep search, `<C-b>` for buffer list
+- **Plugin shortcuts**: `<leader>f` for ripgrep search, `<leader>b` for buffer list
+
+## 🔤 Font Management
+
+The vim configuration includes intelligent font selection for gvim across all platforms.
+
+### Automatic Font Selection
+
+The system automatically detects and applies the best available programming font:
+
+**Windows:**
+- JetBrains Mono Nerd Font (preferred)
+- Fira Code Nerd Font
+- Cascadia Code PL
+- Consolas (fallback)
+
+**macOS:**
+- JetBrains Mono Nerd Font (preferred)
+- Fira Code Nerd Font
+- Menlo (fallback)
+
+**Linux:**
+- JetBrains Mono Nerd Font (preferred)
+- Fira Code Nerd Font
+- DejaVu Sans Mono (fallback)
+
+### Font Installation
+
+```bash
+# Install recommended programming fonts
+make install-fonts
+
+# Check current font availability
+make check-fonts
+
+# Font installation is also checked during prerequisite validation
+make check-prereqs
+```
+
+### Manual Font Management
+
+Fonts are managed through:
+- **Installation scripts**: `fonts/install_fonts.ps1` (Windows), `fonts/install_fonts.sh` (macOS/Linux)
+- **Auto-detection**: `vim/vimfiles/autoload/gui_font.vim`
+- **Integration**: Automatically called from `vimrc.gui`
+
+### CJK Support
+
+The system includes wide font support for CJK characters:
+- **Windows**: Yu Gothic UI
+- **macOS**: Hiragino Sans
+- **Linux**: Noto Sans CJK JP
 
 ### Plugin Ecosystem
 - **vim-fugitive**: Complete git integration (`:Gdiffsplit`, `:Git status`, `:Git commit`)
@@ -137,7 +198,7 @@ make install-vim
 
 Create local configuration files for personal vim customizations:
 - `~/.vim/local.vim` (Unix/macOS)
-- `~/vimfiles/local.vim` (Windows) 
+- `~/vimfiles/local.vim` (Windows)
 - `~/.config/nvim/local.vim` (Neovim)
 - `~/dotfiles/vim/local.vim`
 
@@ -218,7 +279,7 @@ The configuration uses vim-plug for plugin management:
 **Current plugin list:**
 - **tpope/vim-sensible**: Sensible defaults
 - **tpope/vim-fugitive**: Git wrapper (:Gdiffsplit support!)
-- **tpope/vim-surround**: Surround text objects  
+- **tpope/vim-surround**: Surround text objects
 - **preservim/nerdtree**: File tree explorer
 - **vim-airline/vim-airline**: Status line enhancement
 - **dense-analysis/ale**: Async linting engine

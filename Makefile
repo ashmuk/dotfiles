@@ -38,6 +38,7 @@ check-prereqs: ## Check for required tools and suggest installation commands
 	@$(MAKE) -s _check_core_tools
 	@$(MAKE) -s _check_modern_tools
 	@$(MAKE) -s _check_dev_tools
+	@$(MAKE) -s _check_fonts
 	@echo "$(GREEN)[SUCCESS]$(NC) All essential prerequisites are available"
 
 .PHONY: _check_essential_tools
@@ -98,6 +99,48 @@ _check_dev_tools:
 		echo "$(CYAN)[INFO]$(NC) Development tools not found:$$missing_dev"; \
 		echo "$(CYAN)[INFO]$(NC) These tools enhance development experience"; \
 		$(MAKE) -s _suggest_installation TOOLS="$$missing_dev"; \
+	fi
+
+.PHONY: _check_fonts
+_check_fonts:
+	@echo "$(BLUE)[INFO]$(NC) Checking programming fonts for gvim..."
+	@fonts_found=0; \
+	if [[ "$(PLATFORM)" == "win" ]]; then \
+		for font in "JetBrains Mono" "Fira Code" "Cascadia Code" "Consolas"; do \
+			if powershell -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member -Name '*$$font*'" >/dev/null 2>&1; then \
+				fonts_found=$$((fonts_found + 1)); \
+			fi; \
+		done; \
+		if [ $$fonts_found -lt 2 ]; then \
+			echo "$(YELLOW)[WARNING]$(NC) Few programming fonts found ($$fonts_found/4)"; \
+			echo "$(YELLOW)[WARNING]$(NC) Run 'make install-fonts' to install recommended fonts"; \
+		else \
+			echo "$(GREEN)[SUCCESS]$(NC) Programming fonts available ($$fonts_found/4)"; \
+		fi; \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
+		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
+			if fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
+				fonts_found=$$((fonts_found + 1)); \
+			fi; \
+		done; \
+		if [ $$fonts_found -lt 2 ]; then \
+			echo "$(YELLOW)[WARNING]$(NC) Few programming fonts found ($$fonts_found/4)"; \
+			echo "$(YELLOW)[WARNING]$(NC) Run 'make install-fonts' to install recommended fonts"; \
+		else \
+			echo "$(GREEN)[SUCCESS]$(NC) Programming fonts available ($$fonts_found/4)"; \
+		fi; \
+	else \
+		for font in "JetBrainsMono" "FiraCode" "DejaVuSansMono" "UbuntuMono"; do \
+			if fc-list | grep -i "$$font" >/dev/null 2>&1; then \
+				fonts_found=$$((fonts_found + 1)); \
+			fi; \
+		done; \
+		if [ $$fonts_found -lt 2 ]; then \
+			echo "$(YELLOW)[WARNING]$(NC) Few programming fonts found ($$fonts_found/4)"; \
+			echo "$(YELLOW)[WARNING]$(NC) Run 'make install-fonts' to install recommended fonts"; \
+		else \
+			echo "$(GREEN)[SUCCESS]$(NC) Programming fonts available ($$fonts_found/4)"; \
+		fi; \
 	fi
 
 .PHONY: _suggest_installation
@@ -616,6 +659,68 @@ test-compat: validate ## Test cross-platform compatibility
 .PHONY: lint
 lint: test-shellcheck ## Alias for test-shellcheck (deprecated, use test-shellcheck)
 
+# =============================================================================
+# Font Management
+# =============================================================================
+
+.PHONY: install-fonts
+install-fonts: ## Install programming fonts for gvim (cross-platform)
+	@echo "$(BLUE)[INFO]$(NC) Installing programming fonts for gvim..."
+	@if [[ "$(PLATFORM)" == "win" ]]; then \
+		if command -v powershell >/dev/null 2>&1; then \
+			powershell -ExecutionPolicy Bypass -File "$(DOTFILES_DIR)/fonts/install_fonts.ps1"; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) PowerShell not found. Please run fonts/install_fonts.ps1 manually."; \
+		fi; \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
+		if command -v brew >/dev/null 2>&1; then \
+			bash "$(DOTFILES_DIR)/fonts/install_fonts.sh"; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) Homebrew not found. Please install from https://brew.sh/"; \
+		fi; \
+	else \
+		bash "$(DOTFILES_DIR)/fonts/install_fonts.sh"; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Font installation completed"
+
+.PHONY: check-fonts
+check-fonts: ## Check if recommended fonts are installed
+	@echo "$(BLUE)[INFO]$(NC) Checking font availability..."
+	@if [[ "$(PLATFORM)" == "win" ]]; then \
+		echo "Checking Windows fonts..."; \
+		fonts_found=0; \
+		for font in "JetBrains Mono" "Fira Code" "Cascadia Code" "Consolas"; do \
+			if powershell -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member -Name '*$$font*'" >/dev/null 2>&1; then \
+				echo "  ✓ $$font"; fonts_found=$$((fonts_found + 1)); \
+			else \
+				echo "  ✗ $$font"; \
+			fi; \
+		done; \
+		echo "Found $$fonts_found/4 recommended fonts"; \
+	elif [[ "$(PLATFORM)" == "mac" ]]; then \
+		echo "Checking macOS fonts..."; \
+		fonts_found=0; \
+		for font in "JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Menlo" "Monaco"; do \
+			if fc-list | grep -i "$$font" >/dev/null 2>&1 || system_profiler SPFontsDataType | grep -i "$$font" >/dev/null 2>&1; then \
+				echo "  ✓ $$font"; fonts_found=$$((fonts_found + 1)); \
+			else \
+				echo "  ✗ $$font"; \
+			fi; \
+		done; \
+		echo "Found $$fonts_found/4 recommended fonts"; \
+	else \
+		echo "Checking Linux fonts..."; \
+		fonts_found=0; \
+		for font in "JetBrainsMono" "FiraCode" "DejaVuSansMono" "UbuntuMono"; do \
+			if fc-list | grep -i "$$font" >/dev/null 2>&1; then \
+				echo "  ✓ $$font"; fonts_found=$$((fonts_found + 1)); \
+			else \
+				echo "  ✗ $$font"; \
+			fi; \
+		done; \
+		echo "Found $$fonts_found/4 recommended fonts"; \
+	fi
+
 .PHONY: info
 info: ## Show information about this dotfiles project
 	@echo "Dotfiles Project Information"
@@ -626,9 +731,10 @@ info: ## Show information about this dotfiles project
 	@echo ""
 	@echo "Available configurations:"
 	@echo "  - Shell (bash/zsh) with aliases and functions"
-	@echo "  - Vim with multiple configurations"
+	@echo "  - Vim with multiple configurations and smart font selection"
 	@echo "  - Git with common settings"
 	@echo "  - Windows PowerShell (with install-windows)"
+	@echo "  - Programming fonts (with install-fonts)"
 	@echo ""
 	@echo "Platform support:"
 	@echo "  - macOS (darwin)"

@@ -52,7 +52,7 @@ Modern alternatives providing better functionality:
 Tools that enhance the development experience:
 - `shellcheck` - Shell script linting and validation
 - `jq` - JSON processing and manipulation
-- `yq` - YAML processing and manipulation  
+- `yq` - YAML processing and manipulation
 - `tree` - Directory tree visualization
 - `htop`/`btop` - Enhanced process monitoring
 
@@ -84,7 +84,7 @@ iwr -useb get.scoop.sh | iex
 # Essential + Core (many included with Git for Windows)
 scoop install make vim zsh
 
-# Modern enhancements  
+# Modern enhancements
 scoop install ripgrep fd bat fzf exa
 
 # Development tools
@@ -111,6 +111,8 @@ Run `make check-prereqs` to check which tools you have and get installation sugg
 |---------|-------------|
 | `make install` | Install all dotfiles (shell + vim + git) |
 | `make check-prereqs` | Check tools and show installation commands |
+| `make install-fonts` | Install programming fonts for gvim |
+| `make check-fonts` | Check font availability |
 | `make test` | Run complete test suite |
 | `make status` | Show installation status |
 | `make clean` | Remove installed dotfiles |
@@ -284,7 +286,7 @@ The dotfiles system supports user-specific customizations without modifying the 
 ### Shell Customization
 Create a local configuration file in any of these locations (first found will be loaded):
 - `$HOME/.dotfiles-local`
-- `$HOME/.config/dotfiles/local` 
+- `$HOME/.config/dotfiles/local`
 - `$HOME/dotfiles/shell/local`
 - `$HOME/.dotfiles/shell/local`
 
@@ -470,7 +472,7 @@ ls /mnt/c/Users/$USER/scoop/apps/vim/*/gvim.exe
 # For Windows-first layout
 ls -la ~/dotfiles  # should be symlink to /mnt/c/Users/username/dotfiles
 
-# For WSL-first layout  
+# For WSL-first layout
 ls -la "/mnt/c/Users/$USER/dotfiles"  # should be junction to WSL
 ```
 
