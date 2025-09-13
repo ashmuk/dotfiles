@@ -99,7 +99,8 @@ if has('unix') && !has('gui_running')
   elseif s:uname =~? "freebsd"
     set term=builtin_cons25
   elseif s:uname =~? "Darwin"
-    set term=builtin_beos-ansi
+    " macOS ではデフォルトのターミナル設定を使用（builtin_beos-ansiは存在しない）
+    " set term=builtin_beos-ansi  # この行をコメントアウト
   else
     set term=builtin_xterm
   endif
