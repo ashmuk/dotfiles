@@ -14,7 +14,96 @@ make install
 
 # Check installation status
 make status
+
+# Check prerequisites
+make check-prereqs
 ```
+
+## 🔧 CLI Tool Requirements
+
+This dotfiles system uses a comprehensive set of command-line tools across different categories:
+
+### **Essential Tools (Required)**
+Core tools needed for basic dotfiles functionality:
+- `git` - Version control and dotfiles management
+- `make` - Build automation and primary interface
+- `bash` - Shell scripting and cross-platform compatibility
+- `grep` - Text searching in shell functions and aliases
+- `sed` - Stream editing for text processing
+- `awk` - Pattern scanning and text processing
+
+### **Core Tools (Highly Recommended)**
+Tools for full dotfiles experience:
+- `vim` - Text editor (major component of this dotfiles)
+- `zsh` - Enhanced shell with rich configuration
+- `curl` - HTTP downloads and package installations
+- `tar` - Archive handling for backups/restore
+- `find` - File searching and dotfiles management
+
+### **Modern Enhancement Tools (Optional but Valuable)**
+Modern alternatives providing better functionality:
+- `ripgrep` (`rg`) - Faster grep with better defaults
+- `fd` - Faster find replacement with intuitive syntax
+- `bat` - Enhanced cat with syntax highlighting
+- `fzf` - Fuzzy finder for enhanced shell navigation
+- `exa` - Modern ls replacement with better formatting
+
+### **Development & Quality Tools (Optional)**
+Tools that enhance the development experience:
+- `shellcheck` - Shell script linting and validation
+- `jq` - JSON processing and manipulation
+- `yq` - YAML processing and manipulation  
+- `tree` - Directory tree visualization
+- `htop`/`btop` - Enhanced process monitoring
+
+### **Platform-Specific Notes**
+- **macOS**: Install GNU versions via Homebrew (`ggrep`, `gsed`, `gawk`)
+- **Windows**: Most tools available via Git for Windows + Scoop
+- **Linux**: Standard GNU tools usually pre-installed
+
+### **Quick Installation**
+
+**macOS (Homebrew):**
+```bash
+# Essential + Core
+brew install make git bash grep gnu-sed gawk vim zsh curl
+
+# Modern enhancements
+brew install ripgrep fd bat fzf exa
+
+# Development tools
+brew install shellcheck jq yq tree htop
+```
+
+**Windows (Scoop):**
+```powershell
+# Install Scoop first
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iwr -useb get.scoop.sh | iex
+
+# Essential + Core (many included with Git for Windows)
+scoop install make vim zsh
+
+# Modern enhancements  
+scoop install ripgrep fd bat fzf exa
+
+# Development tools
+scoop install shellcheck jq yq tree btop
+```
+
+**Linux (apt/Ubuntu):**
+```bash
+# Essential + Core
+sudo apt update && sudo apt install make git bash grep sed gawk vim zsh curl tar findutils
+
+# Modern enhancements (may need additional repos)
+sudo apt install ripgrep fd-find bat fzf exa
+
+# Development tools
+sudo apt install shellcheck jq tree htop
+```
+
+Run `make check-prereqs` to check which tools you have and get installation suggestions for your platform.
 
 ## 📁 Project Structure
 
@@ -358,8 +447,10 @@ This dotfiles system provides comprehensive Windows integration through two work
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 iwr -useb get.scoop.sh | iex
 
-# 2. Install essential tools
-scoop install make ripgrep fd bat
+# 2. Install essential tools (see CLI Tool Requirements section above)
+scoop install make vim zsh
+scoop install ripgrep fd bat fzf exa
+scoop install shellcheck jq yq tree btop
 ```
 
 #### Setup

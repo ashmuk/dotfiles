@@ -35,14 +35,16 @@ help: ## Show this help message
 check-prereqs: ## Check for required tools and suggest installation commands
 	@echo "$(BLUE)[INFO]$(NC) Checking prerequisites..."
 	@$(MAKE) -s _check_essential_tools
-	@$(MAKE) -s _check_optional_tools
+	@$(MAKE) -s _check_core_tools
+	@$(MAKE) -s _check_modern_tools
+	@$(MAKE) -s _check_dev_tools
 	@echo "$(GREEN)[SUCCESS]$(NC) All essential prerequisites are available"
 
 .PHONY: _check_essential_tools
 _check_essential_tools:
 	@echo "$(BLUE)[INFO]$(NC) Checking essential tools..."
 	@missing_tools=""; \
-	for tool in make git bash; do \
+	for tool in make git bash grep sed awk; do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
 			missing_tools="$$missing_tools $$tool"; \
 		fi; \
@@ -53,19 +55,49 @@ _check_essential_tools:
 		exit 1; \
 	fi
 
-.PHONY: _check_optional_tools
-_check_optional_tools:
-	@echo "$(BLUE)[INFO]$(NC) Checking optional tools..."
-	@missing_optional=""; \
-	for tool in zsh vim shellcheck rg fd bat; do \
+.PHONY: _check_core_tools
+_check_core_tools:
+	@echo "$(BLUE)[INFO]$(NC) Checking core tools..."
+	@missing_core=""; \
+	for tool in vim zsh curl tar find; do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
-			missing_optional="$$missing_optional $$tool"; \
+			missing_core="$$missing_core $$tool"; \
 		fi; \
 	done; \
-	if [ -n "$$missing_optional" ]; then \
-		echo "$(YELLOW)[WARNING]$(NC) Optional tools not found:$$missing_optional"; \
+	if [ -n "$$missing_core" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Core tools not found:$$missing_core"; \
 		echo "$(YELLOW)[WARNING]$(NC) Some features may not work optimally"; \
-		$(MAKE) -s _suggest_installation TOOLS="$$missing_optional"; \
+		$(MAKE) -s _suggest_installation TOOLS="$$missing_core"; \
+	fi
+
+.PHONY: _check_modern_tools
+_check_modern_tools:
+	@echo "$(BLUE)[INFO]$(NC) Checking modern enhancement tools..."
+	@missing_modern=""; \
+	for tool in rg fd bat fzf exa; do \
+		if ! command -v $$tool >/dev/null 2>&1; then \
+			missing_modern="$$missing_modern $$tool"; \
+		fi; \
+	done; \
+	if [ -n "$$missing_modern" ]; then \
+		echo "$(CYAN)[INFO]$(NC) Modern tools not found:$$missing_modern"; \
+		echo "$(CYAN)[INFO]$(NC) These provide enhanced alternatives to traditional tools"; \
+		$(MAKE) -s _suggest_installation TOOLS="$$missing_modern"; \
+	fi
+
+.PHONY: _check_dev_tools
+_check_dev_tools:
+	@echo "$(BLUE)[INFO]$(NC) Checking development & quality tools..."
+	@missing_dev=""; \
+	for tool in shellcheck jq yq tree htop; do \
+		if ! command -v $$tool >/dev/null 2>&1; then \
+			missing_dev="$$missing_dev $$tool"; \
+		fi; \
+	done; \
+	if [ -n "$$missing_dev" ]; then \
+		echo "$(CYAN)[INFO]$(NC) Development tools not found:$$missing_dev"; \
+		echo "$(CYAN)[INFO]$(NC) These tools enhance development experience"; \
+		$(MAKE) -s _suggest_installation TOOLS="$$missing_dev"; \
 	fi
 
 .PHONY: _suggest_installation
@@ -105,12 +137,24 @@ _suggest_installation:
 				make) scoop_tools="$$scoop_tools make" ;; \
 				git) scoop_tools="$$scoop_tools git" ;; \
 				bash) echo "    bash: Already available in Git for Windows" ;; \
-				zsh) scoop_tools="$$scoop_tools zsh" ;; \
+				grep) echo "    grep: Already available in Git for Windows" ;; \
+				sed) echo "    sed: Already available in Git for Windows" ;; \
+				awk) echo "    awk: Already available in Git for Windows (gawk)" ;; \
 				vim) scoop_tools="$$scoop_tools vim" ;; \
-				shellcheck) scoop_tools="$$scoop_tools shellcheck" ;; \
+				zsh) scoop_tools="$$scoop_tools zsh" ;; \
+				curl) echo "    curl: Already available in Windows 10/11" ;; \
+				tar) echo "    tar: Already available in Windows 10/11" ;; \
+				find) echo "    find: Use 'where' or install findutils via scoop" ;; \
 				rg) scoop_tools="$$scoop_tools ripgrep" ;; \
 				fd) scoop_tools="$$scoop_tools fd" ;; \
 				bat) scoop_tools="$$scoop_tools bat" ;; \
+				fzf) scoop_tools="$$scoop_tools fzf" ;; \
+				exa) scoop_tools="$$scoop_tools exa" ;; \
+				shellcheck) scoop_tools="$$scoop_tools shellcheck" ;; \
+				jq) scoop_tools="$$scoop_tools jq" ;; \
+				yq) scoop_tools="$$scoop_tools yq" ;; \
+				tree) scoop_tools="$$scoop_tools tree" ;; \
+				htop) scoop_tools="$$scoop_tools btop" ;; \
 				*) scoop_tools="$$scoop_tools $$tool" ;; \
 			esac; \
 		done; \
