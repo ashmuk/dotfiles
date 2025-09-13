@@ -68,6 +68,9 @@ export config_files
 grep_options="--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}"
 export grep_options
 
+# Initialize grep_command with a default value
+grep_command="grep $grep_options"
+
 # Determine which grep to use and build the command
 if command -v ggrep >/dev/null 2>&1; then
   alias grep='ggrep'
@@ -78,8 +81,6 @@ elif command -v /usr/local/bin/grep >/dev/null 2>&1; then
 elif command -v /opt/homebrew/bin/grep >/dev/null 2>&1; then
   alias grep='/opt/homebrew/bin/grep'
   grep_command="/opt/homebrew/bin/grep $grep_options"
-else
-  grep_command="grep $grep_options"
 fi
 export grep_command
 
@@ -90,6 +91,9 @@ export grep_command
 # Determine which du to use and build the command
 du_options="-h"
 export du_options
+
+# Initialize du_command with a default value
+du_command="du $du_options -d 1"
 
 # Check if du supports GNU-style --max-depth option
 # Use a safer test directory that should exist everywhere
@@ -109,9 +113,6 @@ elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /o
   # GNU du in /opt/homebrew/bin
   alias du='/opt/homebrew/bin/du'
   du_command="/opt/homebrew/bin/du $du_options --max-depth=1"
-else
-  # BSD du (fallback)
-  du_command="du $du_options -d 1"
 fi
 export du_command
 
