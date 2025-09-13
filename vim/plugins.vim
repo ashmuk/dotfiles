@@ -111,9 +111,12 @@ let g:gitgutter_map_keys = 0  " Disable default mappings
 nnoremap <silent> <F2> :NERDTreeToggle<CR>
 
 " fzf mappings
-nnoremap <silent> <C-p> :Files<CR>
-nnoremap <silent> <C-b> :Buffers<CR>
-nnoremap <silent> <C-f> :Rg<CR>
+" CTRL+P restored to default (command-line history) - use <leader>p for file finder
+nnoremap <silent> <leader>p :Files<CR>
+" CTRL+B restored to default (scroll up) - use <leader>b for buffer list
+nnoremap <silent> <leader>b :Buffers<CR>
+" CTRL+F restored to default (page down) - use <leader>f for ripgrep search
+nnoremap <silent> <leader>f :Rg<CR>
 
 " Git fugitive mappings
 nnoremap <silent> <leader>gs :Git status<CR>
