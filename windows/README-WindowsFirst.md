@@ -53,12 +53,38 @@ make install-shell install-vim install-git
 - **PowerShell 5.1+** or PowerShell Core
 - **Git for Windows** (provides bash, git, and basic Unix tools)
 
-#### Recommended Package Manager (Windows)
+##### Enable WSL on Windows
+If WSL is not already installed, enable it through Windows Settings:
+1. **Windows 11**: Settings → Apps → Optional features → More Windows features
+   **Windows 10**: Control Panel → Programs → Turn Windows features on or off
+2. Check the boxes for:
+   - ☑️ **Windows Subsystem for Linux**
+   - ☑️ **Virtual Machine Platform**
+3. Restart your computer when prompted
+4. Install WSL2: Open PowerShell as Administrator and run:
+   ```powershell
+   wsl --install
+   # Or to install a specific distribution:
+   wsl --install -d Ubuntu
+   ```
+
+#### Recommended Package Managers (Windows)
+
+##### Scoop
 Install **Scoop** for easy tool management:
 ```powershell
 # Install Scoop package manager
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 iwr -useb get.scoop.sh | iex
+```
+
+##### Chocolatey (Alternative)
+Install **Chocolatey** for system-wide packages:
+```powershell
+# Install Chocolatey package manager
+Set-ExecutionPolicy Bypass -Scope Process -Force
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 ```
 
 #### Additional Tools (Windows)
@@ -70,6 +96,28 @@ scoop install make ripgrep fd bat
 # Optional but recommended
 scoop install zsh vim shellcheck
 ```
+
+#### Nerd Fonts (Recommended for Terminal)
+For proper terminal icon display, install Nerd Fonts using Chocolatey:
+```powershell
+# Search for available Nerd Fonts (names may vary)
+choco search nerd-fonts
+
+# Install popular Nerd Fonts via Chocolatey
+choco install nerd-fonts-hack -y
+choco install nerd-fonts-firacode -y
+choco install nerd-fonts-cascadiacode -y
+choco install nerd-fonts-jetbrainsmono -y
+
+# Or install all Nerd Fonts (warning: large download)
+# choco install nerd-fonts-complete -y
+```
+
+**Configure Terminal:**
+- Windows Terminal: Settings → Profiles → Defaults → Appearance → Font face
+- Choose: "Hack Nerd Font", "FiraCode Nerd Font", or "CascadiaCode Nerd Font"
+
+**Note:** Font package names may change over time. Use `choco search nerd-fonts` to find current available packages.
 
 #### WSL Prerequisites
 - **WSL distribution** (Ubuntu recommended)
