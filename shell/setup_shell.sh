@@ -36,7 +36,7 @@ create_symlinks() {
 
     # Create symlinks to platform-specific generated files
     ln -sf "$DOTFILES_DIR/bashrc.generated.$PLATFORM" "$HOME/.bashrc"
-    ln -sf "$DOTFILES_DIR/zshrc.generated.$PLATFORM" "$HOME/.zshrc"
+    ln -sf "$DOTFILES_DIR/zshrc.generated" "$HOME/.zshrc"
 
     # Create symlinks to profile files
     print_status "Creating profile file symlinks..."
@@ -83,7 +83,7 @@ create_platform_files() {
     concatenate_files_with_shebang "$DOTFILES_DIR/bashrc.generated.$PLATFORM" "#!/bin/bash" "${bashrc_files[@]}" || return 1
     temp_files+=("$DOTFILES_DIR/bashrc.generated.$PLATFORM")
 
-    # Create zshrc.generated.$PLATFORM
+    # Create zshrc.generated (universal - platform detection handled internally)
     local zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.zsh" "$DOTFILES_DIR/shell/shell.ohmy.zsh")
     for file in "${zshrc_files[@]}"; do
         if [[ ! -f "$file" ]]; then
@@ -92,8 +92,8 @@ create_platform_files() {
         fi
     done
 
-    concatenate_files_with_shebang "$DOTFILES_DIR/zshrc.generated.$PLATFORM" "#!/bin/zsh" "${zshrc_files[@]}" || return 1
-    temp_files+=("$DOTFILES_DIR/zshrc.generated.$PLATFORM")
+    concatenate_files_with_shebang "$DOTFILES_DIR/zshrc.generated" "#!/bin/zsh" "${zshrc_files[@]}" || return 1
+    temp_files+=("$DOTFILES_DIR/zshrc.generated")
 
     print_success "Platform-dependent files created in dotfiles directory"
     return 0
@@ -104,7 +104,7 @@ check_generated_files() {
     print_status "Checking for actual changes in generated files..."
 
     local files_restored=0
-    local files=("bashrc.generated.$PLATFORM" "zshrc.generated.$PLATFORM")
+    local files=("bashrc.generated.$PLATFORM" "zshrc.generated")
 
     for file in "${files[@]}"; do
         if restore_git_file_if_no_changes "$DOTFILES_DIR/$file" "$DOTFILES_DIR"; then
