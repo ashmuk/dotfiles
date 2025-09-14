@@ -131,13 +131,11 @@ Run `make check-prereqs` to check which tools you have and get installation sugg
 dotfiles/
 ├── Makefile                 # Main installation and management script
 ├── README.md               # This file
-├── bashrc.generated.mac     # Generated bash configuration file (platform-specific)
-├── zshrc.generated.mac     # Generated zsh configuration file (platform-specific)
-├── _vimrc                  # Windows vim configuration
-├── _gvimrc                 # Windows GUI vim configuration
-├── vimrc.mac               # macOS-specific vim configuration
-├── gvimrc.mac              # macOS-specific GUI vim configuration
-├── ideavimrc.mac           # macOS-specific IdeaVim configuration
+├── bashrc.generated         # Generated bash configuration file (universal)
+├── zshrc.generated          # Generated zsh configuration file (universal)
+├── vimrc.generated         # Generated vim configuration (universal)
+├── gvimrc.generated        # Generated GUI vim configuration (universal)
+├── ideavimrc.generated     # Generated IdeaVim configuration (universal)
 ├── shell/                  # Shell configuration directory
 │   ├── setup_shell.sh      # Shell installation script
 │   ├── shell.common        # Common shell settings (bash/zsh)
@@ -255,7 +253,8 @@ dotfiles/
 - **Plugin ecosystem**: vim-plug integration with curated essential plugins
 - **Git integration**: vim-fugitive for advanced git operations
 - **Enhanced completion**: Improved TAB completion and command-line completion
-- **Smart Windows integration**: Dynamic gvim detection with Scoop prioritization
+- **Smart Windows integration**: Dynamic gvim detection with .msi prioritization over Scoop
+- **Universal configurations**: Consolidated .generated files with built-in platform detection eliminate duplication
 
 ### Windows & WSL Integration
 - **Dual workflow support**: Windows-first and WSL-first approaches
@@ -322,25 +321,25 @@ vim ~/.vim/local.vim
 
 ### Shell Configuration
 The shell setup creates symlinks to:
-- `~/.bashrc` → Generated bash configuration (bashrc.generated.$PLATFORM)
-- `~/.zshrc` → Generated zsh configuration (zshrc.generated.$PLATFORM)
+- `~/.bashrc` → Generated bash configuration (bashrc.generated)
+- `~/.zshrc` → Generated zsh configuration (zshrc.generated)
 - `~/.bash_logout` → Bash logout configuration
 - `~/.bash_profile` → Bash profile configuration
 - `~/.zprofile` → Zsh profile configuration
 - `~/.zlogout` → Zsh logout configuration
 
 Generated files combine modular components:
-- `bashrc.generated.$PLATFORM` = `shell.common` + `shell.bash`
-- `zshrc.generated.$PLATFORM` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh`
+- `bashrc.generated` = `shell.common` + `shell.bash`
+- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh`
 
-**Note**: Generated files are platform-specific (e.g., `bashrc.generated.mac`, `bashrc.generated.win`, `bashrc.generated.linux`) to avoid conflicts between different environments.
+**Note**: Generated files are universal with built-in platform detection, eliminating the need for separate platform-specific versions.
 
 ### Vim Configuration
 The vim setup creates symlinks to:
 - `~/.vimrc` → Main vim configuration
 - `~/_vimrc` → Windows vim configuration
 - `~/_gvimrc` → Windows GUI vim configuration
-- `~/vimrc.*` → Environment-specific configurations
+- `~/vimrc.generated`, `~/gvimrc.generated`, `~/ideavimrc.generated` → Universal configurations with platform detection
 - `~/mappings.common` → Common key mappings
 
 ## 🔄 Updating
