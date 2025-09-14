@@ -1,7 +1,9 @@
-" Windows gvim configuration
-" This file sources the main gvim configuration with Windows-specific settings
+" Generated gvim configuration (consolidated from platform-specific files)
+" This file sources the main gvim configuration with cross-platform compatibility
 
-" 共通設定を読み込み（Windows固有設定も含む）
+set nocompatible
+
+" 共通設定を読み込み
 if filereadable(expand('~/dotfiles/vim/vimrc.common'))
   source ~/dotfiles/vim/vimrc.common
 endif

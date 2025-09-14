@@ -99,16 +99,16 @@ create_symlinks() {
 
     # Windows では _vimrc, _gvimrc を使用
     if [[ "$PLATFORM" == "win" ]]; then
-        ln -sf "$DOTFILES_DIR/vimrc.$PLATFORM" "$HOME/_vimrc"
-        ln -sf "$DOTFILES_DIR/gvimrc.$PLATFORM" "$HOME/_gvimrc"
-        ln -sf "$DOTFILES_DIR/ideavimrc.$PLATFORM" "$HOME/_ideavimrc"
-        print_info "Created Windows-style symlinks: _vimrc, _gvimrc, _ideavimrc"
+        ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/_vimrc"
+        ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/_gvimrc"
+        ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/_ideavimrc"
+        print_info "Created Windows-style symlinks: _vimrc (consolidated), _gvimrc (consolidated), _ideavimrc (consolidated)"
     else
         # Unix/macOS/Linux では .vimrc, .gvimrc を使用
-        ln -sf "$DOTFILES_DIR/vimrc.$PLATFORM" "$HOME/.vimrc"
-        ln -sf "$DOTFILES_DIR/gvimrc.$PLATFORM" "$HOME/.gvimrc"
-        ln -sf "$DOTFILES_DIR/ideavimrc.$PLATFORM" "$HOME/.ideavimrc"
-        print_info "Created Unix-style symlinks: .vimrc, .gvimrc, .ideavimrc"
+        ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/.vimrc"
+        ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/.gvimrc"
+        ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/.ideavimrc"
+        print_info "Created Unix-style symlinks: .vimrc (consolidated), .gvimrc (consolidated), .ideavimrc (consolidated)"
     fi
 
     print_success "Symbolic links created in home directory"
@@ -118,8 +118,11 @@ create_symlinks() {
 create_platform_files() {
     print_info "Creating platform-dependent files in dotfiles root..."
 
-    # .vimrc の作成
-    cat > "$DOTFILES_DIR/vimrc.$PLATFORM" << 'EOF'
+    # .vimrc の作成（統合版 - プラットフォーム共通、内部で自動検出）
+    cat > "$DOTFILES_DIR/vimrc.generated" << 'EOF'
+" Generated vim configuration (consolidated from platform-specific files)
+" This file sources the main vim configuration with cross-platform compatibility
+
 set nocompatible
 
 " 共通設定を読み込み
@@ -158,8 +161,11 @@ else
 endif
 EOF
 
-    # .gvimrc の作成
-    cat > "$DOTFILES_DIR/gvimrc.$PLATFORM" << 'EOF'
+    # .gvimrc の作成（統合版 - プラットフォーム共通）
+    cat > "$DOTFILES_DIR/gvimrc.generated" << 'EOF'
+" Generated gvim configuration (consolidated from platform-specific files)
+" This file sources the main gvim configuration with cross-platform compatibility
+
 set nocompatible
 
 " 共通設定を読み込み
@@ -178,8 +184,11 @@ if filereadable(expand('~/dotfiles/vim/mappings.common'))
 endif
 EOF
 
-    # .ideavimrc の作成
-    cat > "$DOTFILES_DIR/ideavimrc.$PLATFORM" << 'EOF'
+    # .ideavimrc の作成（統合版 - プラットフォーム共通）
+    cat > "$DOTFILES_DIR/ideavimrc.generated" << 'EOF'
+" Generated IdeaVim configuration (consolidated from platform-specific files)
+" This file sources the main IdeaVim configuration with cross-platform compatibility
+
 set nocompatible
 
 " 共通設定を読み込み
@@ -290,7 +299,7 @@ check_generated_vim_files() {
 
     local files_restored=0
 
-    for file in "vimrc.$PLATFORM" "gvimrc.$PLATFORM" "ideavimrc.$PLATFORM"; do
+    for file in "vimrc.generated" "gvimrc.generated" "ideavimrc.generated"; do
         if [[ -f "$DOTFILES_DIR/$file" ]]; then
             # Check if file is tracked by git and has changes
             if git -C "$DOTFILES_DIR" ls-files --error-unmatch "$file" >/dev/null 2>&1; then

@@ -1,3 +1,6 @@
+" Generated vim configuration (consolidated from platform-specific files)
+" This file sources the main vim configuration with cross-platform compatibility
+
 set nocompatible
 
 " 共通設定を読み込み

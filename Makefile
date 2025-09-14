@@ -526,7 +526,7 @@ status: validate ## Show status of installed dotfiles
 		fi; \
 	done
 	@echo "  Home directory:"
-	@for file in .vimrc _vimrc _gvimrc .ideavimrc vimrc.common mappings.common; do \
+	@for file in .vimrc _vimrc _gvimrc .ideavimrc vimrc.common mappings.common vimrc.generated gvimrc.generated ideavimrc.generated; do \
 		if [ -L $(HOME_DIR)/$$file ]; then \
 			echo "    $(GREEN)✓$(NC) $$file (symlink)"; \
 		elif [ -f $(HOME_DIR)/$$file ]; then \
