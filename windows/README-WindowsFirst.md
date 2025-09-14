@@ -98,26 +98,17 @@ scoop install zsh vim shellcheck
 ```
 
 #### Nerd Fonts (Recommended for Terminal)
-For proper terminal icon display, install Nerd Fonts using Chocolatey:
+For proper terminal icon display with dotfiles, install Nerd Fonts. See the comprehensive **[Font Installation Guide](../fonts/README_font.md)** for detailed instructions across all platforms.
+
+**Quick Windows Setup:**
 ```powershell
-# Search for available Nerd Fonts (names may vary)
-choco search nerd-fonts
-
-# Install popular Nerd Fonts via Chocolatey
-choco install nerd-fonts-hack -y
-choco install nerd-fonts-firacode -y
-choco install nerd-fonts-cascadiacode -y
-choco install nerd-fonts-jetbrainsmono -y
-
-# Or install all Nerd Fonts (warning: large download)
-# choco install nerd-fonts-complete -y
+# Install via Chocolatey (recommended)
+choco search nerd-fonts                    # Find available packages
+choco install nerd-fonts-hack -y           # Install Hack Nerd Font
 ```
 
-**Configure Terminal:**
-- Windows Terminal: Settings → Profiles → Defaults → Appearance → Font face
-- Choose: "Hack Nerd Font", "FiraCode Nerd Font", or "CascadiaCode Nerd Font"
-
-**Note:** Font package names may change over time. Use `choco search nerd-fonts` to find current available packages.
+**Configure Windows Terminal:**
+Settings → Profiles → Defaults → Appearance → Font face → "Hack Nerd Font"
 
 #### WSL Prerequisites
 - **WSL distribution** (Ubuntu recommended)
