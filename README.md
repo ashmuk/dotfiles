@@ -40,6 +40,8 @@ Tools for full dotfiles experience:
 - `tar` - Archive handling for backups/restore
 - `find` - File searching and dotfiles management
 
+**Note**: Oh My Zsh configuration is automatically included only on macOS platforms. For other platforms, zsh will work with basic configuration only.
+
 ### **Modern Enhancement Tools (Optional but Valuable)**
 Modern alternatives providing better functionality:
 - `ripgrep` (`rg`) - Faster grep with better defaults
@@ -330,7 +332,7 @@ The shell setup creates symlinks to:
 
 Generated files combine modular components:
 - `bashrc.generated` = `shell.common` + `shell.bash`
-- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh`
+- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh` (macOS only)
 
 **Note**: Generated files are universal with built-in platform detection, eliminating the need for separate platform-specific versions.
 

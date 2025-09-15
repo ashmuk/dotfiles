@@ -68,9 +68,10 @@ make status
 - Zsh-specific functions (extract, mkcd, dh, j)
 
 ### `shell.ohmy.zsh`
-- Oh My Zsh specific configuration
+- Oh My Zsh specific configuration (macOS only)
 - Plugin settings and theme configuration
 - Oh My Zsh customizations
+- Automatically included only on macOS platforms
 
 ### `shellfirst.zsh`
 - Zsh initialization script

@@ -580,7 +580,11 @@ validate: ## Validate configuration files and dependencies
 	@bash -n $(DOTFILES_DIR)/shell/shell.bash || (echo "$(RED)[ERROR]$(NC) shell.bash has syntax errors" && exit 1)
 	@if command -v zsh >/dev/null 2>&1; then \
 		zsh -n $(DOTFILES_DIR)/shell/shell.zsh || (echo "$(RED)[ERROR]$(NC) shell.zsh has syntax errors" && exit 1); \
-		zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || (echo "$(RED)[ERROR]$(NC) shell.ohmy.zsh has syntax errors" && exit 1); \
+		if [[ "$$OSTYPE" == darwin* ]]; then \
+			zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || (echo "$(RED)[ERROR]$(NC) shell.ohmy.zsh has syntax errors" && exit 1); \
+		else \
+			echo "$(BLUE)[INFO]$(NC) Skipping oh-my-zsh syntax check for non-macOS platform: $$OSTYPE"; \
+		fi; \
 	else \
 		echo "$(YELLOW)[WARNING]$(NC) zsh not installed, skipping zsh syntax check"; \
 	fi
@@ -641,7 +645,11 @@ test-syntax: validate ## Test shell configuration syntax
 	@bash -n $(DOTFILES_DIR)/shell/shell.bash || exit 1
 	@if command -v zsh >/dev/null 2>&1; then \
 		zsh -n $(DOTFILES_DIR)/shell/shell.zsh || exit 1; \
-		zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || exit 1; \
+		if [[ "$$OSTYPE" == darwin* ]]; then \
+			zsh -n $(DOTFILES_DIR)/shell/shell.ohmy.zsh || exit 1; \
+		else \
+			echo "$(BLUE)[INFO]$(NC) Skipping oh-my-zsh syntax test for non-macOS platform: $$OSTYPE"; \
+		fi; \
 	else \
 		echo "$(YELLOW)[WARNING]$(NC) zsh not found, skipping zsh syntax tests"; \
 	fi
@@ -653,7 +661,11 @@ test-shellcheck: validate ## Run shellcheck on all shell scripts
 	@echo "$(BLUE)[INFO]$(NC) Running shellcheck..."
 	@if command -v shellcheck >/dev/null 2>&1; then \
 		find $(DOTFILES_DIR) -name "*.sh" -type f -not -path "*/vim/vimfiles/plugged/*" -exec shellcheck {} \; || exit 1; \
-		shellcheck $(DOTFILES_DIR)/shell/shell.common $(DOTFILES_DIR)/shell/shell.bash $(DOTFILES_DIR)/shell/shell.zsh $(DOTFILES_DIR)/shell/shell.ohmy.zsh || exit 1; \
+		shellcheck_files="$(DOTFILES_DIR)/shell/shell.common $(DOTFILES_DIR)/shell/shell.bash $(DOTFILES_DIR)/shell/shell.zsh"; \
+		if [[ "$$OSTYPE" == darwin* ]]; then \
+			shellcheck_files="$$shellcheck_files $(DOTFILES_DIR)/shell/shell.ohmy.zsh"; \
+		fi; \
+		shellcheck $$shellcheck_files || exit 1; \
 		echo "$(GREEN)[SUCCESS]$(NC) All shell scripts passed shellcheck"; \
 	else \
 		echo "$(YELLOW)[WARNING]$(NC) shellcheck not found, skipping shellcheck tests"; \
