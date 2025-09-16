@@ -84,10 +84,7 @@ create_platform_files() {
     temp_files+=("$DOTFILES_DIR/bashrc.generated")
 
     # Create zshrc.generated (universal - platform detection handled internally)
-    local zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.zsh")
-    if [[ "$PLATFORM" == "mac" ]]; then
-        zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.ohmy.zsh" "$DOTFILES_DIR/shell/shell.zsh")
-    fi
+    zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.ohmy.zsh" "$DOTFILES_DIR/shell/shell.zsh")
 
     for file in "${zshrc_files[@]}"; do
         if [[ ! -f "$file" ]]; then
