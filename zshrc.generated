@@ -505,7 +505,7 @@ done
 #
 ###############################################################################
 
-if [[ "$OSTYPE" != darwin* ]]; then
+if [[ "$OSTYPE" == darwin* ]]; then
 
   # Enable plugins installed by homebrew ... -> This is not really necessary as installed by git clone instead
   # See the installation in the folder: $HOME/.oh-my-zsh/custom/plugins
