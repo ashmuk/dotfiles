@@ -1,9 +1,15 @@
 # shellcheck disable=SC2148  # Shebang added in generated files
 ###############################################################################
 #
-# Oh-my-zsh
+# Oh-my-zsh (macOS only)
 #
 ###############################################################################
+
+# Only execute Oh My Zsh configuration on macOS platforms
+if [[ "$OSTYPE" != darwin* ]]; then
+  # Skip Oh My Zsh configuration on non-macOS platforms
+  return 0 2>/dev/null || true
+fi
 
 # Added by Mukai
 # Enable plugins installed by homebrew ... -> This is not really necessary as installed by git clone instead

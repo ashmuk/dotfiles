@@ -332,7 +332,7 @@ The shell setup creates symlinks to:
 
 Generated files combine modular components:
 - `bashrc.generated` = `shell.common` + `shell.bash`
-- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh` (macOS only)
+- `zshrc.generated` = `shell.common` + `shell.zsh` + `shell.ohmy.zsh` (oh-my-zsh executes only on macOS)
 
 **Note**: Generated files are universal with built-in platform detection, eliminating the need for separate platform-specific versions.
 

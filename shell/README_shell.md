@@ -10,7 +10,7 @@ shell/
 ├── shell.common         # Common shell settings (bash/zsh)
 ├── shell.bash          # Bash-specific settings and functions
 ├── shell.zsh           # Zsh-specific settings and functions
-├── shell.ohmy.zsh      # Oh My Zsh specific configuration
+├── shell.ohmy.zsh      # Oh My Zsh specific configuration (always included, executes only on macOS)
 ├── performance.sh      # Performance monitoring system
 ├── aliases.common      # Common aliases (git, dir nav, etc.)
 ├── aliases.shell       # Shell-specific aliases (grep, ripgrep)
@@ -68,10 +68,12 @@ make status
 - Zsh-specific functions (extract, mkcd, dh, j)
 
 ### `shell.ohmy.zsh`
-- Oh My Zsh specific configuration (macOS only)
+- Oh My Zsh specific configuration (always included, executes only on macOS)
 - Plugin settings and theme configuration
 - Oh My Zsh customizations
-- Automatically included only on macOS platforms
+- **Always included in generated files** but only executes on macOS platforms
+- Uses platform detection (`$OSTYPE`) to skip execution on non-macOS platforms
+- Ensures generated files remain identical across all platforms
 
 ### `shellfirst.zsh`
 - Zsh initialization script

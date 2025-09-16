@@ -84,15 +84,7 @@ create_platform_files() {
     temp_files+=("$DOTFILES_DIR/bashrc.generated")
 
     # Create zshrc.generated (universal - platform detection handled internally)
-    local zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.zsh")
-
-    # Only include oh-my-zsh configuration for macOS
-    if [[ "$OSTYPE" == darwin* ]]; then
-        zshrc_files+=("$DOTFILES_DIR/shell/shell.ohmy.zsh")
-        print_status "Including oh-my-zsh configuration for macOS"
-    else
-        print_status "Skipping oh-my-zsh configuration for non-macOS platform: $OSTYPE"
-    fi
+    local zshrc_files=("$DOTFILES_DIR/shell/shell.common" "$DOTFILES_DIR/shell/shell.zsh" "$DOTFILES_DIR/shell/shell.ohmy.zsh")
 
     for file in "${zshrc_files[@]}"; do
         if [[ ! -f "$file" ]]; then
