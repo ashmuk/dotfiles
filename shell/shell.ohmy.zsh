@@ -5,12 +5,6 @@
 #
 ###############################################################################
 
-# Only execute Oh My Zsh configuration on macOS platforms
-if [[ "$OSTYPE" != darwin* ]]; then
-  # Skip Oh My Zsh configuration on non-macOS platforms
-  return 0 2>/dev/null || true
-fi
-
 # Added by Mukai
 # Enable plugins installed by homebrew ... -> This is not really necessary as installed by git clone instead
 # See the installation in the folder: $HOME/.oh-my-zsh/custom/plugins
@@ -129,41 +123,3 @@ source "$ZSH/oh-my-zsh.sh"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# FIXME: this could be improved better while writing in another file
-# =============================================================================
-# Prompt
-# =============================================================================
-
-# zsh prompt (colored / 2-line)
-ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
-# shellcheck disable=SC2034  # PROMPT_BASE is used in zsh prompt system
-PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n %F{green}%~%f"$'\n'"%# "
-# shellcheck disable=SC2034  # PROMPT is used by zsh
-PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
-
-# Enable vi mode
-bindkey -v
-
-# Display indicator of vi mode in prompt
-# shellcheck disable=SC2034  # PROMPT is used by zsh prompt system in case branches
-function zle-keymap-select {
-  case $KEYMAP in
-    vicmd) PROMPT="%F{red}[NORMAL]%f $PROMPT_BASE" ;;
-    main|viins) PROMPT="%F{green}[INSERT]%f $PROMPT_BASE" ;;
-  esac
-  zle reset-prompt
-}
-zle -N zle-keymap-select
-
-# =============================================================================
-# Theme
-# =============================================================================
-
-# FIXME: this could be clarified if really needed
-# Adding this at the end of ~/.zshrc (e.g. get the setting back even after logout bash)
-# Actually, this is trapped at the end of .bashrc...
-if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
-  # shellcheck disable=SC1091  # Optional theme file may not exist
-  source "$HOME/etc/mintty-colors-solarized/sol.light"
-fi

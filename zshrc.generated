@@ -498,61 +498,10 @@ for local_config in "$@"; do
     break
   fi
 done
-
-# shellcheck disable=SC2148
-
-###############################################################################
-#
-# Zsh-specific configuration
-# This file contains zsh-specific settings and functions
-#
-###############################################################################
-
-# =============================================================================
-# Zsh-specific Settings
-# =============================================================================
-
-# History setting
-export HISTFILE=~/.zsh_history
-
-# Zsh options
-setopt AUTO_CD
-#setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt CORRECT
-setopt NO_BEEP
-setopt INTERACTIVE_COMMENTS
-
-# =============================================================================
-# Auto completion
-# =============================================================================
-
-# Enable auto completion
-autoload -Uz compinit
-compinit
-
-# Show auto completion like 'menu'
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# Kiro integration
-# shellcheck disable=SC1090
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
-
-# =============================================================================
-# Zsh specific
-# =============================================================================
-# to be defined if any applicable
 # shellcheck disable=SC2148  # Shebang added in generated files
 ###############################################################################
 #
-# Oh-my-zsh
+# Oh-my-zsh (macOS only)
 #
 ###############################################################################
 
@@ -675,7 +624,52 @@ source "$ZSH/oh-my-zsh.sh"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# FIXME: this could be improved better while writing in another file
+# shellcheck disable=SC2148
+
+###############################################################################
+#
+# Zsh-specific configuration
+# This file contains zsh-specific settings and functions
+#
+###############################################################################
+
+# =============================================================================
+# Zsh-specific Settings
+# =============================================================================
+
+# History setting
+export HISTFILE=~/.zsh_history
+
+# Zsh options
+setopt AUTO_CD
+#setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt CORRECT
+setopt NO_BEEP
+setopt INTERACTIVE_COMMENTS
+
+# =============================================================================
+# Auto completion
+# =============================================================================
+
+# Enable auto completion
+autoload -Uz compinit
+compinit
+
+# Show auto completion like 'menu'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# Kiro integration
+# shellcheck disable=SC1090
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+
 # =============================================================================
 # Prompt
 # =============================================================================
@@ -705,10 +699,14 @@ zle -N zle-keymap-select
 # Theme
 # =============================================================================
 
-# FIXME: this could be clarified if really needed
 # Adding this at the end of ~/.zshrc (e.g. get the setting back even after logout bash)
 # Actually, this is trapped at the end of .bashrc...
 if [[ -f "$HOME/etc/mintty-colors-solarized/sol.light" ]]; then
   # shellcheck disable=SC1091  # Optional theme file may not exist
   source "$HOME/etc/mintty-colors-solarized/sol.light"
 fi
+
+# =============================================================================
+# Zsh specific
+# =============================================================================
+# to be defined if any applicable
