@@ -1,0 +1,170 @@
+{
+    // Core VS Code settings
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "vs-seti",
+    "window.autoDetectColorScheme": true,
+    "workbench.preferredDarkColorTheme": "Default Dark+",
+    "workbench.preferredLightColorTheme": "Default Light+",
+
+    // Editor settings
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.fontSize": 13,
+    "editor.fontFamily": "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Monaco, 'Cascadia Code PL', 'Ubuntu Mono', monospace",
+    "editor.fontLigatures": true,
+    "editor.minimap.enabled": true,
+    "editor.wordWrap": "on",
+    "editor.rulers": [80, 120],
+    "editor.renderWhitespace": "boundary",
+    "editor.cursorBlinking": "smooth",
+    "editor.smoothScrolling": true,
+
+    // File handling
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+
+    // File exclusions (common patterns for dotfiles projects)
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/.git": true,
+        "**/bower_components": true,
+        "**/*.pyc": true,
+        "**/__pycache__": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.env": true,
+        "**/.vscode": false
+    },
+
+    // File watching exclusions for performance
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.hg/store/**": true,
+        "**/.mypy_cache/**": true,
+        "**/.pytest_cache/**": true,
+        "**/dist/**": true,
+        "**/build/**": true
+    },
+
+    // Enhanced file associations for dotfiles project
+    "files.associations": {
+        // Shell files
+        "shell.*": "shellscript",
+        "aliases.*": "shellscript",
+        ".bashrc": "shellscript",
+        ".zshrc": "shellscript",
+        ".profile": "shellscript",
+        "*.sh": "shellscript",
+        "*.bash": "shellscript",
+        "*.zsh": "shellscript",
+        "*.fish": "shellscript",
+        "*.ps1": "powershell",
+
+        // Git files
+        "*gitignore*": "ignore",
+        "*gitconfig*": "git-config",
+        "*gitattributes*": "git-commit",
+
+        // Vim files
+        ".vimrc": "viml",
+        "vimrc.*": "viml",
+        "mappings.*": "viml",
+        "*.vim": "viml",
+        ".ideavimrc": "viml",
+
+        // Config files
+        "*.conf": "ini",
+        "config": "ini",
+        "Makefile": "makefile",
+        "makefile": "makefile",
+        "*.mk": "makefile",
+
+        // Data files
+        "*.json": "jsonc",
+        "*.jsonc": "jsonc",
+        "*.yaml": "yaml",
+        "*.yml": "yaml",
+        "*.toml": "toml",
+
+        // Documentation
+        "*.md": "markdown",
+        "README": "markdown",
+        "CHANGELOG": "markdown",
+        "LICENSE": "plaintext",
+        "COPYING": "plaintext",
+
+        // Tmux
+        ".tmux.conf": "tmux",
+        "tmux.conf": "tmux",
+
+        // Misc
+        "Dockerfile*": "dockerfile",
+        "*.log": "log",
+        "*.env*": "dotenv"
+    },
+
+    // Search settings
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true
+    },
+
+    // Terminal settings
+    "terminal.integrated.fontFamily": "'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code PL', 'Ubuntu Mono', monospace",
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.copyOnSelection": true,
+
+    // Git settings
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "git.suggestSmartCommit": false,
+    "scm.defaultViewMode": "tree",
+
+    // Extensions and IntelliSense
+    "extensions.autoUpdate": true,
+    "extensions.autoCheckUpdates": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+
+    // Security settings
+    "security.workspace.trust.untrustedFiles": "prompt",
+    "security.workspace.trust.banner": "always",
+
+    // Breadcrumbs
+    "breadcrumbs.enabled": true,
+    "breadcrumbs.symbolSortOrder": "type",
+
+    // Problems panel
+    "problems.decorations.enabled": true,
+    "problems.showCurrentInStatus": true,
+
+    // Make configuration (disable auto-configure to avoid interference)
+    "makefile.configureOnOpen": false,
+
+    // Zen mode settings
+    "zenMode.hideLineNumbers": false,
+    "zenMode.hideStatusBar": false,
+
+    // Explorer settings
+    "explorer.confirmDelete": true,
+    "explorer.confirmDragAndDrop": true,
+    "explorer.compactFolders": false
+}

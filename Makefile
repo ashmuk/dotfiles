@@ -226,7 +226,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git install-tmux install-claude ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-vscode ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -262,6 +262,18 @@ install-claude: validate ## Install Claude configuration
 	@chmod +x $(DOTFILES_DIR)/config/claude/setup_claude.sh
 	@$(DOTFILES_DIR)/config/claude/setup_claude.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Claude configuration installed"
+
+.PHONY: install-vscode
+install-vscode: validate ## Install VS Code configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing VS Code configuration..."
+	@mkdir -p $(HOME_DIR)/.vscode
+	@if [ -f $(HOME_DIR)/.vscode/settings.json ] && [ ! -L $(HOME_DIR)/.vscode/settings.json ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Backing up existing VS Code settings..."; \
+		mkdir -p $(BACKUP_DIR); \
+		cp $(HOME_DIR)/.vscode/settings.json $(BACKUP_DIR)/vscode_settings.json.backup.$$(date +%Y%m%d_%H%M%S); \
+	fi
+	@ln -sf $(DOTFILES_DIR)/config/vscode/settings.json $(HOME_DIR)/.vscode/settings.json
+	@echo "$(GREEN)[SUCCESS]$(NC) VS Code configuration installed"
 
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
@@ -486,6 +498,9 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@echo "$(BLUE)[INFO]$(NC) Removing Claude configuration..."
 	@rm -f $(HOME_DIR)/.claude/settings.json $(HOME_DIR)/.claude/settings.local.json $(HOME_DIR)/.claude/statusline.sh
 	@if [ -d $(HOME_DIR)/.claude ] && [ -z "$$(ls -A $(HOME_DIR)/.claude)" ]; then rmdir $(HOME_DIR)/.claude; fi
+	@echo "$(BLUE)[INFO]$(NC) Removing VS Code configuration..."
+	@rm -f $(HOME_DIR)/.vscode/settings.json
+	@if [ -d $(HOME_DIR)/.vscode ] && [ -z "$$(ls -A $(HOME_DIR)/.vscode)" ]; then rmdir $(HOME_DIR)/.vscode; fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"
 
 .PHONY: status
@@ -619,6 +634,16 @@ status: validate ## Show status of installed dotfiles
 	else \
 		echo "    $(RED)✗$(NC) .claude/statusline.sh (not found)"; \
 	fi
+	@echo ""
+	@echo "VS Code Configuration:"
+	@echo "  Home directory:"
+	@if [ -L $(HOME_DIR)/.vscode/settings.json ]; then \
+		echo "    $(GREEN)✓$(NC) .vscode/settings.json (symlink)"; \
+	elif [ -f $(HOME_DIR)/.vscode/settings.json ]; then \
+		echo "    $(YELLOW)⚠$(NC) .vscode/settings.json (file)"; \
+	else \
+		echo "    $(RED)✗$(NC) .vscode/settings.json (not found)"; \
+	fi
 
 .PHONY: update
 update: ## Update dotfiles from repository
@@ -642,7 +667,7 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 	@echo ""
 	@echo "Checking for required directories..."
-	@for dir in shell vim git config/tmux config/claude; do \
+	@for dir in shell vim git config/tmux config/claude config/vscode; do \
 		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
 			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
 			exit 1; \
@@ -827,6 +852,7 @@ info: ## Show information about this dotfiles project
 	@echo "  - Git with common settings"
 	@echo "  - Tmux with cross-platform clipboard integration"
 	@echo "  - Claude with security-focused AI development setup"
+	@echo "  - VS Code with comprehensive editor settings and file associations"
 	@echo "  - Windows PowerShell (with install-windows)"
 	@echo "  - Programming fonts (with install-fonts)"
 	@echo "  - vim-plug plugin manager (with install-vim-plug)"
