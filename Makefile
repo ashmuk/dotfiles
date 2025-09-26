@@ -73,7 +73,7 @@ _check_essential_tools:
 _check_core_tools:
 	@echo "$(BLUE)[INFO]$(NC) Checking core tools..."
 	@missing_core=""; \
-	for tool in vim zsh curl tar find; do \
+	for tool in vim zsh curl tar find tmux; do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
 			missing_core="$$missing_core $$tool"; \
 		fi; \
@@ -226,7 +226,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -248,6 +248,13 @@ install-git: validate ## Install git configuration
 	@chmod +x $(DOTFILES_DIR)/git/setup_git.sh
 	@$(DOTFILES_DIR)/git/setup_git.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Git configuration installed"
+
+.PHONY: install-tmux
+install-tmux: validate ## Install tmux configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing tmux configuration..."
+	@chmod +x $(DOTFILES_DIR)/config/tmux/setup_tmux.sh
+	@$(DOTFILES_DIR)/config/tmux/setup_tmux.sh
+	@echo "$(GREEN)[SUCCESS]$(NC) Tmux configuration installed"
 
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
@@ -442,7 +449,7 @@ backup: ## Create backup of existing dotfiles
 	@echo "$(BLUE)[INFO]$(NC) Creating backup directory..."
 	@mkdir -p $(BACKUP_DIR)
 	@echo "$(BLUE)[INFO]$(NC) Backing up existing dotfiles..."
-	@for file in .bashrc .zshrc .vimrc _vimrc _gvimrc .gitconfig .gitignore .gitattributes; do \
+	@for file in .bashrc .zshrc .vimrc _vimrc _gvimrc .gitconfig .gitignore .gitattributes .tmux.conf; do \
 		if [ -f $(HOME_DIR)/$$file ]; then \
 			echo "$(YELLOW)[WARNING]$(NC) Backing up $$file"; \
 			cp $(HOME_DIR)/$$file $(BACKUP_DIR)/$$file.backup.$$(date +%Y%m%d_%H%M%S); \
@@ -463,6 +470,8 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@if [ -L "$(HOME_DIR)/vimfiles" ]; then rm "$(HOME_DIR)/vimfiles"; fi
 	@echo "$(BLUE)[INFO]$(NC) Removing git configuration..."
 	@rm -f $(HOME_DIR)/.gitconfig $(HOME_DIR)/.gitignore $(HOME_DIR)/.gitattributes
+	@echo "$(BLUE)[INFO]$(NC) Removing tmux configuration..."
+	@rm -f $(HOME_DIR)/.tmux.conf
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"
 
 .PHONY: status
@@ -564,6 +573,16 @@ status: validate ## Show status of installed dotfiles
 			echo "    $(RED)✗$(NC) $$file (not found)"; \
 		fi; \
 	done
+	@echo ""
+	@echo "Tmux Configuration:"
+	@echo "  Home directory:"
+	@if [ -L $(HOME_DIR)/.tmux.conf ]; then \
+		echo "    $(GREEN)✓$(NC) .tmux.conf (symlink)"; \
+	elif [ -f $(HOME_DIR)/.tmux.conf ]; then \
+		echo "    $(YELLOW)⚠$(NC) .tmux.conf (file)"; \
+	else \
+		echo "    $(RED)✗$(NC) .tmux.conf (not found)"; \
+	fi
 
 .PHONY: update
 update: ## Update dotfiles from repository
@@ -587,7 +606,7 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 	@echo ""
 	@echo "Checking for required directories..."
-	@for dir in shell vim git; do \
+	@for dir in shell vim git config/tmux; do \
 		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
 			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
 			exit 1; \
@@ -597,7 +616,7 @@ validate: ## Validate configuration files and dependencies
 	done
 	@echo ""
 	@echo "Checking setup scripts..."
-	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh; do \
+	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh; do \
 		if [ ! -x "$(DOTFILES_DIR)/$$script" ]; then \
 			echo "$(YELLOW)[WARNING]$(NC) $$script is not executable"; \
 			chmod +x "$(DOTFILES_DIR)/$$script"; \
@@ -770,6 +789,7 @@ info: ## Show information about this dotfiles project
 	@echo "  - Shell (bash/zsh) with aliases and functions"
 	@echo "  - Vim with multiple configurations and smart font selection"
 	@echo "  - Git with common settings"
+	@echo "  - Tmux with cross-platform clipboard integration"
 	@echo "  - Windows PowerShell (with install-windows)"
 	@echo "  - Programming fonts (with install-fonts)"
 	@echo "  - vim-plug plugin manager (with install-vim-plug)"
