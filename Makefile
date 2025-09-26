@@ -226,7 +226,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git install-tmux ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux install-claude ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -255,6 +255,13 @@ install-tmux: validate ## Install tmux configuration
 	@chmod +x $(DOTFILES_DIR)/config/tmux/setup_tmux.sh
 	@$(DOTFILES_DIR)/config/tmux/setup_tmux.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Tmux configuration installed"
+
+.PHONY: install-claude
+install-claude: validate ## Install Claude configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing Claude configuration..."
+	@chmod +x $(DOTFILES_DIR)/config/claude/setup_claude.sh
+	@$(DOTFILES_DIR)/config/claude/setup_claude.sh
+	@echo "$(GREEN)[SUCCESS]$(NC) Claude configuration installed"
 
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
@@ -455,6 +462,10 @@ backup: ## Create backup of existing dotfiles
 			cp $(HOME_DIR)/$$file $(BACKUP_DIR)/$$file.backup.$$(date +%Y%m%d_%H%M%S); \
 		fi; \
 	done
+	@if [ -d $(HOME_DIR)/.claude ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) Backing up .claude directory"; \
+		cp -r $(HOME_DIR)/.claude $(BACKUP_DIR)/.claude.backup.$$(date +%Y%m%d_%H%M%S); \
+	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Backup completed"
 
 .PHONY: clean
@@ -472,6 +483,9 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@rm -f $(HOME_DIR)/.gitconfig $(HOME_DIR)/.gitignore $(HOME_DIR)/.gitattributes
 	@echo "$(BLUE)[INFO]$(NC) Removing tmux configuration..."
 	@rm -f $(HOME_DIR)/.tmux.conf
+	@echo "$(BLUE)[INFO]$(NC) Removing Claude configuration..."
+	@rm -f $(HOME_DIR)/.claude/settings.json $(HOME_DIR)/.claude/settings.local.json $(HOME_DIR)/.claude/statusline.sh
+	@if [ -d $(HOME_DIR)/.claude ] && [ -z "$$(ls -A $(HOME_DIR)/.claude)" ]; then rmdir $(HOME_DIR)/.claude; fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Cleanup completed"
 
 .PHONY: status
@@ -583,6 +597,28 @@ status: validate ## Show status of installed dotfiles
 	else \
 		echo "    $(RED)✗$(NC) .tmux.conf (not found)"; \
 	fi
+	@echo ""
+	@echo "Claude Configuration:"
+	@echo "  Home directory:"
+	@if [ -L $(HOME_DIR)/.claude/settings.json ]; then \
+		echo "    $(GREEN)✓$(NC) .claude/settings.json (symlink)"; \
+	elif [ -f $(HOME_DIR)/.claude/settings.json ]; then \
+		echo "    $(YELLOW)⚠$(NC) .claude/settings.json (file)"; \
+	else \
+		echo "    $(RED)✗$(NC) .claude/settings.json (not found)"; \
+	fi
+	@if [ -f $(HOME_DIR)/.claude/settings.local.json ]; then \
+		if [ -L $(HOME_DIR)/.claude/settings.local.json ]; then \
+			echo "    $(GREEN)✓$(NC) .claude/settings.local.json (symlink)"; \
+		else \
+			echo "    $(YELLOW)⚠$(NC) .claude/settings.local.json (file)"; \
+		fi; \
+	fi
+	@if [ -f $(HOME_DIR)/.claude/statusline.sh ]; then \
+		echo "    $(GREEN)✓$(NC) .claude/statusline.sh (exists)"; \
+	else \
+		echo "    $(RED)✗$(NC) .claude/statusline.sh (not found)"; \
+	fi
 
 .PHONY: update
 update: ## Update dotfiles from repository
@@ -606,7 +642,7 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 	@echo ""
 	@echo "Checking for required directories..."
-	@for dir in shell vim git config/tmux; do \
+	@for dir in shell vim git config/tmux config/claude; do \
 		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
 			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
 			exit 1; \
@@ -616,7 +652,7 @@ validate: ## Validate configuration files and dependencies
 	done
 	@echo ""
 	@echo "Checking setup scripts..."
-	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh; do \
+	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh config/claude/setup_claude.sh; do \
 		if [ ! -x "$(DOTFILES_DIR)/$$script" ]; then \
 			echo "$(YELLOW)[WARNING]$(NC) $$script is not executable"; \
 			chmod +x "$(DOTFILES_DIR)/$$script"; \
@@ -790,6 +826,7 @@ info: ## Show information about this dotfiles project
 	@echo "  - Vim with multiple configurations and smart font selection"
 	@echo "  - Git with common settings"
 	@echo "  - Tmux with cross-platform clipboard integration"
+	@echo "  - Claude with security-focused AI development setup"
 	@echo "  - Windows PowerShell (with install-windows)"
 	@echo "  - Programming fonts (with install-fonts)"
 	@echo "  - vim-plug plugin manager (with install-vim-plug)"

@@ -1,0 +1,207 @@
+{
+  // モデル設定
+  "model": "claude-opus-4-1-20250805",  // 最新・最強のClaude Opus 4.1を使用
+
+  // 出力スタイル設定
+  "outputStyle": "Explanatory",  // コード変更の理由を詳細に説明
+
+  // ステータスライン設定（プロジェクト状態の可視化）
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+
+  // 環境変数設定
+  "env": {
+    // プロジェクトディレクトリ管理
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",  // 作業ディレクトリを維持
+
+    // Bashコマンド実行のタイムアウト設定
+    "BASH_MAX_TIMEOUT_MS": "300000",      // 最大5分（ビルドやテスト実行を考慮）
+    "BASH_DEFAULT_TIMEOUT_MS": "60000",   // デフォルト1分
+    "BASH_MAX_OUTPUT_LENGTH": "500000",   // 出力上限を増やして大規模ログに対応
+
+    // MCP (Model Context Protocol) 設定
+    "MCP_TIMEOUT": "30000",                // MCP接続タイムアウト（30秒）
+    "MCP_TOOL_TIMEOUT": "180000",          // MCPツール実行タイムアウト（3分）
+    "MAX_MCP_OUTPUT_TOKENS": "50000",      // MCP出力トークン上限を増加
+
+    // 追加の推奨環境変数
+    "CLAUDE_CODE_WORKSPACE": "~/projects", // ワークスペースのベースディレクトリ
+    "CLAUDE_CODE_HISTORY_SIZE": "1000",    // コマンド履歴のサイズ
+    "CLAUDE_CODE_RETRY_ATTEMPTS": "3"      // 失敗時のリトライ回数
+  },
+
+  // パーミッション設定
+  "permissions": {
+    "defaultMode": "acceptEdits",  // 編集を自動承認（開発効率優先）
+
+    // 常に許可するパス/コマンド
+    "allow": [
+      // 設定ファイルの読み取り
+      "Read(~/.zshrc)",
+      "Read(~/.bashrc)",
+      "Read(~/.gitconfig)",
+      "Read(~/.ssh/config)",
+      "Read(~/.npmrc)",
+      "Read(~/.cargo/config.toml)",
+      "Read(~/.m2/settings.xml)",
+
+      // プロジェクト設定ファイル
+      "Read(./package.json)",
+      "Read(./package-lock.json)",
+      "Read(./yarn.lock)",
+      "Read(./pom.xml)",
+      "Read(./build.gradle)",
+      "Read(./Cargo.toml)",
+      "Read(./pyproject.toml)",
+      "Read(./requirements.txt)",
+
+      // 一般的な開発コマンド（安全）
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(yarn test:*)",
+      "Bash(cargo test:*)",
+      "Bash(pytest:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+
+      // dotfiles プロジェクト固有のコマンド
+      "Bash(make validate:*)",
+      "Bash(make status:*)",
+      "Bash(make test:*)",
+      "Bash(find:*)",
+      "Bash(shellcheck:*)",
+      "Bash(bash:*)"
+    ],
+
+    // 実行前に確認を求めるコマンド（重要な操作）
+    "ask": [
+      // リモートへの変更
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+
+      // パッケージのデプロイ/公開
+      "Bash(npm publish:*)",
+      "Bash(mvn deploy:*)",
+      "Bash(gradle publish:*)",
+      "Bash(cargo publish:*)",
+      "Bash(poetry publish:*)",
+
+      // コンテナ操作
+      "Bash(docker push:*)",
+      "Bash(docker run:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl delete:*)",
+
+      // パッケージインストール（セキュリティ考慮）
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(yarn add:*)",
+      "Bash(cargo install:*)",
+
+      // データベース操作
+      "Bash(psql:*)",
+      "Bash(mysql:*)",
+      "Bash(mongosh:*)",
+
+      // システム変更
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+
+      // dotfiles インストール操作
+      "Bash(make install:*)",
+      "Bash(make clean:*)"
+    ],
+
+    // 明示的に拒否するパス/コマンド（セキュリティ）
+    "deny": [
+      // 機密情報を含むファイル
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./credentials/**)",
+      "Read(./config/credentials.json)",
+      "Read(./config/secrets.*)",
+      "Read(./**/*secret*)",
+      "Read(./**/*password*)",
+      "Read(./**/*token*)",
+      "Read(./**/*key.pem)",
+      "Read(./**/*.key)",
+
+      // ビルド成果物（不要な読み込み防止）
+      "Read(./build/**)",
+      "Read(./dist/**)",
+      "Read(./target/**)",
+      "Read(./node_modules/**)",
+      "Read(./.git/objects/**)",
+
+      // 危険なコマンド
+      "Bash(curl:* | bash)",  // 直接実行を防ぐ
+      "Bash(wget:* | sh)",
+      "Bash(rm -rf /)",
+      "Bash(:(){ :|:& };:)",  // フォーク爆弾
+
+      // ネットワーク操作（セキュリティ）
+      "Bash(nc:*)",
+      "Bash(netcat:*)",
+      "Bash(telnet:*)"
+    ],
+
+    // 追加でアクセスを許可するディレクトリ
+    "additionalDirectories": [
+      "../docs/",           // ドキュメント
+      "../shared/",         // 共有リソース
+      "~/templates/",       // テンプレート
+      "~/.config/claude/",  // Claude Code設定
+      "~/dotfiles/"         // dotfiles プロジェクト
+    ]
+  },
+
+  // MCP サーバー設定
+  "enableAllProjectMcpServers": true,      // プロジェクトのMCPサーバーを全て有効化
+  "enabledMcpjsonServers": [
+    // 明示的に有効化するMCPサーバー
+    "filesystem",    // ファイルシステム操作
+    "git",          // Git操作
+    "github",       // GitHub連携
+    "sqlite"        // SQLiteデータベース
+  ],
+  "disabledMcpjsonServers": [
+    // 明示的に無効化するMCPサーバー（必要に応じて）
+  ],
+
+  // Git設定
+  "includeCoAuthoredBy": true,  // Gitコミットに共同作成者情報を含める
+
+  // 追加の推奨設定
+  "autoSave": true,              // 自動保存を有効化
+  "autoFormat": true,            // 自動フォーマットを有効化
+  "confirmBeforeExecute": true,  // 実行前の確認（重要な操作）
+  "maxFileSize": "10MB",         // 最大ファイルサイズ制限
+  "excludePatterns": [           // 除外パターン
+    "**/*.log",
+    "**/*.tmp",
+    "**/coverage/**",
+    "**/.DS_Store"
+  ],
+
+  // ロギング設定
+  "logging": {
+    "level": "info",             // ログレベル（debug, info, warn, error）
+    "file": "~/.claude/logs/claude-code.log",
+    "maxFiles": 10,              // 保持するログファイル数
+    "maxSize": "10MB"           // 各ログファイルの最大サイズ
+  },
+
+  // パフォーマンス設定
+  "performance": {
+    "maxConcurrentOperations": 5,  // 並行操作の最大数
+    "cacheEnabled": true,           // キャッシュを有効化
+    "cacheTTL": 3600               // キャッシュの有効期限（秒）
+  }
+}
