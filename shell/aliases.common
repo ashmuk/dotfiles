@@ -29,6 +29,35 @@ alias po='popd'
 alias ds='dirs -v'
 
 # =============================================================================
+# tmux Aliases
+# =============================================================================
+alias tm='tmux -2'
+alias tx='tmux -2'
+alias tmux='tmux -2'
+alias tmpane="tmux list-panes -aF '#S:#I.#P #{pane_title} #{pane_current_command}'"
+
+default_tmux_session='dev'
+alias tmn='tmux new-session -s ${default_tmux_session}'
+alias tma='tmux attach-session -t ${default_tmux_session}'
+alias tml='tmux list-sessions'
+alias tmkill='tmux kill-session -t ${default_tmux_session}'
+alias tmkillall='tmux kill-server'
+alias tmux-new='tmux new-session -s ${default_tmux_session}'
+alias tmux-attach='tmux attach-session -t ${default_tmux_session}'
+alias tmux-list='tmux list-sessions'
+alias tmux-kill='tmux kill-session -t ${default_tmux_session}'
+alias tmux-killall='tmux kill-server'
+
+alias tmdev='tmux new-session -s ${default_tmux_session}\; \
+  split-window -v -p 75 \; \
+  split-window -h -p 65 \; \
+  split-window -t 0.1 -v -p 80\; \
+  send-keys -t 0.0 "htop" C-m \; \
+  send-keys -t 0.1 "watch -n 1 ~/dotfiles/bin/tmux_pane_top.sh" C-m \; \
+  send-keys -t 0.2 "ls -lah" C-m \; \
+  select-pane -t 0.3'
+
+# =============================================================================
 # Multibyte Character Search Aliases
 # =============================================================================
 
