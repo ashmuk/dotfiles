@@ -84,4 +84,6 @@ fi
 # =============================================================================
 # Zsh specific
 # =============================================================================
-# to be defined if any applicable
+
+# Just to overwrite the setting made by Oh-my-zsh
+unsetopt AUTO_PUSHD

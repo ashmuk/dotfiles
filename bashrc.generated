@@ -482,6 +482,191 @@ gvim() {
   fi
 }
 
+# Function to find symbolic links pointing to a target file
+# Usage: wholink <target_file> [search_directory]
+# Finds all symbolic links in the search directory that point to the target file
+wholink() {
+  # Input validation
+  if [ $# -eq 0 ]; then
+    echo "Usage: wholink <target_file> [search_directory]" >&2
+    echo "  Finds symbolic links pointing to the target file" >&2
+    return 1
+  fi
+
+  local target="$1"
+  local search_dir="$2"
+
+  # Determine default search directory based on OS if not provided
+  if [ -z "$search_dir" ]; then
+    if [[ "$OSTYPE" == darwin* ]]; then
+      # macOS
+      search_dir="$HOME/Library/Application Support"
+    elif grep -qi microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
+      # WSL (Windows Subsystem for Linux)
+      search_dir="$HOME/.local/share"
+    elif [[ "$OSTYPE" == msys* ]] || [[ "$OSTYPE" == cygwin* ]]; then
+      # MSYS/Cygwin on Windows
+      search_dir="$HOME/AppData/Local"
+    else
+      # Linux and other Unix-like systems
+      search_dir="$HOME/.local/share"
+    fi
+  fi
+
+  # Check if target exists
+  if [ ! -e "$target" ]; then
+    echo "Error: Target file does not exist: $target" >&2
+    return 1
+  fi
+
+  # Get the real path of the target
+  local realpathstr
+  if command -v realpath >/dev/null 2>&1; then
+    realpathstr="$(realpath "$target")"
+  elif command -v readlink >/dev/null 2>&1; then
+    # Fallback for systems without realpath
+    realpathstr="$(readlink -f "$target" 2>/dev/null || echo "$target")"
+  else
+    echo "Error: Neither realpath nor readlink found" >&2
+    return 1
+  fi
+
+  if [ -z "$realpathstr" ]; then
+    echo "Error: Could not resolve real path for: $target" >&2
+    return 1
+  fi
+
+  # Check if search directory exists
+  if [ ! -d "$search_dir" ]; then
+    echo "Error: Search directory does not exist: $search_dir" >&2
+    return 1
+  fi
+
+  # Determine which readlink to use
+  local readlink_cmd="readlink"
+  if command -v greadlink >/dev/null 2>&1; then
+    readlink_cmd="greadlink"
+  elif command -v /usr/local/bin/readlink >/dev/null 2>&1; then
+    readlink_cmd="/usr/local/bin/readlink"
+  elif command -v /opt/homebrew/bin/readlink >/dev/null 2>&1; then
+    readlink_cmd="/opt/homebrew/bin/readlink"
+  fi
+
+  # Find symbolic links and check their targets
+  # Use sudo only if needed (when search_dir requires elevated permissions)
+  local find_cmd="find"
+  if [ ! -r "$search_dir" ] 2>/dev/null; then
+    find_cmd="sudo find"
+    echo "Note: Using sudo to search $search_dir" >&2
+  fi
+
+  $find_cmd "$search_dir" -xdev -type l -exec bash -c '
+    target_real="$1"; shift
+    readlink_cmd="$1"; shift
+    for link in "$@"; do
+      if link_target=$($readlink_cmd -f -- "$link" 2>/dev/null); then
+        if [ "$link_target" = "$target_real" ]; then
+          printf "%s\n" "$link"
+        fi
+      fi
+    done
+  ' _ "$realpathstr" "$readlink_cmd" {} + 2>/dev/null
+}
+
+# Function to list all symbolic links in a directory
+# Usage: findlinks [directory] [options]
+# Lists all symbolic links found in the directory (defaults to OS-appropriate location)
+# Options:
+#   -l : Show link targets (long format)
+#   -r : Show resolved/real paths
+findlinks() {
+  local search_dir=""
+  local show_target=0
+  local show_real=0
+
+  # Parse arguments
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -l)
+        show_target=1
+        shift
+        ;;
+      -r)
+        show_real=1
+        shift
+        ;;
+      -*)
+        echo "Unknown option: $1" >&2
+        echo "Usage: findlinks [directory] [-l] [-r]" >&2
+        echo "  -l : Show link targets" >&2
+        echo "  -r : Show resolved/real paths" >&2
+        return 1
+        ;;
+      *)
+        search_dir="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Determine default search directory based on OS if not provided
+  if [ -z "$search_dir" ]; then
+    if [[ "$OSTYPE" == darwin* ]]; then
+      # macOS
+      search_dir="$HOME/Library/Application Support"
+    elif grep -qi microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
+      # WSL (Windows Subsystem for Linux)
+      search_dir="$HOME/.local/share"
+    elif [[ "$OSTYPE" == msys* ]] || [[ "$OSTYPE" == cygwin* ]]; then
+      # MSYS/Cygwin on Windows
+      search_dir="$HOME/AppData/Local"
+    else
+      # Linux and other Unix-like systems
+      search_dir="$HOME/.local/share"
+    fi
+  fi
+
+  # Check if search directory exists
+  if [ ! -d "$search_dir" ]; then
+    echo "Error: Directory does not exist: $search_dir" >&2
+    return 1
+  fi
+
+  # Determine which readlink to use
+  local readlink_cmd="readlink"
+  if command -v greadlink >/dev/null 2>&1; then
+    readlink_cmd="greadlink"
+  elif command -v /usr/local/bin/readlink >/dev/null 2>&1; then
+    readlink_cmd="/usr/local/bin/readlink"
+  elif command -v /opt/homebrew/bin/readlink >/dev/null 2>&1; then
+    readlink_cmd="/opt/homebrew/bin/readlink"
+  fi
+
+  # Find and list symbolic links
+  if [ "$show_target" -eq 1 ] || [ "$show_real" -eq 1 ]; then
+    find "$search_dir" -type l 2>/dev/null | while IFS= read -r link; do
+      if [ "$show_real" -eq 1 ]; then
+        # Show resolved real path
+        if real_path=$($readlink_cmd -f "$link" 2>/dev/null); then
+          printf "%s -> %s\n" "$link" "$real_path"
+        else
+          printf "%s -> (broken link)\n" "$link"
+        fi
+      else
+        # Show immediate target
+        if target=$($readlink_cmd "$link" 2>/dev/null); then
+          printf "%s -> %s\n" "$link" "$target"
+        else
+          printf "%s -> (broken link)\n" "$link"
+        fi
+      fi
+    done
+  else
+    # Simple list of symbolic links
+    find "$search_dir" -type l 2>/dev/null
+  fi
+}
+
 # =============================================================================
 # User Local Configuration
 # =============================================================================
