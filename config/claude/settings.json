@@ -1,6 +1,6 @@
 {
-  "_comment_model": "モデル設定 - 最新・最強のClaude Opus 4.1を使用",
-  "model": "claude-opus-4-1-20250805",
+  "_comment_model": "モデル設定 - 最新・最強のClaude Sonnet 4.5を使用",
+  "model": "claude-sonnet-4-5-20250929",
 
   "_comment_outputStyle": "出力スタイル設定 - コード変更の理由を説明",
   "outputStyle": "Explanatory",
