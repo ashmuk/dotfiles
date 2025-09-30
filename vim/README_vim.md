@@ -125,8 +125,9 @@ make check-fonts
 - **Clear highlights**: `ESC ESC` clears search highlighting
 - **Screen-line movement**: `j`/`k` move by screen lines, `gj`/`gk` move by actual lines
 - **Git operations**: `<leader>gs` (git status), `<leader>gd` (git diff), `<leader>gc` (git commit)
-- **File navigation**: `<F2>` toggles NERDTree, `<C-p>` opens file finder
+- **File navigation**: `<F2>` toggles NERDTree, `<leader>p` opens file finder
 - **Plugin shortcuts**: `<leader>f` for ripgrep search, `<leader>b` for buffer list
+- **EasyMotion**: `<leader><leader>w` (word), `<leader><leader>s` (2-char search), `<leader><leader>j/k` (line jump)
 
 ## 🔤 Font Management
 
@@ -186,6 +187,7 @@ The system includes wide font support for CJK characters:
 - **ALE**: Async linting for real-time error checking
 - **FZF**: Fuzzy file finder integration (if available)
 - **Auto-pairs**: Automatic bracket/quote pairing
+- **EasyMotion**: Lightning-fast cursor movement with minimal keystrokes
 
 ### Environment-Specific Optimizations
 - **Terminal**: Optimized for terminal performance and compatibility
@@ -280,10 +282,15 @@ The configuration uses vim-plug for plugin management:
 - **tpope/vim-sensible**: Sensible defaults
 - **tpope/vim-fugitive**: Git wrapper (:Gdiffsplit support!)
 - **tpope/vim-surround**: Surround text objects
+- **tpope/vim-commentary**: Comment/uncomment shortcuts
+- **tpope/vim-repeat**: Repeat plugin commands
 - **preservim/nerdtree**: File tree explorer
 - **vim-airline/vim-airline**: Status line enhancement
 - **dense-analysis/ale**: Async linting engine
 - **junegunn/fzf.vim**: Fuzzy finder integration
+- **easymotion/vim-easymotion**: Quick cursor movement
+- **jiangmiao/auto-pairs**: Auto-close brackets
+- **godlygeek/tabular**: Text alignment
 
 ### Adding New Plugins
 Add to your local vim configuration:
@@ -291,6 +298,48 @@ Add to your local vim configuration:
 " In ~/.vim/local.vim
 Plug 'your-username/your-plugin'
 ```
+
+## 🚀 EasyMotion Quick Reference
+
+EasyMotion provides lightning-fast cursor movement with visual feedback. All commands use `<leader><leader>` prefix (default leader is `\`, or space if configured).
+
+### Basic Usage
+
+1. Press the EasyMotion key combination
+2. Type the target character(s)
+3. Press the highlighted letter to jump
+
+### Key Mappings
+
+**Character Search:**
+- `<leader><leader>s{char}{char}` - Search for 2 characters
+- `<leader><leader>t{char}{char}` - Search till (before) 2 characters
+
+**Word Movement:**
+- `<leader><leader>w` - Jump to word forward
+- `<leader><leader>b` - Jump to word backward
+- `<leader><leader>e` - Jump to word end forward
+- `<leader><leader>ge` - Jump to word end backward
+
+**Line Movement:**
+- `<leader><leader>j` - Jump to line below
+- `<leader><leader>k` - Jump to line above
+- `<leader><leader>l` - Jump forward in line
+- `<leader><leader>h` - Jump backward in line
+
+**Search Motion:**
+- `<leader><leader>/` - EasyMotion search (like `/` but with jump labels)
+
+**Repeat:**
+- `<leader><leader>.` - Repeat last EasyMotion command
+
+### Configuration
+
+EasyMotion is configured with:
+- **Smart case**: Case-insensitive by default, case-sensitive when using uppercase
+- **Uppercase labels**: Uses uppercase letters for jump targets (easier to see)
+- **Column preservation**: Keeps cursor column when using JK motions
+- **Smart sign matching**: Matches similar characters (1 matches !, etc.)
 
 ## 🛠️ Advanced Configuration
 

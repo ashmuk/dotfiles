@@ -5,6 +5,13 @@ scriptencoding utf-8
 "
 
 "---------------------------------------------------------------------------
+" Leader key configuration:
+"
+" Set leader key to space for easier access
+let mapleader = " "
+let g:mapleader = " "
+
+"---------------------------------------------------------------------------
 " 検索の挙動に関する設定:
 "
 " 検索時に大文字小文字を無視

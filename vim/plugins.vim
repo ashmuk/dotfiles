@@ -111,6 +111,7 @@ Plug 'dense-analysis/ale'           " Async linting engine
 " Productivity enhancements
 Plug 'jiangmiao/auto-pairs'         " Auto-close brackets
 Plug 'godlygeek/tabular'           " Text alignment
+Plug 'easymotion/vim-easymotion'   " Quick cursor movement
 
 call plug#end()
 
@@ -157,6 +158,14 @@ let g:ale_fix_on_save = 0
 let g:gitgutter_enabled = 1
 let g:gitgutter_map_keys = 0  " Disable default mappings
 
+" EasyMotion configuration
+let g:EasyMotion_do_mapping = 0  " Disable default mappings
+let g:EasyMotion_smartcase = 1   " Turn on case-insensitive feature
+let g:EasyMotion_startofline = 0 " Keep cursor column when JK motion
+let g:EasyMotion_use_upper = 1   " Use uppercase letters for labels
+let g:EasyMotion_keys = 'ASDGHKLQWERTYUIOPZXCVBNMFJ;'
+let g:EasyMotion_use_smartsign_us = 1 " Smart sign matching
+
 "---------------------------------------------------------------------------
 " Plugin-related key mappings
 "
@@ -180,6 +189,30 @@ nnoremap <silent> <leader>gc :Git commit<CR>
 " ALE navigation
 nnoremap <silent> <leader>an :ALENext<CR>
 nnoremap <silent> <leader>ap :ALEPrevious<CR>
+
+" EasyMotion mappings
+" <Leader><Leader> prefix for all EasyMotion commands
+" Jump to anywhere you want with minimal keystrokes
+nmap <Leader><Leader>s <Plug>(easymotion-s2)
+nmap <Leader><Leader>t <Plug>(easymotion-t2)
+
+" Line motions
+map <Leader><Leader>j <Plug>(easymotion-j)
+map <Leader><Leader>k <Plug>(easymotion-k)
+map <Leader><Leader>l <Plug>(easymotion-lineforward)
+map <Leader><Leader>h <Plug>(easymotion-linebackward)
+
+" Word motions
+map <Leader><Leader>w <Plug>(easymotion-w)
+map <Leader><Leader>b <Plug>(easymotion-b)
+map <Leader><Leader>e <Plug>(easymotion-e)
+map <Leader><Leader>ge <Plug>(easymotion-ge)
+
+" Search motion (similar to / but with EasyMotion)
+map <Leader><Leader>/ <Plug>(easymotion-sn)
+
+" Repeat last motion
+map <Leader><Leader>. <Plug>(easymotion-repeat)
 
 "---------------------------------------------------------------------------
 " Plugin management commands
