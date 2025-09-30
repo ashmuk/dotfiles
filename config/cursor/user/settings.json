@@ -2,19 +2,21 @@
     "window.commandCenter": true,
     "workbench.colorTheme": "Solarized Dark",
 
-    "workbench.colorCustomizations": {
-        "terminal.background": "#00000000"
-    },
-
     "terminal.integrated.gpuAcceleration": "off",
     "window.systemColorTheme": "dark",
     "window.autoDetectColorScheme": false,
     "window.titleBarStyle": "custom",
     "git.autofetch": true,
     "redhat.telemetry.enabled": true,
+
     "vim.hlsearch": true,
+    "vim.incsearch": true,
+    "vim.searchHighlightColor": "rgba(255, 255, 255, 0.7)",
+    "vim.searchHighlightTextColor": "rgba(0, 43, 54, 1.0)",
 
     "workbench.colorCustomizations": {
+        "terminal.background": "#00000000",
+
         "editor.findMatchHighlight": "rgba(255, 235, 59, 0.5)",
         "editor.findMatchHighlightBorder": "rgba(0, 0, 0, 1.0)",
 
@@ -23,7 +25,8 @@
         "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
         "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
 
-        "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)"
+        "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)",
+        "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)"
     },
 
     "makefile.configureOnOpen": false,
