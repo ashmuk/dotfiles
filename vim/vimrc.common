@@ -165,8 +165,8 @@ endif
 if has('win32') || has('win64')
   " Windows用のランタイムパス設定
   set runtimepath+=~/vimfiles
-  set runtimepath+=~/vimfiles/after
   set runtimepath+=~/vimfiles/plugged
+  set runtimepath+=~/vimfiles/after
 endif
 
 "---------------------------------------------------------------------------
