@@ -10,6 +10,7 @@
 .netrwhist
 Session.vim
 **/plugged/**
+.vim
 
 # User-specific stuff:
 .idea/**/workspace.xml
