@@ -10,9 +10,35 @@
     "redhat.telemetry.enabled": true,
 
     "vim.hlsearch": true,
+    "vim.highlightSearch": true,          // 検索マッチをハイライト（hlsearch とほぼ同義）
     "vim.incsearch": true,
+    "vim.ignorecase": true,
+    "vim.smartcase": true,
     "vim.searchHighlightColor": "rgba(255, 255, 255, 0.7)",
     "vim.searchHighlightTextColor": "rgba(0, 43, 54, 1.0)",
+
+    "vim.useSystemClipboard": true,       // OS クリップボードを使う
+    "vim.useCtrlKeys": true,              // Ctrl 系キー (Ctrl+f など) を有効化
+    "vim.handleKeys": {                   // VS Code 側のキーを上書きするかどうか
+        "<C-a>": false,
+        "<C-f>": false
+    },
+//    "vim.insertModeKeyBindings": [ ... ], // 挿入モード用のキーバインド定義
+//    "vim.normalModeKeyBindings": [ ... ]  // ノーマルモード用のキーバインド定義
+
+    "vim.statusBarColorControl": true,    // モードごとにステータスバーの色を変える
+    "vim.enableNeovim": false,             // Neovim バイナリ連携を無効（Cursor は推奨: false）
+
+    "vim.useCtrlKeys": true,              // Ctrl キーの有効化
+    "vim.leader": "<space>",              // リーダーキー定義
+    "vim.easymotion": true,               // EasyMotion の有効化
+
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<Esc>", "<Esc>"],
+            "commands": [":nohl"]
+        }
+    ]
 
     "workbench.colorCustomizations": {
         "terminal.background": "#00000000",
