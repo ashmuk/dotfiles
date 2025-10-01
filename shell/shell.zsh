@@ -87,3 +87,4 @@ fi
 
 # Just to overwrite the setting made by Oh-my-zsh
 unsetopt AUTO_PUSHD
+unsetopt PUSHD_MINUS
