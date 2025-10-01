@@ -20,8 +20,9 @@
     "vim.useSystemClipboard": true,       // OS クリップボードを使う
     "vim.useCtrlKeys": true,              // Ctrl 系キー (Ctrl+f など) を有効化
     "vim.handleKeys": {                   // VS Code 側のキーを上書きするかどうか
-        "<C-a>": false,
-        "<C-f>": false
+        "<C-a>": true,
+        "<C-b>": true,
+        "<C-f>": true
     },
 //    "vim.insertModeKeyBindings": [ ... ], // 挿入モード用のキーバインド定義
 //    "vim.normalModeKeyBindings": [ ... ]  // ノーマルモード用のキーバインド定義
