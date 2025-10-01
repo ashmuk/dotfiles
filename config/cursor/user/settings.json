@@ -40,6 +40,8 @@
         }
     ]
 
+    "workbench.activityBar.orientation": "vertical"
+
     "workbench.colorCustomizations": {
         "terminal.background": "#00000000",
 
