@@ -559,6 +559,7 @@ wholink() {
     echo "Note: Using sudo to search $search_dir" >&2
   fi
 
+  # shellcheck disable=SC2016
   $find_cmd "$search_dir" -xdev -type l -exec bash -c '
     target_real="$1"; shift
     readlink_cmd="$1"; shift

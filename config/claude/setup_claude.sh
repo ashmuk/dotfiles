@@ -10,6 +10,7 @@ DOTFILES_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
 # Source common functions
 if [[ -f "$DOTFILES_DIR/lib/common.sh" ]]; then
+    # shellcheck disable=SC1091
     source "$DOTFILES_DIR/lib/common.sh"
 else
     echo "Error: Common functions library not found at $DOTFILES_DIR/lib/common.sh" >&2
