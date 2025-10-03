@@ -4,4 +4,9 @@
         "key": "cmd+i",
         "command": "composerMode.agent"
     }
+    {
+      "key": "shift+ctrl+p",
+      "command": "markdown.showPreviewToSide",
+      "when": "editorLangId == 'markdown'"
+    }
 ]
