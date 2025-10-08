@@ -1,42 +1,34 @@
 {
   "_comment_model": "モデル設定 - 最新・最強のClaude Sonnet 4.5を使用",
   "model": "claude-sonnet-4-5-20250929",
-
   "_comment_outputStyle": "出力スタイル設定 - コード変更の理由を説明",
   "outputStyle": "Explanatory",
-
   "_comment_statusLine": "ステータスライン設定（プロジェクト状態の可視化）",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-
   "_comment_env": "環境変数設定",
   "env": {
     "_comment_working_dir": "プロジェクトディレクトリ管理 - 作業ディレクトリを維持",
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
-
     "_comment_timeouts": "Bashコマンド実行のタイムアウト設定",
     "BASH_MAX_TIMEOUT_MS": "300000",
     "BASH_DEFAULT_TIMEOUT_MS": "60000",
     "BASH_MAX_OUTPUT_LENGTH": "500000",
-
     "_comment_mcp": "MCP (Model Context Protocol) 設定",
     "MCP_TIMEOUT": "30000",
     "MCP_TOOL_TIMEOUT": "180000",
     "MAX_MCP_OUTPUT_TOKENS": "50000",
-
     "_comment_additional": "追加の推奨環境変数",
     "CLAUDE_CODE_WORKSPACE": "~/projects",
     "CLAUDE_CODE_HISTORY_SIZE": "1000",
     "CLAUDE_CODE_RETRY_ATTEMPTS": "3"
   },
-
   "_comment_permissions": "パーミッション設定",
   "permissions": {
     "_comment_defaultMode": "編集を自動承認（開発効率優先）",
     "defaultMode": "acceptEdits",
-
     "_comment_allow": "常に許可するパス/コマンド",
     "allow": [
       "Read(~/.zshrc)",
@@ -46,7 +38,6 @@
       "Read(~/.npmrc)",
       "Read(~/.cargo/config.toml)",
       "Read(~/.m2/settings.xml)",
-
       "Read(./package.json)",
       "Read(./package-lock.json)",
       "Read(./yarn.lock)",
@@ -55,7 +46,6 @@
       "Read(./Cargo.toml)",
       "Read(./pyproject.toml)",
       "Read(./requirements.txt)",
-
       "Bash(npm test:*)",
       "Bash(npm run:*)",
       "Bash(yarn test:*)",
@@ -71,42 +61,34 @@
       "Bash(make status:*)",
       "Bash(make test:*)"
     ],
-
     "_comment_ask": "実行前に確認を求めるコマンド",
     "ask": [
       "Bash(git push:*)",
       "Bash(git pull:*)",
       "Bash(git fetch:*)",
-
       "Bash(npm publish:*)",
       "Bash(mvn deploy:*)",
       "Bash(gradle publish:*)",
       "Bash(cargo publish:*)",
       "Bash(poetry publish:*)",
-
       "Bash(docker push:*)",
       "Bash(docker run:*)",
       "Bash(kubectl apply:*)",
       "Bash(kubectl delete:*)",
-
       "Bash(pip install:*)",
       "Bash(npm install:*)",
       "Bash(yarn add:*)",
       "Bash(cargo install:*)",
-
       "Bash(psql:*)",
       "Bash(mysql:*)",
       "Bash(mongosh:*)",
-
       "Bash(sudo:*)",
       "Bash(rm -rf:*)",
       "Bash(chmod:*)",
       "Bash(chown:*)",
-
       "Bash(make install:*)",
       "Bash(make clean:*)"
     ],
-
     "_comment_deny": "明示的に拒否するパス/コマンド",
     "deny": [
       "Read(./.env)",
@@ -120,23 +102,19 @@
       "Read(./**/*token*)",
       "Read(./**/*key.pem)",
       "Read(./**/*.key)",
-
       "Read(./build/**)",
       "Read(./dist/**)",
       "Read(./target/**)",
       "Read(./node_modules/**)",
       "Read(./.git/objects/**)",
-
       "Bash(curl:* | bash)",
       "Bash(wget:* | sh)",
       "Bash(rm -rf /)",
       "Bash(:(){ :|:& };:)",
-
       "Bash(nc:*)",
       "Bash(netcat:*)",
       "Bash(telnet:*)"
     ],
-
     "_comment_additionalDirectories": "追加でアクセスを許可するディレクトリ",
     "additionalDirectories": [
       "../docs/",
@@ -146,7 +124,6 @@
       "~/dotfiles/"
     ]
   },
-
   "_comment_mcp": "MCP サーバー設定",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
@@ -156,10 +133,8 @@
     "sqlite"
   ],
   "disabledMcpjsonServers": [],
-
   "_comment_git": "Git設定",
   "includeCoAuthoredBy": true,
-
   "_comment_additional_settings": "追加の推奨設定",
   "autoSave": true,
   "autoFormat": true,
@@ -171,7 +146,6 @@
     "**/coverage/**",
     "**/.DS_Store"
   ],
-
   "_comment_logging": "ロギング設定",
   "logging": {
     "level": "info",
@@ -179,11 +153,11 @@
     "maxFiles": 10,
     "maxSize": "10MB"
   },
-
   "_comment_performance": "パフォーマンス設定",
   "performance": {
     "maxConcurrentOperations": 5,
     "cacheEnabled": true,
     "cacheTTL": 3600
-  }
+  },
+  "alwaysThinkingEnabled": true
 }
