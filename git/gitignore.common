@@ -77,6 +77,16 @@ fabric.properties
 # Atom
 .atom/
 
+# Cursor
+.cursor/cache/
+.cursor/history/
+.cursor/sandbox/
+.cursor/secrets.json
+.cursor/tokens.json
+
+# Claude Code
+.claude/settings.local.json
+
 # =============================================================================
 # Language-Specific Files
 # =============================================================================
