@@ -1,0 +1,17 @@
+{
+  "model": "anthropic/claude-4.5-sonnet",
+  "fallbackModels": ["openai/gpt-5"],
+  "maxTokens": 4000,
+  "contextFiles": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "prompts/refactor.md"
+  ],
+  "enableMCP": true,
+  "mcpConfigPath": ".codex/mcp.yaml",
+  "allowWrite": true,
+  "codeStyle": {
+    "typescriptPreferred": true,
+    "testsRequired": true
+  }
+}

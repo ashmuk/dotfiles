@@ -1,0 +1,14 @@
+version: 1
+name: codex-tools
+
+# JSON-Schema based function tools
+commands:
+  - name: echo
+    description: Echo back the provided text.
+    schema: ./../mcp/tools/echo.json
+
+# OpenAPI based HTTP tools
+openapi:
+  - name: demo-api
+    description: Simple demo API (ping endpoint)
+    spec: ./../mcp/openapi/demo.yaml

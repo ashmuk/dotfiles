@@ -1,0 +1,5 @@
+{
+  "model": "anthropic/claude-4.5-sonnet",
+  "contextFiles": ["README.md", "docs/ARCHITECTURE.md"],
+  "allowWrite": true
+}
