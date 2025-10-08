@@ -9,38 +9,65 @@
 ## Overview
 
 This guide provides a template for organizing agent-based development using:
-- **CLAUDE.md**: Project-wide policies and principles
-- **AGENTS.md**: Role definitions for specialized agents
-- **codex/config.json**: Codex runtime configuration (Copy this and paste in <project root> directory as .codex)
-- **codex/mcp.yaml**: MCP tool declarations (Copy this and paste in <project root> directory as .codex)
-- **mcp/**: Tool definitions (JSON Schema and OpenAPI)
-- **prompts/**: Shared prompt templates (used by Codex; Cursor has its own copy in `cursor/prompts/`)
+- **CLAUDE.md**: Project-wide policies and principles (copy to project root)
+- **AGENTS.md**: Role definitions for specialized agents (copy to project root)
+- **codex/**: Codex runtime configuration (**copy to project root as `.codex/`**)
+  - config.json: Model and context file settings
+  - mcp.yaml: MCP tool declarations
+- **cursor/**: Cursor AI configuration (**copy to project root as `.cursor/`**)
+  - See [README_cursor.md](./README_cursor.md) for details
+- **mcp/**: Tool definitions (JSON Schema and OpenAPI) (copy to project root)
+- **prompts/**: Shared prompt templates (copy to project root; Cursor has isolated copies)
 
 ```text
-agent/
+agent/                      # Template directory (this location in dotfiles)
 ├─ README_agent.md          # This file (Claude Code / Codex guide)
 ├─ README_cursor.md         # Cursor AI-specific guide (see this for Cursor setup)
-├─ CLAUDE.md                # Project-wide policies and principles
-├─ AGENTS.md                # Role definitions for specialied agents
-├─ prompts/                 # Shared prompts for Codex (referenced by codex/config.json)
-│  └─ refactor.md           # Direction how to refactor
 │
-├─ codex/                   # Place this folder in <project root> directory as `.codex`
-│  ├─ config.json           # Codex/IDE integration config for execution (models, context...)
-│  └─ mcp.yaml              # MCP tool usage declare ()OpenAPI/JSON Schema/commands)
+├─ CLAUDE.md                # Copy to <project-root>/CLAUDE.md
+├─ CLAUDE.full.md           # Comprehensive reference (optional)
+├─ AGENTS.md                # Copy to <project-root>/AGENTS.md
 │
-├─ cursor/                  # Place this folder in <project root> directory as `.cursor`
-│  ├─ prompts/              # Cursor-specific prompts (isolated copy for Cursor)
-│  │  └─ refactor.md        # Direction how to refactor (same content as ../prompts/refactor.md)
-│  ├─ rules/                # Rules how to assist by Cursor
-│  │  └─ 00_general.md      # Generic directions
-│  └─ settings.json         # Minimal setting at project level
+├─ prompts/                 # Copy to <project-root>/prompts/
+│  └─ refactor.md           # Shared refactoring prompt (referenced by .codex/config.json)
 │
-└─ mcp/
-   ├─ tools/
-   │  └─ echo.json          # JSON-Schema tool (ex. echo)
-   └─ openapi/
-      └─ demo.yaml          # OpenAPI tools sample (ex. /ping)
+├─ codex/                   # ⚠️ Copy to <project-root>/.codex/ (rename with dot prefix)
+│  ├─ config.json           # Codex runtime config (models, context files)
+│  └─ mcp.yaml              # MCP tool declarations (JSON Schema and OpenAPI)
+│
+├─ cursor/                  # ⚠️ Copy to <project-root>/.cursor/ (rename with dot prefix)
+│  ├─ prompts/              # Cursor-specific prompts (isolated from shared prompts/)
+│  │  └─ refactor.md        # Same content as ../prompts/refactor.md
+│  ├─ rules/                # Cursor assistant behavior rules
+│  │  └─ 00_general.md      # Generic AI guidance
+│  └─ settings.json         # Project-level Cursor settings
+│
+└─ mcp/                     # Copy to <project-root>/mcp/
+   ├─ tools/                # JSON Schema tool definitions
+   │  └─ echo.json          # Example: echo tool
+   └─ openapi/              # OpenAPI tool definitions
+      └─ demo.yaml          # Example: demo API
+```
+
+**Deployment to Your Project:**
+```bash
+cd <your-project-root>
+
+# Copy policy files
+cp ~/dotfiles/agent/CLAUDE.md ./
+cp ~/dotfiles/agent/AGENTS.md ./
+
+# Copy and rename codex (add dot prefix)
+cp -r ~/dotfiles/agent/codex ./.codex
+
+# Copy and rename cursor (add dot prefix)
+cp -r ~/dotfiles/agent/cursor ./.cursor
+
+# Copy shared resources
+cp -r ~/dotfiles/agent/prompts ./
+cp -r ~/dotfiles/agent/mcp ./
+
+# Customize CLAUDE.md and AGENTS.md for your project
 ```
 
 ### Key Benefits
@@ -208,12 +235,24 @@ paths:
 
 ## Usage Workflow
 
-1. **CLAUDE.md**: Define project-wide **principles and policies**
-2. **AGENTS.md**: Define **specific roles** and handoff formats
-3. **.codex/mcp.yaml**: Declare **available tools** (JSON Schema and OpenAPI)
-4. **mcp/tools/*** and **mcp/openapi/***: Implement tool definitions
-5. **.codex/config.json**: Configure model and context files
-6. Execute workflow: **Planner → Coder → Reviewer** sequence with MCP tools
+### Setup Steps
+
+1. **Deploy templates** to your project (see bash commands above)
+   - Remember to rename `codex/` → `.codex/` and `cursor/` → `.cursor/`
+2. **Customize CLAUDE.md** for your project (replace placeholders)
+3. **Customize AGENTS.md** for your specific agent roles
+4. **Configure .codex/config.json** with your model preferences and context files
+5. **Configure .cursor/settings.json** (if using Cursor)
+6. **Add MCP tools** as needed in `mcp/tools/` and `mcp/openapi/`
+7. **Update .codex/mcp.yaml** to reference your custom tools
+
+### Execution Workflow
+
+1. **Define policies**: Set project-wide principles in CLAUDE.md
+2. **Define roles**: Specify agent responsibilities in AGENTS.md
+3. **Declare tools**: Configure available MCP tools in .codex/mcp.yaml
+4. **Implement tools**: Create tool definitions in mcp/tools/ and mcp/openapi/
+5. **Execute**: Run Planner → Coder → Reviewer workflow with MCP tools
 
 ### Tips for Success
 
@@ -228,6 +267,8 @@ paths:
 ## Best Practices
 
 ### For CLAUDE.md
+- Use simplified CLAUDE.md as quick reference for AI (CLAUDE.full.md for comprehensive docs)
+- Replace all placeholder brackets `[...]` with project-specific values
 - Keep policies technology-agnostic where possible
 - Define clear success criteria (Definition of Done)
 - Explicitly state what's out of scope (Non-Goals)
