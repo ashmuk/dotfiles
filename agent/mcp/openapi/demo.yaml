@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Demo API
+  version: 1.0.0
+paths:
+  /ping:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: pong
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
