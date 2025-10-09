@@ -10,19 +10,19 @@
 flowchart TD
     subgraph macOS_Host["🖥️ macOS Host"]
         subgraph UI["UI / Interactive Layer"]
-            Cursor["Cursor / ClaudeCode\n(IDE + 対話補助)"]
-            JetBrains["JetBrains / VS Code\n(レビュー/編集)"]
+            Cursor["Cursor / ClaudeCode<br/>(IDE + 対話補助)"]
+            JetBrains["JetBrains / VS Code<br/>(レビュー/編集)"]
         end
         subgraph Term["Terminal / Orchestrator"]
-            iTerm2["iTerm2 / zsh / tmux\n(並行タスク制御)"]
+            iTerm2["iTerm2 / zsh / tmux<br/>(並行タスク制御)"]
         end
-        Repo[("Project Folder\n~/work/repo")]
+        Repo[("Project Folder<br/>~/work/repo")]
     end
 
-    subgraph DevC["🐳 Docker DevContainer\n(非root・権限/ネットワーク制御)"]
+    subgraph DevC["🐳 Docker DevContainer<br/>(非root・権限/ネットワーク制御)"]
         subgraph Agent["AI Execution Layer"]
-            Aider["Aider (CLI)\n→ Claude/GPT API 呼出"]
-            SWE["SWE-agent\n→ Issue→Fix→PR 自動"]
+            Aider["Aider (CLI)<br/>→ Claude/GPT API 呼出"]
+            SWE["SWE-agent<br/>→ Issue→Fix→PR 自動"]
         end
         subgraph CI["CI / Test / QA"]
             Lint["Ruff / ESLint / Prettier"]
