@@ -265,7 +265,169 @@ tmux attach -t dev
 
 ---
 
-## 7. まとめ
+## 7. 自律実行開発環境で必要な設定ファイルと使い方
+
+### 🧱 基本構成ファイル一覧
+
+| ファイル/ディレクトリ | 用途 | 配置場所 | 備考 |
+|-----------------------|------|-----------|------|
+| `.devcontainer/devcontainer.json` | DevContainer定義 | プロジェクトルート | VSCode/CursorでReopen in Container可。必要な拡張も指定。 |
+| `.devcontainer/Dockerfile` | コンテナベースイメージ定義 | 同上 | Aider, tmux, git, lint等をインストール。 |
+| `.devcontainer/docker-compose.yml` | サービス定義（プロファイル別） | 同上 | default/no-netプロファイル切替。 |
+| `.env` | APIキー/環境変数 | プロジェクトルート | gitignore対象。OPENAI_API_KEYなどを指定。 |
+| `Makefile` | 操作用コマンド集 | プロジェクトルート | `make aider-refactor`, `make ci-local`等。 |
+| `.tmux.conf` | tmux設定 | ホストHOME | カラー/ペイン操作/ショートカット設定。 |
+| `~/.tmuxinator/ai-dev.yml` | tmuxセッションテンプレート | ホストHOME | paneごとにcompose, aider, test, monitorを定義。 |
+| `.gitignore` | Git管理除外設定 | プロジェクトルート | `.env`, `/logs/`, `__pycache__/` 等。 |
+| `.aider.conf.yml` | Aider 設定 | プロジェクトルート | 使用モデル, commit戦略, ignoreリストを指定。 |
+| `.pre-commit-config.yaml` | Lint/Format統一 | プロジェクトルート | ruff, black, eslint など設定。 |
+| `.github/workflows/ci.yml` | CIワークフロー | GitHub側 | actでローカル再現可能。 |
+
+---
+
+### ⚙️ 主要ファイルサンプル
+
+#### `.tmux.conf`
+```bash
+set -g mouse on
+set -g history-limit 10000
+set -g status-bg colour235
+set -g status-fg colour136
+setw -g mode-keys vi
+bind-key -n C-h select-pane -L
+bind-key -n C-l select-pane -R
+bind-key -n C-j select-pane -D
+bind-key -n C-k select-pane -U
+```
+
+#### `~/.tmuxinator/ai-dev.yml`
+```yaml
+name: ai-dev
+root: ~/work/repo
+windows:
+  - name: compose
+    panes:
+      - docker compose up
+  - name: aider
+    panes:
+      - devcontainer exec make aider-refactor
+  - name: test
+    panes:
+      - devcontainer exec make ci-local
+  - name: monitor
+    panes:
+      - gh pr status --watch
+```
+起動:
+```bash
+tmuxinator start ai-dev
+```
+
+#### `.aider.conf.yml`
+```yaml
+model: claude-3.5-sonnet
+max_tokens: 4096
+git: true
+auto_commit: true
+ignore:
+  - node_modules
+  - dist
+  - .venv
+  - __pycache__
+```
+
+#### `Makefile`
+```Makefile
+setup:
+	pip install -U aider-chat swe-agent ruff pytest
+
+aider-plan:
+	aider --message "未整備テストを列挙し tests/TESTPLAN.md に出力" --yes
+
+aider-refactor:
+	aider --message "src配下をリファクタし ruff/pytest が通るよう最小修正" --yes
+
+ci-local:
+	act pull_request -j check
+
+swe-fix:
+	python -m swe_agent --issue-url "$$ISSUE_URL" --model "claude-3-5-sonnet"
+```
+
+#### `.devcontainer/devcontainer.json`
+```jsonc
+{
+  "name": "ai-devbox",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/work",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "timonwong.shellcheck",
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  },
+  "runArgs": ["--cap-drop=ALL", "--security-opt=no-new-privileges:true"],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.cache,target=/home/vscode/.cache,type=bind"
+  ]
+}
+```
+
+#### `.devcontainer/docker-compose.yml`
+```yaml
+version: "3.9"
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: vscode
+    working_dir: /work
+    volumes:
+      - ..:/work:rw,cached
+    environment:
+      - OPENAI_API_KEY
+      - ANTHROPIC_API_KEY
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: "6g"
+    profiles: [default]
+  dev-nonet:
+    extends: dev
+    network_mode: "none"
+    profiles: ["no-net"]
+```
+
+---
+
+### 🚀 運用のポイント
+- **ホスト側tmuxで全体オーケストレーション**、**コンテナ内でAI実行・テスト・CI再現**を行う。
+- `.tmuxinator` によりマルチペイン環境を即座に再現可能。
+- `.aider.conf.yml` によりモデル選択や除外対象を明示し、安全な自動修正を促す。
+- `.devcontainer` 系設定で環境差を排除し、再現性を確保。
+- `Makefile` は一貫した実行エントリーポイントとして活用。
+
+---
+
+## 8. まとめ
 
 この構成により、以下が実現されます：
 
