@@ -63,6 +63,10 @@ alias txr='tmuxinator start dev-env' # dev-env: shortcut to launch
 # --- tmux + tmuxinator utility ---
 alias tclean='tmux kill-server && echo "Killed all tmux sessions."'
 alias tpane="tmux list-panes -aF '#S:#I.#P #{pane_title} #{pane_current_command}'"
+
+# Create 4-pane dev session (htop, process watch, files, workspace)
+# NOTE: Consider using 'tmuxinator start dev' instead for more flexibility
+#       See: ~/dotfiles/config/tmux/tmuxinator/dev.yml
 alias td='tmux new-session -s ${default_tmux_session}\; \
   split-window -v -p 75 \; \
   split-window -h -p 65 \; \
@@ -71,6 +75,9 @@ alias td='tmux new-session -s ${default_tmux_session}\; \
   send-keys -t 0.1 "watch -n 1 ~/dotfiles/bin/tmux_pane_top.sh" C-m \; \
   send-keys -t 0.2 "ls -lah" C-m \; \
   select-pane -t 0.3'
+
+# Shortcut to launch dev template with tmuxinator (alternative to 'td')
+alias tdev='tmuxinator start dev'
 
 # =============================================================================
 # Multibyte Character Search Aliases

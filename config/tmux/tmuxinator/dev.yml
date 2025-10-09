@@ -1,0 +1,56 @@
+# General Development Session Template
+# Replicates the behavior of the 'td' alias from shell/aliases.common
+#
+# Original alias behavior:
+# - Creates session named 'dev' (or custom name)
+# - 4 panes in specific layout:
+#   - Pane 0 (top-left): htop (system monitor)
+#   - Pane 1 (top-right): Custom top script watcher
+#   - Pane 2 (bottom-left): Directory listing
+#   - Pane 3 (bottom-right): Main workspace (active)
+#
+# Usage:
+#   tmuxinator start dev
+#   SESSION_NAME=myproject tmuxinator start dev
+
+name: <%= ENV['SESSION_NAME'] || 'dev' %>
+root: <%= ENV['PROJECT_ROOT'] || '~' %>
+
+# Window with 4-pane layout matching the 'td' alias
+windows:
+  - main:
+      layout: tiled
+      panes:
+        # Pane 0: System monitor (htop)
+        - title: "Monitor"
+          command: |
+            if command -v htop >/dev/null 2>&1; then
+              htop
+            else
+              top
+            fi
+
+        # Pane 1: Custom top script watcher
+        - title: "Process Watch"
+          command: |
+            if [ -f ~/dotfiles/bin/tmux_pane_top.sh ]; then
+              watch -n 1 ~/dotfiles/bin/tmux_pane_top.sh
+            else
+              echo "tmux_pane_top.sh not found"
+              echo "Expected location: ~/dotfiles/bin/tmux_pane_top.sh"
+              exec $SHELL
+            fi
+
+        # Pane 2: Directory listing
+        - title: "Files"
+          command: |
+            ls -lah
+            exec $SHELL
+
+        # Pane 3: Main workspace (this will be the active pane)
+        - title: "Workspace"
+          focus: true
+          command: |
+            echo "Development workspace ready"
+            echo "Current directory: $(pwd)"
+            exec $SHELL

@@ -261,6 +261,41 @@ APP_COMMAND="python -m debugpy --listen 5678 main.py" tmuxinator start debug
 
 ---
 
+#### 5. General Development (dev.yml)
+
+Basic 4-pane development layout (replicates the `td` alias behavior).
+
+**Features:**
+- System monitoring (htop/top)
+- Process watcher (custom top script)
+- Directory listing
+- Main workspace
+
+**Environment Variables:**
+- `SESSION_NAME` - Session name (default: dev)
+- `PROJECT_ROOT` - Project directory (default: ~)
+
+**Pane Layout:**
+1. **Monitor** - htop system monitor
+2. **Process Watch** - Custom process watcher (~/dotfiles/bin/tmux_pane_top.sh)
+3. **Files** - Directory listing
+4. **Workspace** - Main workspace (focused)
+
+```bash
+# Start with default name 'dev'
+tmuxinator start dev
+
+# Start with custom session name
+SESSION_NAME=myproject tmuxinator start dev
+
+# Start in specific directory
+PROJECT_ROOT=~/projects/myapp tmuxinator start dev
+```
+
+**Note:** This template replicates the behavior of the `td` alias from `shell/aliases.common`. The tmuxinator version is more flexible with environment variables and easier to customize.
+
+---
+
 ### Template Customization
 
 All templates support local customization:
