@@ -96,6 +96,14 @@ echo -e "${GREEN}[✓]${NC} Created .pre-commit-config.yaml"
 cp "$SCRIPT_DIR/Makefile" "$PROJECT_ROOT/Makefile"
 echo -e "${GREEN}[✓]${NC} Created Makefile"
 
+# Deploy VSCode tasks (optional but recommended)
+if [ -d "$SCRIPT_DIR/vscode" ]; then
+  echo -e "${BLUE}[INFO]${NC} Deploying VSCode tasks..."
+  mkdir -p "$PROJECT_ROOT/.vscode"
+  cp "$SCRIPT_DIR/vscode/tasks.json" "$PROJECT_ROOT/.vscode/tasks.json"
+  echo -e "${GREEN}[✓]${NC} Created .vscode/tasks.json"
+fi
+
 echo ""
 echo -e "${GREEN}[SUCCESS]${NC} AI development environment files deployed successfully!"
 echo ""

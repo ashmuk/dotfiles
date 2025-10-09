@@ -11,10 +11,13 @@ sample/
 ├── devcontainer/              # DevContainer設定（プロジェクトでは .devcontainer/）
 │   ├── devcontainer.json      # VSCode/Cursor DevContainer 設定
 │   ├── Dockerfile             # コンテナイメージ定義
-│   └── docker-compose.yml     # サービス定義（default/no-net プロファイル）
+│   ├── docker-compose.yml     # サービス定義（default/no-net プロファイル）
+│   └── health-check.sh        # 環境ヘルスチェックスクリプト ⭐NEW
 ├── github/                    # GitHub Actions設定（プロジェクトでは .github/）
 │   └── workflows/
 │       └── ci.yml             # GitHub Actions CI ワークフロー
+├── vscode/                    # VSCode設定（プロジェクトでは .vscode/） ⭐NEW
+│   └── tasks.json             # タスク定義（Makefile統合）
 ├── aider.conf.yml             # Aider 設定（プロジェクトでは .aider.conf.yml）
 ├── env.example                # 環境変数テンプレート（プロジェクトでは .env）
 ├── gitignore                  # Git 除外設定（プロジェクトでは .gitignore）
@@ -145,6 +148,57 @@ tmux 関連の設定ファイルは `~/dotfiles/config/tmux/` に配置されて
 - Pull Request / Push 時に自動実行
 - Lint, Format, Test, Security Scan
 - Coverage レポート生成
+
+### VSCode 統合
+
+#### `.vscode/tasks.json` ⭐NEW
+VSCode/Cursor からMakefileタスクを直接実行できるタスク定義:
+
+**主なタスク:**
+- **Aider: Plan Development** - 開発計画生成
+- **Aider: Auto-Refactor** - 自動リファクタリング
+- **CI: Run Local Tests** - ローカルCI実行（act）
+- **Test: Run All Tests** - テスト実行
+- **Lint: Check Code Quality** - コード品質チェック
+- **Format: Auto-Format Code** - 自動フォーマット
+- **Docker: Build/Start/Stop** - コンテナ管理
+- **Health Check: Verify Environment** - 環境検証
+- **Pre-commit: Run All Hooks** - pre-commit フック実行
+
+**使い方:**
+1. VSCode/Cursorでプロジェクトを開く
+2. `Cmd+Shift+P` → `Tasks: Run Task`
+3. 実行したいタスクを選択
+
+または `Cmd+Shift+B`（ビルドタスク）でよく使うタスクに素早くアクセス
+
+### 環境ヘルスチェック
+
+#### `.devcontainer/health-check.sh` ⭐NEW
+開発環境が正しく設定されているかを検証するスクリプト:
+
+**チェック項目:**
+- コンテナ環境の検証
+- 必須ツールのインストール確認
+- 環境変数の設定確認
+- プロジェクトファイルの存在確認
+- Aider設定の検証
+- Git設定の確認
+- ネットワーク接続テスト
+
+**実行方法:**
+```bash
+# コンテナ内で実行
+./.devcontainer/health-check.sh
+
+# または VSCode タスクから実行
+Cmd+Shift+P → Tasks: Run Task → Health Check: Verify Environment
+```
+
+**出力例:**
+- ✓ PASS - 正常
+- ⚠ WARNING - 警告（オプション項目）
+- ✗ FAIL - 失敗（必須項目）
 
 ### その他
 

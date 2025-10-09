@@ -1,0 +1,126 @@
+# Pre-commit hooks for dotfiles repository
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Prevent large files
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      # Check for merge conflicts
+      - id: check-merge-conflict
+      # Prevent committing to main/master directly
+      - id: no-commit-to-branch
+        args: ['--branch', 'main', '--branch', 'master']
+        exclude: ^(Makefile|\.github/)
+      # Trim trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      # Fix end of files
+      - id: end-of-file-fixer
+      # Detect private keys
+      - id: detect-private-key
+      # Check symlinks
+      - id: check-symlinks
+      - id: destroyed-symlinks
+
+  # YAML validation (tmuxinator templates, GitHub Actions, etc.)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        args: ['--unsafe']  # Allow custom tags like <%= %> in tmuxinator
+        files: \.(yml|yaml)$
+        exclude: ^(ai_dev/sample/|\.github/workflows/)
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-d', '{extends: default, rules: {line-length: {max: 120}, document-start: disable, truthy: disable}}']
+        files: \.(yml|yaml)$
+        exclude: ^(config/tmux/tmuxinator/|ai_dev/sample/)  # Exclude templates with ERB syntax
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: ['--severity=warning']
+        files: \.(sh|bash)$
+
+  # Bash/shell formatting
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: v6.2.1
+    hooks:
+      - id: beautysh
+        args: ['--indent-size', '2']
+        files: \.(sh|bash)$
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix']
+        exclude: ^(CHANGELOG\.md|node_modules/)
+
+  # Check JSON syntax
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-json
+        files: \.(json|jsonc)$
+
+  # Python formatting (for utility scripts)
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3
+        files: \.py$
+
+  # Custom local hooks
+  - repo: local
+    hooks:
+      # Validate tmuxinator templates
+      - id: validate-tmuxinator
+        name: Validate tmuxinator templates
+        entry: bash -c 'for file in config/tmux/tmuxinator/*.yml; do echo "Checking $file..."; ruby -e "require \"yaml\"; YAML.load_file(\"$file\")"; done'
+        language: system
+        files: ^config/tmux/tmuxinator/.*\.yml$
+        pass_filenames: false
+
+      # Check for TODO/FIXME in shell scripts before commit
+      - id: check-todos
+        name: Check for unresolved TODOs
+        entry: bash -c '! git diff --cached | grep -E "^\+.*TODO:|^\+.*FIXME:"'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      # Validate Makefile syntax
+      - id: check-makefile
+        name: Validate Makefile
+        entry: make -n --dry-run
+        language: system
+        files: ^Makefile$
+        pass_filenames: false
+
+# Exclude patterns
+exclude: |
+  (?x)^(
+    \.git/|
+    \.github/|
+    node_modules/|
+    \.venv/|
+    venv/|
+    __pycache__/|
+    \.DS_Store|
+    \.pytest_cache/|
+    \.mypy_cache/
+  )
