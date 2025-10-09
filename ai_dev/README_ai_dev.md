@@ -29,24 +29,36 @@
 
 ### 🖥️ ホスト側に配置するファイル
 
-| サンプルファイル | 配置先 | 用途 |
+| 設定ファイル | 配置先 | 用途 |
 |----------------|--------|------|
-| `sample/.tmux.conf` | `~/.tmux.conf` | tmux 設定（ペイン操作、カラー等） |
-| `sample/tmuxinator/ai-dev.yml` | `~/.tmuxinator/ai-dev.yml` | tmux セッションテンプレート |
+| `config/tmux/tmux.conf` | `~/.tmux.conf` | tmux 設定（通常開発とAI開発の両方に対応） |
+| `config/tmux/tmuxinator/ai-dev.yml` | `~/.tmuxinator/ai-dev.yml` | AI開発用 tmux セッションテンプレート |
 
 **配置コマンド例:**
 ```bash
-# ホームディレクトリに配置
-cp ~/dotfiles/ai_dev/sample/.tmux.conf ~/.tmux.conf
+# tmux 設定をホームディレクトリに配置
+cp ~/dotfiles/config/tmux/tmux.conf ~/.tmux.conf
 
-# tmuxinator ディレクトリを作成して配置
+# tmuxinator ディレクトリを作成して AI開発テンプレートを配置
 mkdir -p ~/.tmuxinator
-cp ~/dotfiles/ai_dev/sample/tmuxinator/ai-dev.yml ~/.tmuxinator/
+cp ~/dotfiles/config/tmux/tmuxinator/ai-dev.yml ~/.tmuxinator/
 ```
 
 **参照元:**
 - tmux: `~/.tmux.conf` を起動時に自動読み込み
 - tmuxinator: `tmuxinator start ai-dev` 実行時に `~/.tmuxinator/ai-dev.yml` を参照
+
+**AI開発ワークフローでの使用:**
+- `tmux.conf` には通常開発とAI開発の両方で使える設定を統合
+  - Vimスタイルのペイン移動（Ctrl+hjkl）
+  - 256色・true colorサポート
+  - ウィンドウ/ペイン番号を1から開始
+  - ステータスバーにペイン番号表示
+- `tmuxinator/ai-dev.yml` で4ペイン構成を自動起動
+  - compose: Docker Compose起動
+  - aider: AI リファクタリング
+  - test: CI/テスト実行
+  - monitor: PR ステータス監視
 
 ---
 
@@ -115,11 +127,11 @@ DevContainer 起動時、以下のようにディレクトリがマウントさ�
 
 ```bash
 # tmux 設定をホームディレクトリに配置
-cp ~/dotfiles/ai_dev/sample/.tmux.conf ~/.tmux.conf
+cp ~/dotfiles/config/tmux/tmux.conf ~/.tmux.conf
 
-# tmuxinator 設定
+# tmuxinator 設定（AI開発用テンプレート）
 mkdir -p ~/.tmuxinator
-cp ~/dotfiles/ai_dev/sample/tmuxinator/ai-dev.yml ~/.tmuxinator/
+cp ~/dotfiles/config/tmux/tmuxinator/ai-dev.yml ~/.tmuxinator/
 
 # tmux 設定を再読み込み（既存セッションがある場合）
 tmux source-file ~/.tmux.conf

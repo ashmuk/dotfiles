@@ -276,8 +276,8 @@ tmux attach -t dev
 | `.devcontainer/docker-compose.yml` | サービス定義（プロファイル別） | 同上 | default/no-netプロファイル切替。 |
 | `.env` | APIキー/環境変数 | プロジェクトルート | gitignore対象。OPENAI_API_KEYなどを指定。 |
 | `Makefile` | 操作用コマンド集 | プロジェクトルート | `make aider-refactor`, `make ci-local`等。 |
-| `.tmux.conf` | tmux設定 | ホストHOME | カラー/ペイン操作/ショートカット設定。 |
-| `~/.tmuxinator/ai-dev.yml` | tmuxセッションテンプレート | ホストHOME | paneごとにcompose, aider, test, monitorを定義。 |
+| `.tmux.conf` | tmux設定 | ホストHOME (`~/dotfiles/config/tmux/tmux.conf`) | カラー/ペイン操作/ショートカット設定。通常開発とAI開発両方で使用。 |
+| `~/.tmuxinator/ai-dev.yml` | tmuxセッションテンプレート | ホストHOME (`~/dotfiles/config/tmux/tmuxinator/ai-dev.yml`) | AI開発用4ペイン構成（compose, aider, test, monitor）。 |
 | `.gitignore` | Git管理除外設定 | プロジェクトルート | `.env`, `/logs/`, `__pycache__/` 等。 |
 | `.aider.conf.yml` | Aider 設定 | プロジェクトルート | 使用モデル, commit戦略, ignoreリストを指定。 |
 | `.pre-commit-config.yaml` | Lint/Format統一 | プロジェクトルート | ruff, black, eslint など設定。 |
@@ -287,41 +287,52 @@ tmux attach -t dev
 
 ### ⚙️ 主要ファイルサンプル
 
-#### `.tmux.conf`
+#### `.tmux.conf` (ホスト: `~/.tmux.conf`)
+
+**配置場所**: `~/dotfiles/config/tmux/tmux.conf`
+
+このファイルは通常開発とAI開発の両方で使用されます。
+
+主な設定:
+- 256色・true color サポート（`screen-256color` + `xterm-256color:Tc`）
+- Vim スタイルのペイン移動（`Ctrl+hjkl`、プレフィックス不要）
+- マウス操作有効化
+- ウィンドウ/ペイン番号を1から開始
+- OS別クリップボード連携（macOS/WSL/X11）
+- プレフィックス: `Ctrl-a`
+
+配置方法:
 ```bash
-set -g mouse on
-set -g history-limit 10000
-set -g status-bg colour235
-set -g status-fg colour136
-setw -g mode-keys vi
-bind-key -n C-h select-pane -L
-bind-key -n C-l select-pane -R
-bind-key -n C-j select-pane -D
-bind-key -n C-k select-pane -U
+cp ~/dotfiles/config/tmux/tmux.conf ~/.tmux.conf
+tmux source-file ~/.tmux.conf  # 設定を再読み込み
 ```
 
-#### `~/.tmuxinator/ai-dev.yml`
-```yaml
-name: ai-dev
-root: ~/work/repo
-windows:
-  - name: compose
-    panes:
-      - docker compose up
-  - name: aider
-    panes:
-      - devcontainer exec make aider-refactor
-  - name: test
-    panes:
-      - devcontainer exec make ci-local
-  - name: monitor
-    panes:
-      - gh pr status --watch
+#### `~/.tmuxinator/ai-dev.yml` (ホスト: `~/.tmuxinator/ai-dev.yml`)
+
+**配置場所**: `~/dotfiles/config/tmux/tmuxinator/ai-dev.yml`
+
+AI開発専用の tmux セッションテンプレート。4ペイン構成で並行タスクを実行します。
+
+ペイン構成:
+1. **compose**: Docker Compose起動
+2. **aider**: AI リファクタリング実行
+3. **test**: CI/テスト実行
+4. **monitor**: PR ステータス監視
+
+配置方法:
+```bash
+mkdir -p ~/.tmuxinator
+cp ~/dotfiles/config/tmux/tmuxinator/ai-dev.yml ~/.tmuxinator/
 ```
+
 起動:
 ```bash
 tmuxinator start ai-dev
 ```
+
+**AI開発ワークフローでの使用**:
+- ホスト側でこのテンプレートを起動し、全ペインから DevContainer 内のコマンドを実行
+- 複数のAIタスク（aider）、テスト、モニタリングを同時並行で進められる
 
 #### `.aider.conf.yml`
 ```yaml
