@@ -1,0 +1,264 @@
+# Debugging Session Template
+#
+# Usage:
+#   tmuxinator start debug
+#
+# Environment variables (optional):
+#   PROJECT_ROOT - Project directory (default: current directory)
+#   DEBUG_PORT   - Debugger port (default: language-specific)
+#   APP_COMMAND  - Application start command
+
+name: debug
+root: <%= ENV['PROJECT_ROOT'] || '.' %>
+
+windows:
+  - application:
+      layout: main-vertical
+      panes:
+        # Application with debugger
+        - title: "App (Debug Mode)"
+          command: |
+            echo "=== Debug Mode Application ==="
+            echo ""
+
+            # Auto-detect project type and provide debug commands
+            if [ -f "package.json" ]; then
+              echo "Node.js project detected"
+              echo "Debug with: node --inspect=9229 app.js"
+              echo "Or: npm run debug"
+              echo ""
+              <%= ENV['APP_COMMAND'] || 'exec $SHELL' %>
+            elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              echo "Python project detected"
+              echo "Debug with: python -m pdb main.py"
+              echo "Or: python -m debugpy --listen 5678 --wait-for-client main.py"
+              echo ""
+              if [ -d ".venv" ]; then
+                source .venv/bin/activate
+              fi
+              <%= ENV['APP_COMMAND'] || 'exec $SHELL' %>
+            elif [ -f "go.mod" ]; then
+              echo "Go project detected"
+              echo "Debug with: dlv debug --headless --listen=:2345 --api-version=2"
+              echo ""
+              <%= ENV['APP_COMMAND'] || 'exec $SHELL' %>
+            elif [ -f "Cargo.toml" ]; then
+              echo "Rust project detected"
+              echo "Debug with: rust-lldb target/debug/app"
+              echo ""
+              <%= ENV['APP_COMMAND'] || 'exec $SHELL' %>
+            else
+              echo "Project type not auto-detected"
+              echo "Set APP_COMMAND environment variable or start manually"
+              exec $SHELL
+            fi
+        # Debugger client/REPL
+        - title: "Debugger REPL"
+          command: |
+            echo "=== Debugger Console ==="
+            echo ""
+            echo "Waiting for application to start..."
+            sleep 2
+
+            if [ -f "package.json" ]; then
+              echo "Node.js Debugger:"
+              echo "  Connect Chrome DevTools to chrome://inspect"
+              echo "  Or use: node inspect localhost:9229"
+            elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              echo "Python Debugger:"
+              echo "  Connect VSCode/PyCharm debugger to port 5678"
+              echo "  Or use pdb commands: (b)reak, (c)ontinue, (s)tep, (n)ext, (p)rint"
+            elif [ -f "go.mod" ]; then
+              echo "Go Debugger:"
+              echo "  Connect delve client: dlv connect :2345"
+            fi
+            echo ""
+            exec $SHELL
+
+  - logs:
+      layout: even-vertical
+      panes:
+        # Application logs
+        - title: "App Logs"
+          command: |
+            echo "=== Application Logs ==="
+            echo "Watching for log files..."
+
+            # Auto-detect and tail common log locations
+            if [ -f "logs/app.log" ]; then
+              tail -f logs/app.log
+            elif [ -f "app.log" ]; then
+              tail -f app.log
+            elif [ -d "logs" ]; then
+              echo "Log directory found. Specify file:"
+              ls -lh logs/
+              exec $SHELL
+            else
+              echo "No log files detected"
+              echo "Application output will appear here"
+              exec $SHELL
+            fi
+        # Error logs
+        - title: "Error Logs"
+          command: |
+            echo "=== Error Logs ==="
+
+            if [ -f "logs/error.log" ]; then
+              tail -f logs/error.log
+            elif [ -f "error.log" ]; then
+              tail -f error.log
+            else
+              echo "No error log file detected"
+              echo "stderr output will appear here"
+              exec $SHELL
+            fi
+
+  - network:
+      layout: main-vertical
+      panes:
+        # Network traffic monitoring
+        - title: "Network Monitor"
+          command: |
+            echo "=== Network Traffic ==="
+
+            # Detect application port
+            PORT=<%= ENV['DEBUG_PORT'] || '3000' %>
+
+            if command -v tcpdump >/dev/null; then
+              echo "Monitoring traffic on port $PORT..."
+              echo "Run: sudo tcpdump -i any -n port $PORT"
+            elif command -v ngrep >/dev/null; then
+              echo "Monitoring HTTP traffic on port $PORT..."
+              sudo ngrep -d any -W byline port $PORT
+            else
+              echo "Network monitoring tools not available"
+              echo "Install: tcpdump or ngrep"
+            fi
+            exec $SHELL
+        # API requests/responses
+        - title: "HTTP Traffic"
+          command: |
+            echo "=== HTTP Request Logger ==="
+            echo ""
+            echo "Tools available:"
+            echo "  - mitmproxy: Monitor and modify HTTP/HTTPS traffic"
+            echo "  - httpie: Make HTTP requests (http GET/POST ...)"
+            echo "  - curl: Make requests with -v for verbose output"
+            echo ""
+            exec $SHELL
+
+  - profiler:
+      layout: tiled
+      panes:
+        # Performance profiler
+        - title: "CPU Profiler"
+          command: |
+            echo "=== CPU Profiling ==="
+            echo ""
+
+            if [ -f "package.json" ]; then
+              echo "Node.js profiling:"
+              echo "  node --prof app.js"
+              echo "  Analyze: node --prof-process isolate-*-v8.log"
+            elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              echo "Python profiling:"
+              echo "  python -m cProfile -o output.pstats main.py"
+              echo "  Analyze: python -m pstats output.pstats"
+              echo "  Visualize: snakeviz output.pstats"
+            elif [ -f "go.mod" ]; then
+              echo "Go profiling:"
+              echo "  go test -cpuprofile=cpu.prof -bench=."
+              echo "  Analyze: go tool pprof cpu.prof"
+            fi
+            echo ""
+            exec $SHELL
+        # Memory profiler
+        - title: "Memory Profiler"
+          command: |
+            echo "=== Memory Profiling ==="
+            echo ""
+
+            if [ -f "package.json" ]; then
+              echo "Node.js memory:"
+              echo "  node --inspect --expose-gc app.js"
+              echo "  Chrome DevTools → Memory tab"
+            elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              echo "Python memory:"
+              echo "  python -m memory_profiler main.py"
+              echo "  Or: mprof run main.py && mprof plot"
+            elif [ -f "go.mod" ]; then
+              echo "Go memory:"
+              echo "  go test -memprofile=mem.prof -bench=."
+              echo "  Analyze: go tool pprof mem.prof"
+            fi
+            echo ""
+            exec $SHELL
+        # Process monitor
+        - title: "Process Info"
+          command: |
+            echo "=== Process Monitor ==="
+            echo "Waiting for application to start..."
+            sleep 2
+
+            # Find and monitor the application process
+            if command -v pgrep >/dev/null; then
+              if [ -f "package.json" ]; then
+                PID=$(pgrep -f "node.*app" | head -1)
+              elif [ -f "main.py" ]; then
+                PID=$(pgrep -f "python.*main" | head -1)
+              fi
+
+              if [ -n "$PID" ]; then
+                watch -n 1 "ps aux | grep $PID | head -1"
+              else
+                exec $SHELL
+              fi
+            else
+              exec $SHELL
+            fi
+
+  - database:
+      panes:
+        # Database queries/inspection
+        - title: "Database"
+          command: |
+            echo "=== Database Inspector ==="
+            echo ""
+
+            if [ -f "docker-compose.yml" ]; then
+              echo "Starting database services..."
+              docker compose up -d postgres mongodb redis 2>/dev/null || true
+              sleep 2
+            fi
+
+            echo "Database connections:"
+            echo "  PostgreSQL: psql -h localhost -U user -d dbname"
+            echo "  MongoDB: mongosh mongodb://localhost:27017"
+            echo "  Redis: redis-cli"
+            echo "  MySQL: mysql -h localhost -u user -p"
+            echo ""
+            exec $SHELL
+
+  - breakpoints:
+      panes:
+        # Breakpoint manager
+        - title: "Breakpoints"
+          command: |
+            echo "=== Breakpoint Manager ==="
+            echo ""
+            echo "Current breakpoints:"
+            echo "(Will be populated by debugger)"
+            echo ""
+            echo "Common breakpoint commands:"
+            echo "  Node.js: debugger statement in code"
+            echo "  Python: import pdb; pdb.set_trace()"
+            echo "  Go: runtime.Breakpoint()"
+            echo ""
+            echo "Files with potential breakpoints:"
+
+            # List source files
+            if [ -d "src" ]; then
+              find src -type f \( -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.go" \) | head -10
+            fi
+
+            exec $SHELL

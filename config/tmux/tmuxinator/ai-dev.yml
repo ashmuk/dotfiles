@@ -1,15 +1,244 @@
+# AI Development Session Template
+#
+# Usage:
+#   tmuxinator start ai-dev
+#
+# Environment variables (optional):
+#   PROJECT_ROOT  - Project directory (default: ~/work/repo)
+#   PROJECT_TYPE  - Project type: python|node|go|rust (auto-detected if not set)
+#   AIDER_MODEL   - AI model to use (default: claude-4.5-sonnet)
+#   CONTAINER_CMD - Container command: devcontainer|docker (default: devcontainer)
+
 name: ai-dev
-root: ~/work/repo
+root: <%= ENV['PROJECT_ROOT'] || '~/work/repo' %>
+
+# Detect project type if not explicitly set
+pre_window: |
+  export PROJECT_TYPE=${PROJECT_TYPE:-$(
+    if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+      echo "python"
+    elif [ -f "package.json" ]; then
+      echo "node"
+    elif [ -f "go.mod" ]; then
+      echo "go"
+    elif [ -f "Cargo.toml" ]; then
+      echo "rust"
+    else
+      echo "generic"
+    fi
+  )}
+  export CONTAINER_CMD=${CONTAINER_CMD:-devcontainer}
+
 windows:
-  - name: compose
-    panes:
-      - docker compose up
-  - name: aider
-    panes:
-      - devcontainer exec make aider-refactor
-  - name: test
-    panes:
-      - devcontainer exec make ci-local
-  - name: monitor
-    panes:
-      - gh pr status --watch
+  - compose:
+      panes:
+        # Docker Compose services
+        - title: "Services"
+          command: |
+            if [ -f "docker-compose.yml" ] || [ -f "compose.yml" ]; then
+              echo "Starting Docker Compose services..."
+              docker compose up
+            elif [ -f ".devcontainer/docker-compose.yml" ]; then
+              echo "Starting DevContainer services..."
+              docker compose -f .devcontainer/docker-compose.yml up
+            else
+              echo "No docker-compose.yml found"
+              echo "Skipping service startup"
+              exec $SHELL
+            fi
+
+  - aider:
+      layout: main-vertical
+      panes:
+        # Aider AI code assistant
+        - title: "Aider"
+          command: |
+            CONTAINER=<%= ENV['CONTAINER_CMD'] || 'devcontainer' %>
+            MODEL=<%= ENV['AIDER_MODEL'] || 'claude-4.5-sonnet' %>
+
+            echo "=== Aider AI Assistant ==="
+            echo "Model: $MODEL"
+            echo "Project: $PROJECT_TYPE"
+            echo ""
+
+            if command -v $CONTAINER >/dev/null; then
+              # Run inside container
+              $CONTAINER exec bash -c "aider --model $MODEL" || \
+              $CONTAINER exec make aider-refactor
+            elif command -v aider >/dev/null; then
+              # Run on host
+              aider --model $MODEL
+            else
+              echo "Aider not found. Install with: pip install aider-chat"
+              echo "Or run: make aider-refactor"
+              exec $SHELL
+            fi
+        # Aider chat/planning
+        - title: "AI Plan"
+          command: |
+            CONTAINER=<%= ENV['CONTAINER_CMD'] || 'devcontainer' %>
+
+            echo "=== AI Planning & Analysis ==="
+            echo ""
+            echo "Available commands:"
+            echo "  make aider-plan       - Generate development plan"
+            echo "  make aider-refactor   - Auto-refactor code"
+            echo "  make swe-fix          - Fix GitHub issue with SWE-agent"
+            echo ""
+
+            if command -v $CONTAINER >/dev/null; then
+              $CONTAINER exec bash
+            else
+              exec $SHELL
+            fi
+
+  - test:
+      layout: main-vertical
+      panes:
+        # CI/Test execution
+        - title: "CI/Tests"
+          command: |
+            CONTAINER=<%= ENV['CONTAINER_CMD'] || 'devcontainer' %>
+
+            echo "=== CI/Test Environment ==="
+            echo "Project type: $PROJECT_TYPE"
+            echo ""
+
+            # Project-specific test commands
+            case "$PROJECT_TYPE" in
+              python)
+                echo "Python test commands:"
+                echo "  pytest tests/ -v"
+                echo "  pytest --cov"
+                echo "  ruff check ."
+                ;;
+              node)
+                echo "Node.js test commands:"
+                echo "  npm test"
+                echo "  npm run lint"
+                echo "  npm run type-check"
+                ;;
+              go)
+                echo "Go test commands:"
+                echo "  go test ./..."
+                echo "  go test -race ./..."
+                echo "  golangci-lint run"
+                ;;
+              rust)
+                echo "Rust test commands:"
+                echo "  cargo test"
+                echo "  cargo clippy"
+                echo "  cargo fmt --check"
+                ;;
+            esac
+
+            echo ""
+            echo "Run local CI:"
+            echo "  make ci-local  (using act)"
+            echo ""
+
+            if command -v $CONTAINER >/dev/null; then
+              $CONTAINER exec bash
+            else
+              exec $SHELL
+            fi
+        # Watch mode for tests
+        - title: "Test Watch"
+          command: |
+            CONTAINER=<%= ENV['CONTAINER_CMD'] || 'devcontainer' %>
+
+            echo "=== Test Watch Mode ==="
+            echo ""
+
+            # Start test watcher based on project type
+            case "$PROJECT_TYPE" in
+              python)
+                if command -v $CONTAINER >/dev/null; then
+                  $CONTAINER exec bash -c "pytest-watch tests/ || ptw tests/ || exec bash"
+                elif command -v pytest-watch >/dev/null; then
+                  pytest-watch tests/
+                else
+                  echo "Install pytest-watch: pip install pytest-watch"
+                  exec $SHELL
+                fi
+                ;;
+              node)
+                if command -v $CONTAINER >/dev/null; then
+                  $CONTAINER exec npm test -- --watch
+                else
+                  npm test -- --watch
+                fi
+                ;;
+              *)
+                echo "Test watch not configured for $PROJECT_TYPE"
+                exec $SHELL
+                ;;
+            esac
+
+  - monitor:
+      layout: even-horizontal
+      panes:
+        # PR status monitoring
+        - title: "PR Status"
+          command: |
+            if command -v gh >/dev/null; then
+              gh pr status --watch
+            else
+              echo "GitHub CLI not installed"
+              echo "Install: brew install gh"
+              exec $SHELL
+            fi
+        # Git status
+        - title: "Git"
+          command: |
+            echo "=== Git Status ==="
+            git status
+            echo ""
+            echo "Recent commits:"
+            git log --oneline -5
+            exec $SHELL
+
+  - logs:
+      layout: even-vertical
+      panes:
+        # Application logs
+        - title: "App Logs"
+          command: |
+            echo "=== Application Logs ==="
+            echo "Watching for logs..."
+
+            if [ -d "logs" ]; then
+              # Find the most recent log file
+              LATEST_LOG=$(ls -t logs/*.log 2>/dev/null | head -1)
+              if [ -n "$LATEST_LOG" ]; then
+                tail -f "$LATEST_LOG"
+              else
+                echo "No log files found in logs/"
+                exec $SHELL
+              fi
+            elif [ -f "app.log" ]; then
+              tail -f app.log
+            else
+              echo "No log files detected"
+              echo "Logs will appear here when generated"
+              exec $SHELL
+            fi
+        # Container logs
+        - title: "Container Logs"
+          command: |
+            echo "=== Container Logs ==="
+            echo "Waiting for containers to start..."
+            sleep 3
+
+            # Get the primary container name
+            CONTAINER=$(docker ps --format '{{.Names}}' | grep -E '(dev|app|web)' | head -1)
+
+            if [ -n "$CONTAINER" ]; then
+              echo "Following logs for: $CONTAINER"
+              docker logs -f "$CONTAINER"
+            else
+              echo "No running containers found"
+              echo "Available containers:"
+              docker ps --format "table {{.Names}}\t{{.Status}}"
+              exec $SHELL
+            fi

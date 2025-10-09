@@ -1,0 +1,200 @@
+# Data Science Session Template
+#
+# Usage:
+#   tmuxinator start data-science
+#
+# Environment variables (optional):
+#   PROJECT_ROOT  - Project directory (default: current directory)
+#   NOTEBOOK_PORT - Jupyter port (default: 8888)
+#   DATA_DIR      - Data directory (default: data)
+
+name: data-science
+root: <%= ENV['PROJECT_ROOT'] || '.' %>
+
+windows:
+  - jupyter:
+      layout: main-vertical
+      panes:
+        # Jupyter Lab/Notebook
+        - title: "Jupyter"
+          command: |
+            # Activate virtual environment if exists
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            # Start Jupyter
+            PORT=<%= ENV['NOTEBOOK_PORT'] || '8888' %>
+            if command -v jupyter-lab >/dev/null; then
+              echo "Starting Jupyter Lab on port $PORT..."
+              jupyter-lab --port=$PORT --no-browser
+            elif command -v jupyter >/dev/null; then
+              echo "Starting Jupyter Notebook on port $PORT..."
+              jupyter notebook --port=$PORT --no-browser
+            else
+              echo "Jupyter not found. Install with: pip install jupyterlab"
+              exec $SHELL
+            fi
+        # Python REPL/IPython
+        - title: "REPL"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            if command -v ipython >/dev/null; then
+              echo "Starting IPython..."
+              echo "Useful commands: %load, %run, %timeit, %matplotlib inline"
+              ipython
+            else
+              python
+            fi
+
+  - analysis:
+      layout: main-vertical
+      panes:
+        # Main analysis script
+        - title: "Scripts"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            echo "Analysis workspace ready"
+            echo "Python environment: $(which python)"
+            echo ""
+            echo "Quick commands:"
+            echo "  python scripts/analyze.py  - Run analysis"
+            echo "  python -m pytest tests/    - Run tests"
+            exec $SHELL
+        # Data exploration
+        - title: "Explore"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            DATA_DIR=<%= ENV['DATA_DIR'] || 'data' %>
+            echo "Data directory: $DATA_DIR"
+            if [ -d "$DATA_DIR" ]; then
+              echo "Files:"
+              ls -lh $DATA_DIR
+            fi
+            exec $SHELL
+
+  - visualization:
+      panes:
+        # Plotting/Dashboard server
+        - title: "Viz Server"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            echo "Visualization workspace ready"
+            echo ""
+            echo "Available tools:"
+            echo "  Streamlit: streamlit run app.py"
+            echo "  Dash: python app.py"
+            echo "  Panel: panel serve dashboard.py"
+            echo "  Voila: voila notebooks/analysis.ipynb"
+            exec $SHELL
+
+  - data:
+      layout: tiled
+      panes:
+        # Database/Data source
+        - title: "Database"
+          command: |
+            if [ -f "docker-compose.yml" ]; then
+              echo "Starting database services..."
+              docker compose up postgres mongodb redis
+            else
+              echo "Database workspace ready"
+              echo "Connect to: PostgreSQL, MongoDB, etc."
+              exec $SHELL
+            fi
+        # Data pipeline/ETL
+        - title: "Pipeline"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            echo "Data pipeline workspace ready"
+            echo ""
+            echo "Run ETL/Pipeline:"
+            echo "  python scripts/etl.py"
+            echo "  airflow standalone  (if using Airflow)"
+            exec $SHELL
+
+  - experiment:
+      layout: even-horizontal
+      panes:
+        # MLflow tracking
+        - title: "MLflow"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            if command -v mlflow >/dev/null; then
+              echo "Starting MLflow UI..."
+              mlflow ui --port 5000
+            else
+              echo "MLflow not installed"
+              echo "Install with: pip install mlflow"
+              exec $SHELL
+            fi
+        # TensorBoard (if using TensorFlow/PyTorch)
+        - title: "TensorBoard"
+          command: |
+            if [ -d ".venv" ]; then
+              source .venv/bin/activate
+            elif [ -d "venv" ]; then
+              source venv/bin/activate
+            fi
+
+            if [ -d "logs" ] && command -v tensorboard >/dev/null; then
+              echo "Starting TensorBoard..."
+              tensorboard --logdir=logs --port 6006
+            else
+              echo "TensorBoard workspace ready"
+              echo "Start with: tensorboard --logdir=logs"
+              exec $SHELL
+            fi
+
+  - monitor:
+      layout: even-horizontal
+      panes:
+        # GPU monitoring
+        - title: "GPU"
+          command: |
+            if command -v nvidia-smi >/dev/null; then
+              watch -n 1 nvidia-smi
+            else
+              echo "No GPU detected or nvidia-smi not available"
+              exec $SHELL
+            fi
+        # System resources
+        - title: "Resources"
+          command: |
+            if command -v htop >/dev/null; then
+              htop
+            else
+              top
+            fi

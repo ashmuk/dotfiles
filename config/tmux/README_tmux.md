@@ -113,27 +113,6 @@ tmux -f ~/.tmux.conf list-commands
 
 Tmuxinator provides pre-configured session templates for different workflows. The setup script automatically deploys templates to `~/.tmuxinator/`.
 
-#### AI Development Session (ai-dev.yml)
-
-A 4-pane layout optimized for AI-assisted development workflows:
-
-```bash
-# Start the AI development session
-tmuxinator start ai-dev
-
-# Edit the template
-tmuxinator edit ai-dev
-
-# List available templates
-tmuxinator list
-```
-
-**Pane Layout:**
-1. **compose** - Docker Compose services
-2. **aider** - AI code refactoring (Aider CLI)
-3. **test** - CI/CD and testing
-4. **monitor** - PR status monitoring
-
 **Installation:**
 ```bash
 # Install tmuxinator (Ruby gem required)
@@ -144,11 +123,164 @@ brew install tmuxinator  # macOS
 apt install tmuxinator   # Ubuntu/Debian
 ```
 
-**Customization:**
-Edit `~/.tmuxinator/ai-dev.yml` to adjust:
-- Project root directory
-- Commands for each pane
-- Window layout and naming
+**General Usage:**
+```bash
+# Start a session
+tmuxinator start <template-name>
+
+# Start with environment variables
+PROJECT_ROOT=/path/to/project tmuxinator start web-dev
+
+# Edit a template
+tmuxinator edit <template-name>
+
+# List available templates
+tmuxinator list
+```
+
+---
+
+#### 1. AI Development (ai-dev.yml)
+
+**Enhanced** AI-assisted development with auto-detection and logging.
+
+**Features:**
+- Auto-detects project type (Python/Node.js/Go/Rust)
+- Configurable AI model and container command
+- Project-specific test commands
+- Real-time log monitoring (app logs + container logs)
+- PR status tracking
+
+**Environment Variables:**
+- `PROJECT_ROOT` - Project directory (default: ~/work/repo)
+- `PROJECT_TYPE` - python|node|go|rust (auto-detected)
+- `AIDER_MODEL` - AI model (default: claude-4.5-sonnet)
+- `CONTAINER_CMD` - devcontainer|docker (default: devcontainer)
+
+**Windows:**
+1. **compose** - Docker Compose services (auto-detects compose files)
+2. **aider** - AI assistant + planning pane
+3. **test** - CI/tests + test watch mode
+4. **monitor** - PR status + Git status
+5. **logs** - App logs + Container logs
+
+```bash
+# Start with custom settings
+PROJECT_ROOT=~/projects/myapp AIDER_MODEL=gpt-4 tmuxinator start ai-dev
+```
+
+---
+
+#### 2. Web Development (web-dev.yml)
+
+Full-stack web development with frontend, backend, and database.
+
+**Features:**
+- Auto-detects frontend frameworks (Vite, Next.js, etc.)
+- Auto-detects backend frameworks (FastAPI, Express, etc.)
+- Database service management via Docker Compose
+- Resource monitoring (htop, docker ps)
+- API testing workspace
+
+**Environment Variables:**
+- `PROJECT_ROOT` - Project directory (default: current directory)
+- `FRONTEND_DIR` - Frontend subdirectory (default: frontend)
+- `BACKEND_DIR` - Backend subdirectory (default: backend)
+- `DB_COMPOSE` - Docker compose file (default: docker-compose.yml)
+
+**Windows:**
+1. **frontend** - Dev server + logs/tests
+2. **backend** - API server + console
+3. **database** - Docker Compose database services
+4. **tools** - Git + build + API testing
+5. **monitor** - System resources + containers
+
+```bash
+FRONTEND_DIR=web BACKEND_DIR=api tmuxinator start web-dev
+```
+
+---
+
+#### 3. Data Science (data-science.yml)
+
+Data analysis and machine learning workflows.
+
+**Features:**
+- Jupyter Lab/Notebook auto-start
+- IPython REPL with helpful commands
+- MLflow and TensorBoard integration
+- GPU monitoring (if available)
+- Virtual environment auto-activation
+
+**Environment Variables:**
+- `PROJECT_ROOT` - Project directory (default: current directory)
+- `NOTEBOOK_PORT` - Jupyter port (default: 8888)
+- `DATA_DIR` - Data directory (default: data)
+
+**Windows:**
+1. **jupyter** - Jupyter Lab/Notebook + IPython REPL
+2. **analysis** - Scripts + data exploration
+3. **visualization** - Streamlit/Dash/Panel servers
+4. **data** - Database + ETL pipeline
+5. **experiment** - MLflow + TensorBoard
+6. **monitor** - GPU + system resources
+
+```bash
+NOTEBOOK_PORT=9999 tmuxinator start data-science
+```
+
+---
+
+#### 4. Debugging (debug.yml)
+
+Comprehensive debugging environment for multiple languages.
+
+**Features:**
+- Auto-detects debugger for Node.js/Python/Go/Rust
+- Log file monitoring (app + error logs)
+- Network traffic monitoring
+- CPU and memory profiling
+- Breakpoint management
+
+**Environment Variables:**
+- `PROJECT_ROOT` - Project directory (default: current directory)
+- `DEBUG_PORT` - Debugger port (language-specific defaults)
+- `APP_COMMAND` - Application start command
+
+**Windows:**
+1. **application** - App in debug mode + debugger REPL
+2. **logs** - Application logs + error logs
+3. **network** - Network monitor + HTTP traffic
+4. **profiler** - CPU + memory + process monitor
+5. **database** - Database inspector
+6. **breakpoints** - Breakpoint manager
+
+```bash
+APP_COMMAND="python -m debugpy --listen 5678 main.py" tmuxinator start debug
+```
+
+---
+
+### Template Customization
+
+All templates support local customization:
+
+1. **Copy to home directory** (done automatically by `make install-tmux`):
+   ```bash
+   cp ~/dotfiles/config/tmux/tmuxinator/*.yml ~/.tmuxinator/
+   ```
+
+2. **Edit templates:**
+   ```bash
+   tmuxinator edit ai-dev
+   ```
+
+3. **Create project-specific templates:**
+   ```bash
+   # Copy and modify
+   cp ~/.tmuxinator/web-dev.yml ~/.tmuxinator/myproject.yml
+   tmuxinator edit myproject
+   ```
 
 ## Platform-Specific Features
 

@@ -1,0 +1,123 @@
+# Web Development Session Template
+#
+# Usage:
+#   tmuxinator start web-dev
+#
+# Environment variables (optional):
+#   PROJECT_ROOT - Project directory (default: current directory)
+#   FRONTEND_DIR - Frontend subdirectory (default: frontend)
+#   BACKEND_DIR  - Backend subdirectory (default: backend)
+#   DB_COMPOSE   - Docker compose file for database (default: docker-compose.yml)
+
+name: web-dev
+root: <%= ENV['PROJECT_ROOT'] || '.' %>
+
+# Optional: Run commands before starting tmux session
+# pre_window: rbenv shell 2.0.0-p247
+
+windows:
+  - frontend:
+      layout: main-vertical
+      panes:
+        # Frontend dev server
+        - title: "Dev Server"
+          command: |
+            cd <%= ENV['FRONTEND_DIR'] || 'frontend' %>
+            # Auto-detect and start frontend dev server
+            if [ -f "package.json" ]; then
+              npm run dev || npm start
+            elif [ -f "vite.config.js" ] || [ -f "vite.config.ts" ]; then
+              npm run dev
+            else
+              echo "No frontend dev server detected. Start manually."
+              exec $SHELL
+            fi
+        # Frontend logs/tests
+        - title: "Tests/Logs"
+          command: |
+            cd <%= ENV['FRONTEND_DIR'] || 'frontend' %>
+            echo "Frontend workspace ready"
+            echo "Run: npm test (tests) | npm run lint (linting)"
+            exec $SHELL
+
+  - backend:
+      layout: main-vertical
+      panes:
+        # Backend server
+        - title: "API Server"
+          command: |
+            cd <%= ENV['BACKEND_DIR'] || 'backend' %>
+            # Auto-detect and start backend server
+            if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              # Python backend
+              if [ -d ".venv" ]; then
+                source .venv/bin/activate
+              fi
+              python -m uvicorn main:app --reload || python app.py || flask run
+            elif [ -f "package.json" ]; then
+              # Node.js backend
+              npm run dev || npm start
+            elif [ -f "go.mod" ]; then
+              # Go backend
+              go run main.go
+            else
+              echo "No backend server detected. Start manually."
+              exec $SHELL
+            fi
+        # Backend logs/REPL
+        - title: "Console"
+          command: |
+            cd <%= ENV['BACKEND_DIR'] || 'backend' %>
+            echo "Backend workspace ready"
+            exec $SHELL
+
+  - database:
+      panes:
+        # Database services (Docker Compose)
+        - title: "Database"
+          command: |
+            if [ -f "<%= ENV['DB_COMPOSE'] || 'docker-compose.yml' %>" ]; then
+              echo "Starting database services..."
+              docker compose -f <%= ENV['DB_COMPOSE'] || 'docker-compose.yml' %> up
+            else
+              echo "No docker-compose.yml found"
+              echo "Database services not started"
+              exec $SHELL
+            fi
+
+  - tools:
+      layout: tiled
+      panes:
+        # Git operations
+        - title: "Git"
+          command: |
+            git status
+            exec $SHELL
+        # Build/Deploy
+        - title: "Build"
+          command: |
+            echo "Build workspace ready"
+            echo "Run: npm run build | docker build ..."
+            exec $SHELL
+        # API testing (curl/httpie)
+        - title: "API Test"
+          command: |
+            echo "API testing ready"
+            echo "Tools: curl, httpie, or use tools like Postman"
+            exec $SHELL
+
+  - monitor:
+      layout: even-horizontal
+      panes:
+        # System resources
+        - title: "Resources"
+          command: |
+            if command -v htop >/dev/null; then
+              htop
+            else
+              top
+            fi
+        # Docker containers
+        - title: "Containers"
+          command: |
+            watch -n 2 'docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
