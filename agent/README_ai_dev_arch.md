@@ -155,16 +155,16 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A([Start]) --> B{Profile}
-    B -->|default| C[LLM API 呼び出し可\n npm/pip 可\n gh/CI 実行可]
-    C --> D[AIタスク実行\n(Aider / SWE-agent)]
-    D --> E[ファイル変更・commit]
-    E --> F[push / PR]
+    B -->|default| C["LLM API 呼び出し可<br/>npm/pip 可<br/>gh/CI 実行可"]
+    C --> D["AIタスク実行<br/>(Aider, SWE-agent)"]
+    D --> E["ファイル変更・commit"]
+    E --> F["push / PR"]
 
     B -->|no-net| X{LLM 必須?}
-    X -->|Yes| X1[外部API不可 → 失敗/スキップ]
-    X1 --> X2[代替: ローカルLLM / キャッシュ / ドライラン]
-    X -->|No| Y[静的解析/テスト/ビルド]
-    Y --> Z[成果物は /work に保存]
+    X -->|Yes| X1["外部API不可 → 失敗/スキップ"]
+    X1 --> X2["代替: ローカルLLM / キャッシュ / ドライラン"]
+    X -->|No| Y["静的解析/テスト/ビルド"]
+    Y --> Z["成果物は /work に保存"]
 
     style X1 fill:#FDE2E1,stroke:#C62828
     style Y fill:#E0F2F1,stroke:#00695C
