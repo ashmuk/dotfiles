@@ -436,6 +436,22 @@ services:
 - `.devcontainer` 系設定で環境差を排除し、再現性を確保。
 - `Makefile` は一貫した実行エントリーポイントとして活用。
 
+### 📦 サンプルファイルの配置
+
+プロジェクトへのサンプルファイル配置は `setup_ai_dev_sample.sh` スクリプトを使用:
+
+```bash
+cd /path/to/your/project
+~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
+```
+
+スクリプトは自動的に:
+- サンプルファイルをドット付きファイル名で配置
+- 既存ファイルのバックアップを作成
+- `.env` ファイルを `env.example` から生成
+
+詳細は [`ai_dev/sample/README_ai_dev_sample.md`](./sample/README_ai_dev_sample.md) を参照。
+
 ---
 
 ## 8. まとめ

@@ -66,35 +66,47 @@ cp ~/dotfiles/config/tmux/tmuxinator/ai-dev.yml ~/.tmuxinator/
 
 | サンプルファイル | 配置先 | 主な参照元 |
 |----------------|--------|-----------|
-| `sample/.devcontainer/*` | `<project>/.devcontainer/` | VSCode/Cursor (Reopen in Container) |
-| `sample/.aider.conf.yml` | `<project>/.aider.conf.yml` | Aider (コンテナ内) |
+| `sample/devcontainer/` | `<project>/.devcontainer/` | VSCode/Cursor (Reopen in Container) |
+| `sample/aider.conf.yml` | `<project>/.aider.conf.yml` | Aider (コンテナ内) |
 | `sample/Makefile` | `<project>/Makefile` | ホスト/コンテナ両方 |
-| `sample/.env.example` | `<project>/.env` ※コピー後編集 | docker-compose (環境変数) |
-| `sample/.gitignore` | `<project>/.gitignore` | Git |
-| `sample/.pre-commit-config.yaml` | `<project>/.pre-commit-config.yaml` | pre-commit (コンテナ内) |
-| `sample/.github/workflows/ci.yml` | `<project>/.github/workflows/ci.yml` | GitHub Actions |
+| `sample/env.example` | `<project>/.env` ※コピー後編集 | docker-compose (環境変数) |
+| `sample/gitignore` | `<project>/.gitignore` | Git |
+| `sample/pre-commit-config.yaml` | `<project>/.pre-commit-config.yaml` | pre-commit (コンテナ内) |
+| `sample/github/workflows/ci.yml` | `<project>/.github/workflows/ci.yml` | GitHub Actions |
 
-**配置コマンド例:**
+**注**: サンプルファイルは先頭のドット `.` を外した状態で保存されています。
+
+**配置方法:**
+
+### 方法1: ブートストラップスクリプト使用（推奨）
+```bash
+# プロジェクトルートに移動
+cd ~/work/your-project
+
+# スクリプトを実行（自動的にドット付きファイル名で展開）
+~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
+```
+
+### 方法2: 手動コピー
 ```bash
 # プロジェクトルートに移動
 cd ~/work/your-project
 
 # DevContainer 設定
-cp -r ~/dotfiles/ai_dev/sample/.devcontainer .
+cp -r ~/dotfiles/ai_dev/sample/devcontainer .devcontainer
 
 # AI/開発ツール設定
-cp ~/dotfiles/ai_dev/sample/.aider.conf.yml .
+cp ~/dotfiles/ai_dev/sample/aider.conf.yml .aider.conf.yml
 cp ~/dotfiles/ai_dev/sample/Makefile .
-cp ~/dotfiles/ai_dev/sample/.gitignore .
-cp ~/dotfiles/ai_dev/sample/.pre-commit-config.yaml .
+cp ~/dotfiles/ai_dev/sample/gitignore .gitignore
+cp ~/dotfiles/ai_dev/sample/pre-commit-config.yaml .pre-commit-config.yaml
 
 # 環境変数（.envは編集が必要）
-cp ~/dotfiles/ai_dev/sample/.env.example .env
-echo ".env" >> .gitignore  # 念のため確認
+cp ~/dotfiles/ai_dev/sample/env.example .env
 
 # GitHub Actions
 mkdir -p .github/workflows
-cp ~/dotfiles/ai_dev/sample/.github/workflows/ci.yml .github/workflows/
+cp ~/dotfiles/ai_dev/sample/github/workflows/ci.yml .github/workflows/
 ```
 
 ---
@@ -143,35 +155,15 @@ tmux source-file ~/.tmux.conf
 # プロジェクトディレクトリへ移動
 cd ~/work/your-project
 
-# 一括コピースクリプト（推奨）
-cat << 'EOF' > /tmp/setup-ai-dev.sh
-#!/bin/bash
-set -e
-
-DOTFILES=~/dotfiles/ai_dev/sample
-
-# DevContainer
-cp -r $DOTFILES/.devcontainer .
-
-# AI/開発設定
-cp $DOTFILES/.aider.conf.yml .
-cp $DOTFILES/Makefile .
-cp $DOTFILES/.gitignore .
-cp $DOTFILES/.pre-commit-config.yaml .
-
-# 環境変数
-cp $DOTFILES/.env.example .env
-
-# GitHub Actions
-mkdir -p .github/workflows
-cp $DOTFILES/.github/workflows/ci.yml .github/workflows/
-
-echo "✅ Setup complete! Edit .env to add your API keys."
-EOF
-
-chmod +x /tmp/setup-ai-dev.sh
-/tmp/setup-ai-dev.sh
+# ブートストラップスクリプトを実行（推奨）
+~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
 ```
+
+スクリプトは以下を自動的に行います:
+- 既存ファイルのバックアップ
+- 設定ファイルの配置（適切なドット付きファイル名で）
+- `.env` ファイルの作成
+- 次のステップの表示
 
 ### ステップ 3: 環境変数の設定
 
