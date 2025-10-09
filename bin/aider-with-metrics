@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# aider-with-metrics - Wrapper for Aider with API usage tracking
+#
+# Usage:
+#   aider-with-metrics [aider options]
+#
+# Environment variables:
+#   METRICS_DIR - Directory to store metrics (default: ./.metrics)
+#   AIDER_MODEL - Model name for cost calculation
+
+set -euo pipefail
+
+# Configuration
+METRICS_DIR="${METRICS_DIR:-./.metrics}"
+METRICS_FILE="${METRICS_DIR}/aider_usage.jsonl"
+SESSION_ID="$(date +%Y%m%d_%H%M%S)_$$"
+START_TIME=$(date +%s)
+
+# Model pricing (per 1M tokens) - Update as needed
+declare -A INPUT_PRICES=(
+    ["claude-4.5-sonnet"]="3.00"
+    ["claude-sonnet-4-5-20250929"]="3.00"
+    ["claude-3-5-sonnet-20241022"]="3.00"
+    ["gpt-4-turbo"]="10.00"
+    ["gpt-4o"]="5.00"
+    ["gpt-3.5-turbo"]="0.50"
+)
+
+declare -A OUTPUT_PRICES=(
+    ["claude-4.5-sonnet"]="15.00"
+    ["claude-sonnet-4-5-20250929"]="15.00"
+    ["claude-3-5-sonnet-20241022"]="15.00"
+    ["gpt-4-turbo"]="30.00"
+    ["gpt-4o"]="15.00"
+    ["gpt-3.5-turbo"]="1.50"
+)
+
+# Ensure metrics directory exists
+mkdir -p "$METRICS_DIR"
+
+# Create temporary log file for Aider output
+TEMP_LOG=$(mktemp)
+trap 'rm -f "$TEMP_LOG"' EXIT
+
+# Get model from arguments or environment
+MODEL="${AIDER_MODEL:-claude-4.5-sonnet}"
+for arg in "$@"; do
+    if [[ "$arg" == --model=* ]]; then
+        MODEL="${arg#--model=}"
+    elif [[ "$prev_arg" == "--model" ]]; then
+        MODEL="$arg"
+    fi
+    prev_arg="$arg"
+done
+
+echo "=== Aider Session Started ==="
+echo "Session ID: $SESSION_ID"
+echo "Model: $MODEL"
+echo "Metrics: $METRICS_FILE"
+echo ""
+
+# Run Aider with output capture
+aider "$@" 2>&1 | tee "$TEMP_LOG"
+EXIT_CODE=${PIPESTATUS[0]}
+
+# Calculate duration
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# Extract token usage from Aider output
+# Aider typically outputs: "Tokens: 1234 sent, 5678 received, cost: $0.12"
+INPUT_TOKENS=$(grep -oP 'Tokens: \K[0-9]+(?= sent)' "$TEMP_LOG" | tail -1 || echo "0")
+OUTPUT_TOKENS=$(grep -oP '[0-9]+(?= received)' "$TEMP_LOG" | tail -1 || echo "0")
+COST=$(grep -oP 'cost: \$\K[0-9.]+' "$TEMP_LOG" | tail -1 || echo "0")
+
+# If cost not found, calculate it manually
+if [[ "$COST" == "0" ]] && [[ "$INPUT_TOKENS" != "0" ]] || [[ "$OUTPUT_TOKENS" != "0" ]]; then
+    INPUT_PRICE="${INPUT_PRICES[$MODEL]:-0}"
+    OUTPUT_PRICE="${OUTPUT_PRICES[$MODEL]:-0}"
+
+    # Calculate cost: (tokens / 1M) * price_per_1M
+    COST=$(awk "BEGIN {printf \"%.4f\", ($INPUT_TOKENS/1000000.0)*$INPUT_PRICE + ($OUTPUT_TOKENS/1000000.0)*$OUTPUT_PRICE}")
+fi
+
+# Extract git commits made during session
+COMMITS=$(git log --since="$START_TIME seconds ago" --oneline 2>/dev/null | wc -l || echo "0")
+
+# Extract files modified
+FILES_MODIFIED=$(git diff --name-only HEAD~${COMMITS}..HEAD 2>/dev/null | wc -l || echo "0")
+
+# Write metrics to JSONL file
+cat >> "$METRICS_FILE" <<EOF
+{"timestamp":"$(date -u +%Y-%m-%dT%H:%M:%SZ)","session_id":"$SESSION_ID","model":"$MODEL","duration_seconds":$DURATION,"input_tokens":$INPUT_TOKENS,"output_tokens":$OUTPUT_TOKENS,"total_tokens":$((INPUT_TOKENS + OUTPUT_TOKENS)),"cost_usd":$COST,"commits":$COMMITS,"files_modified":$FILES_MODIFIED,"exit_code":$EXIT_CODE}
+EOF
+
+echo ""
+echo "=== Session Metrics ==="
+echo "Duration: ${DURATION}s"
+echo "Input tokens: $INPUT_TOKENS"
+echo "Output tokens: $OUTPUT_TOKENS"
+echo "Total tokens: $((INPUT_TOKENS + OUTPUT_TOKENS))"
+echo "Cost: \$$COST"
+echo "Commits: $COMMITS"
+echo "Files modified: $FILES_MODIFIED"
+
+exit $EXIT_CODE

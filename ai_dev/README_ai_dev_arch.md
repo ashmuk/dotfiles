@@ -235,6 +235,29 @@ tmux ls
 tmux attach -t dev
 ```
 
+### 6.5 API 使用量とコストの監視
+
+AI 開発では API コストの把握が重要です。メトリクスシステムを使用して自動的に追跡できます：
+
+```bash
+# メトリクス付きで Aider を実行
+aider-with-metrics --message "リファクタリング" --yes
+
+# 使用状況の確認
+make metrics          # サマリー表示
+make metrics-today    # 今日の使用量
+make metrics-watch    # リアルタイム監視
+```
+
+**収集されるメトリクス**:
+- トークン使用量（入力/出力）
+- API コスト（USD）
+- セッション時間
+- コミット数、変更ファイル数
+- 使用モデル
+
+詳細は [`README_metrics.md`](./README_metrics.md) を参照。
+
 ### 6.4 Aider を選択する理由と他ツールとの比較
 
 #### Aider を選ぶ主な理由

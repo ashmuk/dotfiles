@@ -56,17 +56,25 @@ windows:
             CONTAINER=<%= ENV['CONTAINER_CMD'] || 'devcontainer' %>
             MODEL=<%= ENV['AIDER_MODEL'] || 'claude-4.5-sonnet' %>
 
-            echo "=== Aider AI Assistant ==="
+            echo "=== Aider AI Assistant (with metrics tracking) ==="
             echo "Model: $MODEL"
             echo "Project: $PROJECT_TYPE"
             echo ""
 
             if command -v $CONTAINER >/dev/null; then
-              # Run inside container
-              $CONTAINER exec bash -c "aider --model $MODEL" || \
-              $CONTAINER exec make aider-refactor
+              # Run inside container with metrics
+              if command -v aider-with-metrics >/dev/null; then
+                $CONTAINER exec bash -c "aider-with-metrics --model $MODEL" || \
+                $CONTAINER exec make aider-refactor
+              else
+                $CONTAINER exec bash -c "aider --model $MODEL" || \
+                $CONTAINER exec make aider-refactor
+              fi
+            elif command -v aider-with-metrics >/dev/null; then
+              # Run on host with metrics
+              aider-with-metrics --model $MODEL
             elif command -v aider >/dev/null; then
-              # Run on host
+              # Fallback to regular aider
               aider --model $MODEL
             else
               echo "Aider not found. Install with: pip install aider-chat"
@@ -176,8 +184,29 @@ windows:
             esac
 
   - monitor:
-      layout: even-horizontal
+      layout: tiled
       panes:
+        # API Usage Metrics
+        - title: "API Metrics"
+          command: |
+            if command -v aider-metrics >/dev/null; then
+              echo "=== Aider API Usage Metrics ==="
+              echo "Watching metrics... (refreshes every 10s)"
+              echo ""
+              while true; do
+                clear
+                aider-metrics summary 2>/dev/null || {
+                  echo "No metrics yet. Run aider-with-metrics to start tracking."
+                  echo ""
+                  echo "Quick stats will appear here after first session."
+                }
+                sleep 10
+              done
+            else
+              echo "aider-metrics not found"
+              echo "Ensure ~/dotfiles/bin is in PATH"
+              exec $SHELL
+            fi
         # PR status monitoring
         - title: "PR Status"
           command: |

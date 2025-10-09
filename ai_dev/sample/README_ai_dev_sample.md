@@ -227,9 +227,33 @@ docker compose --profile no-net up
 ### tmux レイアウト変更
 `~/.tmuxinator/ai-dev.yml` を編集してペイン構成をカスタマイズ（詳細は `config/tmux/README_tmux.md` 参照）
 
+## 📊 API 使用量の監視
+
+このサンプル環境には、Aider の API 使用量とコストを追跡するメトリクスシステムが統合されています。
+
+### 基本的な使い方
+
+```bash
+# メトリクス付きで Aider を実行
+make aider-plan       # または make aider-refactor
+
+# 使用状況の確認
+make metrics          # サマリー表示
+make metrics-today    # 今日の使用量
+make metrics-watch    # リアルタイム監視
+```
+
+### tmuxinator 統合
+
+`tmuxinator start ai-dev` で起動すると、メトリクス監視ペインが自動的に含まれます：
+- Window 4 (monitor) の API Metrics ペインで 10 秒ごとに自動更新
+
+詳細は [`README_metrics.md`](../README_metrics.md) を参照。
+
 ## 📚 参考ドキュメント
 
 - [AI Agent × DevContainer × tmux Architecture](../README_ai_dev_arch.md)
+- [API Usage Metrics](../README_metrics.md) ⭐NEW
 - [Aider 公式ドキュメント](https://aider.chat/)
 - [DevContainers 公式ドキュメント](https://containers.dev/)
 
