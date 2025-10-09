@@ -96,8 +96,8 @@ alias gl='git log' # also defined in Oh!MyZsh
 alias glo='git log --oneline'
 alias gd='git diff' # also defined in Oh!MyZsh
 alias gds='git diff --staged'
-alias gdcn='git diff --cached --nameonly'
-alias gdsn='git diff --staged --nameonly'
+alias gdcn='git diff --cached --name-only'
+alias gdsn='git diff --staged --name-only'
 
 # リモート関連 (Remote related)
 alias gr='git remote' # also defined in Oh!MyZsh
