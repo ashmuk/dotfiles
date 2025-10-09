@@ -31,14 +31,31 @@ validate_required_commands ln || exit 1
 PLATFORM=$(detect_platform)
 print_status "Detected platform: $PLATFORM"
 
-# Create symlinks in home directory
+# Create symlinks and deploy tmuxinator templates
 create_symlinks() {
     print_status "Creating symbolic links in home directory..."
 
     # Create symlink to tmux configuration
     ln -sf "$DOTFILES_DIR/config/tmux/tmux.conf" "$HOME/.tmux.conf"
 
-    print_success "Symbolic links created in home directory"
+    # Deploy tmuxinator templates if directory exists
+    if [[ -d "$DOTFILES_DIR/config/tmux/tmuxinator" ]]; then
+        print_status "Deploying tmuxinator templates..."
+        mkdir -p "$HOME/.tmuxinator"
+
+        # Copy all YAML files from tmuxinator directory
+        for template in "$DOTFILES_DIR/config/tmux/tmuxinator"/*.yml; do
+            if [[ -f "$template" ]]; then
+                local template_name=$(basename "$template")
+                cp "$template" "$HOME/.tmuxinator/$template_name"
+                print_status "  - Deployed tmuxinator template: $template_name"
+            fi
+        done
+
+        print_success "Tmuxinator templates deployed"
+    fi
+
+    print_success "Symbolic links and templates deployed"
 }
 
 # Backup existing files
@@ -99,14 +116,27 @@ main() {
 
     print_success "Tmux configuration setup completed!"
     print_status ""
-    print_status "Symlinks created in home directory:"
-    print_status "  - $HOME/.tmux.conf"
+    print_status "Files deployed:"
+    print_status "  - $HOME/.tmux.conf (symlink)"
+    if [[ -d "$HOME/.tmuxinator" ]]; then
+        print_status "  - $HOME/.tmuxinator/ (tmuxinator templates)"
+        # List deployed templates
+        for template in "$HOME/.tmuxinator"/*.yml; do
+            if [[ -f "$template" ]]; then
+                print_status "    - $(basename "$template")"
+            fi
+        done
+    fi
     print_status ""
     print_status "Next steps:"
     if ! command -v tmux >/dev/null 2>&1; then
         print_status "  - Install tmux: brew install tmux (macOS) or apt install tmux (Linux)"
     fi
+    if ! command -v tmuxinator >/dev/null 2>&1; then
+        print_status "  - Install tmuxinator: gem install tmuxinator"
+    fi
     print_status "  - Start a new tmux session: tmux new-session"
+    print_status "  - Start tmuxinator session: tmuxinator start ai-dev"
     print_status "  - Reload config in running session: Ctrl-a + r"
     print_status ""
 

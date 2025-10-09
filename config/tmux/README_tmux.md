@@ -6,8 +6,10 @@ This directory contains tmux configuration files with cross-platform clipboard i
 
 ```
 config/tmux/
-├── setup_tmux.sh       # Installation script for tmux config
+├── setup_tmux.sh       # Installation script for tmux config and tmuxinator templates
 ├── tmux.conf           # Main tmux configuration file
+├── tmuxinator/         # Tmuxinator session templates
+│   └── ai-dev.yml      # AI development session template (4-pane layout)
 └── README_tmux.md      # This documentation file
 ```
 
@@ -106,6 +108,47 @@ Ctrl-a + r
 # Test configuration syntax (before applying)
 tmux -f ~/.tmux.conf list-commands
 ```
+
+### Tmuxinator Session Templates
+
+Tmuxinator provides pre-configured session templates for different workflows. The setup script automatically deploys templates to `~/.tmuxinator/`.
+
+#### AI Development Session (ai-dev.yml)
+
+A 4-pane layout optimized for AI-assisted development workflows:
+
+```bash
+# Start the AI development session
+tmuxinator start ai-dev
+
+# Edit the template
+tmuxinator edit ai-dev
+
+# List available templates
+tmuxinator list
+```
+
+**Pane Layout:**
+1. **compose** - Docker Compose services
+2. **aider** - AI code refactoring (Aider CLI)
+3. **test** - CI/CD and testing
+4. **monitor** - PR status monitoring
+
+**Installation:**
+```bash
+# Install tmuxinator (Ruby gem required)
+gem install tmuxinator
+
+# Or via package manager
+brew install tmuxinator  # macOS
+apt install tmuxinator   # Ubuntu/Debian
+```
+
+**Customization:**
+Edit `~/.tmuxinator/ai-dev.yml` to adjust:
+- Project root directory
+- Commands for each pane
+- Window layout and naming
 
 ## Platform-Specific Features
 

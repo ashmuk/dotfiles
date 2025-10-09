@@ -250,11 +250,11 @@ install-git: validate ## Install git configuration
 	@echo "$(GREEN)[SUCCESS]$(NC) Git configuration installed"
 
 .PHONY: install-tmux
-install-tmux: validate ## Install tmux configuration
-	@echo "$(BLUE)[INFO]$(NC) Installing tmux configuration..."
+install-tmux: validate ## Install tmux configuration and tmuxinator templates
+	@echo "$(BLUE)[INFO]$(NC) Installing tmux configuration and tmuxinator templates..."
 	@chmod +x $(DOTFILES_DIR)/config/tmux/setup_tmux.sh
 	@$(DOTFILES_DIR)/config/tmux/setup_tmux.sh
-	@echo "$(GREEN)[SUCCESS]$(NC) Tmux configuration installed"
+	@echo "$(GREEN)[SUCCESS]$(NC) Tmux configuration and tmuxinator templates installed"
 
 .PHONY: install-claude
 install-claude: validate ## Install Claude configuration
