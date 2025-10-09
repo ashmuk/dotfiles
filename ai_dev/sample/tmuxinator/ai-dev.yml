@@ -1,0 +1,15 @@
+name: ai-dev
+root: ~/work/repo
+windows:
+  - name: compose
+    panes:
+      - docker compose up
+  - name: aider
+    panes:
+      - devcontainer exec make aider-refactor
+  - name: test
+    panes:
+      - devcontainer exec make ci-local
+  - name: monitor
+    panes:
+      - gh pr status --watch
