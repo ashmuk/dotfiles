@@ -325,7 +325,7 @@ tmuxinator start ai-dev
 
 #### `.aider.conf.yml`
 ```yaml
-model: claude-3.5-sonnet
+model: claude-4.5-sonnet
 max_tokens: 4096
 git: true
 auto_commit: true
@@ -351,7 +351,7 @@ ci-local:
 	act pull_request -j check
 
 swe-fix:
-	python -m swe_agent --issue-url "$$ISSUE_URL" --model "claude-3-5-sonnet"
+	python -m swe_agent --issue-url "$$ISSUE_URL" --model "claude-4-5-sonnet"
 ```
 
 #### `.devcontainer/devcontainer.json`
