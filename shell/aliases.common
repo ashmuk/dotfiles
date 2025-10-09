@@ -32,24 +32,38 @@ alias ds='dirs -v'
 # =============================================================================
 # tmux Aliases
 # =============================================================================
-alias tm='tmux -2'
-alias tx='tmux -2'
+
+# --- tmux aliases ---
 alias tmux='tmux -2'
-alias tmpane="tmux list-panes -aF '#S:#I.#P #{pane_title} #{pane_current_command}'"
+alias tm='tmux -2'
 
 default_tmux_session='dev'
-alias tmn='tmux new-session -s ${default_tmux_session}'
-alias tma='tmux attach-session -t ${default_tmux_session}'
-alias tml='tmux list-sessions'
-alias tmkill='tmux kill-session -t ${default_tmux_session}'
-alias tmkillall='tmux kill-server'
-alias tmux-new='tmux new-session -s ${default_tmux_session}'
-alias tmux-attach='tmux attach-session -t ${default_tmux_session}'
-alias tmux-list='tmux list-sessions'
-alias tmux-kill='tmux kill-session -t ${default_tmux_session}'
-alias tmux-killall='tmux kill-server'
+# Connect session
+alias ta='tmux attach -t'
+alias tadev='tmux attach-session -t ${default_tmux_session}'
+# New session
+alias tn='tmux new -s'
+alias tndev='tmux new-session -s ${default_tmux_session}'
+# Show sessions
+alias tl='tmux list-sessions'
+# Kill session
+alias tk='tmux kill-session -t'
+alias tkdev='tmux kill-session -t ${default_tmux_session}'
+# Reload
+alias trel='tmux source-file ~/.tmux.conf && echo "Reloaded tmux.conf"'
 
-alias tmdev='tmux new-session -s ${default_tmux_session}\; \
+# --- tmuxinator aliases ---
+alias tx='tmuxinator start'        # Launch project
+alias txl='tmuxinator list'        # Show regisetered list
+alias txe='tmuxinator edit'        # Edit setting
+alias txn='tmuxinator new'         # New project
+alias txd='tmuxinator delete'      # Delete project
+alias txr='tmuxinator start dev-env' # dev-env: shortcut to launch
+
+# --- tmux + tmuxinator utility ---
+alias tclean='tmux kill-server && echo "Killed all tmux sessions."'
+alias tpane="tmux list-panes -aF '#S:#I.#P #{pane_title} #{pane_current_command}'"
+alias td='tmux new-session -s ${default_tmux_session}\; \
   split-window -v -p 75 \; \
   split-window -h -p 65 \; \
   split-window -t 0.1 -v -p 80\; \
