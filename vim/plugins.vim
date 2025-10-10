@@ -113,6 +113,9 @@ Plug 'jiangmiao/auto-pairs'         " Auto-close brackets
 Plug 'godlygeek/tabular'           " Text alignment
 Plug 'easymotion/vim-easymotion'   " Quick cursor movement
 
+" Markdown support
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npm install' }
+
 call plug#end()
 
 "---------------------------------------------------------------------------
@@ -165,6 +168,14 @@ let g:EasyMotion_startofline = 0 " Keep cursor column when JK motion
 let g:EasyMotion_use_upper = 1   " Use uppercase letters for labels
 let g:EasyMotion_keys = 'ASDGHKLQWERTYUIOPZXCVBNMFJ;'
 let g:EasyMotion_use_smartsign_us = 1 " Smart sign matching
+
+" Markdown Preview configuration
+let g:mkdp_auto_start = 1
+let g:mkdp_browser = 'Google Chrome'
+let g:mkdp_preview_options = {
+  \ 'custom_js': ['https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js'],
+  \ 'custom_script': 'mermaid.initialize({startOnLoad:true});'
+  \ }
 
 "---------------------------------------------------------------------------
 " Plugin-related key mappings
