@@ -170,7 +170,7 @@ let g:EasyMotion_keys = 'ASDGHKLQWERTYUIOPZXCVBNMFJ;'
 let g:EasyMotion_use_smartsign_us = 1 " Smart sign matching
 
 " Markdown Preview configuration
-let g:mkdp_auto_start = 1
+let g:mkdp_auto_start = 0
 let g:mkdp_browser = 'Google Chrome'
 let g:mkdp_preview_options = {
   \ 'custom_js': ['https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js'],
