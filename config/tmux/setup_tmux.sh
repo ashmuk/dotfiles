@@ -38,21 +38,11 @@ create_symlinks() {
     # Create symlink to tmux configuration
     ln -sf "$DOTFILES_DIR/config/tmux/tmux.conf" "$HOME/.tmux.conf"
 
-    # Deploy tmuxinator templates if directory exists
+    # Create symlink for tmuxinator directory if it exists
     if [[ -d "$DOTFILES_DIR/config/tmux/tmuxinator" ]]; then
-        print_status "Deploying tmuxinator templates..."
-        mkdir -p "$HOME/.tmuxinator"
-
-        # Copy all YAML files from tmuxinator directory
-        for template in "$DOTFILES_DIR/config/tmux/tmuxinator"/*.yml; do
-            if [[ -f "$template" ]]; then
-                local template_name=$(basename "$template")
-                cp "$template" "$HOME/.tmuxinator/$template_name"
-                print_status "  - Deployed tmuxinator template: $template_name"
-            fi
-        done
-
-        print_success "Tmuxinator templates deployed"
+        print_status "Creating symlink for tmuxinator templates directory..."
+        ln -sfn "$DOTFILES_DIR/config/tmux/tmuxinator" "$HOME/.tmuxinator"
+        print_success "Tmuxinator directory symlinked"
     fi
 
     print_success "Symbolic links and templates deployed"
