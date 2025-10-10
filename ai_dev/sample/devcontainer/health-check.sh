@@ -97,7 +97,8 @@ check_tool() {
   local required=$2
   print_check "$tool"
   if command -v "$tool" >/dev/null 2>&1; then
-    local version=$(${tool} --version 2>&1 | head -1 || echo "unknown")
+    local version
+    version=$(${tool} --version 2>&1 | head -1 || echo "unknown")
     print_pass
     print_info "$version"
   else
@@ -164,7 +165,8 @@ check_file() {
   print_check "$file"
   if [ -f "$file" ]; then
     print_pass
-    local size=$(du -h "$file" | cut -f1)
+    local size
+    size=$(du -h "$file" | cut -f1)
     print_info "Size: $size"
   else
     if [ "$required" = "true" ]; then
@@ -209,7 +211,7 @@ if command -v aider >/dev/null 2>&1; then
     print_pass
 
     if command -v yq >/dev/null 2>&1; then
-      local model=$(yq -r '.model // empty' .aider.conf.yml 2>/dev/null)
+      model=$(yq -r '.model // empty' .aider.conf.yml 2>/dev/null)
       [ -n "$model" ] && print_info "Model: $model"
     fi
   fi
@@ -239,7 +241,7 @@ fi
 print_check "Git repository"
 if git rev-parse --git-dir >/dev/null 2>&1; then
   print_pass
-  local branch=$(git branch --show-current 2>/dev/null || echo "detached")
+  branch=$(git branch --show-current 2>/dev/null || echo "detached")
   print_info "Branch: $branch"
 else
   print_warn "Not a git repository"
