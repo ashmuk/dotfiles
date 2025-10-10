@@ -7,10 +7,11 @@
 ## 📋 目次
 
 1. [概要](#概要)
-2. [ファイル配置マップ](#ファイル配置マップ)
-3. [セットアップ手順](#セットアップ手順)
-4. [ファイル詳細](#ファイル詳細)
-5. [トラブルシューティング](#トラブルシューティング)
+2. [前提条件](#前提条件)
+3. [ファイル配置マップ](#ファイル配置マップ)
+4. [セットアップ手順](#セットアップ手順)
+5. [ファイル詳細](#ファイル詳細)
+6. [トラブルシューティング](#トラブルシューティング)
 
 ---
 
@@ -22,6 +23,174 @@
 |---------|------|-----------|
 | **ホスト (macOS)** | UI/対話、オーケストレーション | Cursor/VSCode, tmux, iTerm2 |
 | **コンテナ (DevContainer)** | AI実行、CI/テスト | Aider, SWE-agent, pytest, ruff |
+
+---
+
+## 前提条件
+
+### 必須ツール
+
+AI開発環境を構築する前に、以下のツールがホスト (macOS) にインストールされている必要があります:
+
+#### 1. Docker Desktop
+**用途**: DevContainer の実行環境
+
+**インストール方法**:
+```bash
+# Homebrew を使用
+brew install --cask docker
+
+# または公式サイトからダウンロード
+# https://www.docker.com/products/docker-desktop
+```
+
+**確認**:
+```bash
+docker --version
+docker compose version
+```
+
+#### 2. VSCode または Cursor
+**用途**: DevContainer の起動とコード編集
+
+**インストール方法**:
+```bash
+# VSCode
+brew install --cask visual-studio-code
+
+# Cursor
+brew install --cask cursor
+```
+
+**必須拡張機能**:
+- Dev Containers (`ms-vscode-remote.remote-containers`)
+
+```bash
+# VSCode の場合
+code --install-extension ms-vscode-remote.remote-containers
+```
+
+#### 3. tmux
+**用途**: マルチペイン開発環境の構築
+
+**インストール方法**:
+```bash
+brew install tmux
+```
+
+**確認**:
+```bash
+tmux -V
+```
+
+#### 4. tmuxinator
+**用途**: tmux セッション管理
+
+**インストール方法**:
+```bash
+# Ruby gem 経由
+gem install tmuxinator
+
+# または Homebrew 経由
+brew install tmuxinator
+```
+
+**確認**:
+```bash
+tmuxinator version
+```
+
+#### 5. GitHub CLI (gh)
+**用途**: PR ステータス監視、リポジトリ操作
+
+**インストール方法**:
+```bash
+brew install gh
+
+# 認証
+gh auth login
+```
+
+**確認**:
+```bash
+gh --version
+gh auth status
+```
+
+#### 6. Git
+**用途**: バージョン管理
+
+**インストール方法**:
+```bash
+# macOS 標準で含まれている場合が多い
+# または Homebrew 経由で最新版をインストール
+brew install git
+```
+
+**確認**:
+```bash
+git --version
+```
+
+### 推奨ツール
+
+以下は必須ではありませんが、快適な開発環境のために推奨されます:
+
+#### 1. Homebrew
+**用途**: パッケージ管理
+
+**インストール方法**:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+#### 2. direnv
+**用途**: プロジェクト単位の環境変数管理
+
+**インストール方法**:
+```bash
+brew install direnv
+
+# シェル設定に追加 (.zshrc または .bashrc)
+eval "$(direnv hook zsh)"  # zsh の場合
+eval "$(direnv hook bash)" # bash の場合
+```
+
+### API キー
+
+以下の API キーを事前に取得しておくことを推奨します:
+
+| サービス | 用途 | 取得URL |
+|---------|------|---------|
+| **Anthropic API Key** | Claude モデル使用 (Aider) | https://console.anthropic.com/ |
+| **OpenAI API Key** | GPT モデル使用 (Aider) | https://platform.openai.com/ |
+| **GitHub Token** | gh CLI 認証、API アクセス | `gh auth login` で取得 |
+
+**注**: API キーは `.env` ファイルに保存しますが、セットアップスクリプト実行後に手動で編集する必要があります。
+
+### システム要件
+
+| 項目 | 最小要件 | 推奨 |
+|------|---------|------|
+| **OS** | macOS 12.0+ | macOS 13.0+ |
+| **RAM** | 8GB | 16GB以上 |
+| **ディスク空き容量** | 10GB | 20GB以上 |
+| **Docker Desktop** | 4.0+ | 最新版 |
+
+### 前提条件チェック
+
+セットアップ前に以下のコマンドで必須ツールがインストールされているか確認できます:
+
+```bash
+# 簡易チェック
+command -v docker && echo "✓ Docker installed" || echo "✗ Docker missing"
+command -v tmux && echo "✓ tmux installed" || echo "✗ tmux missing"
+command -v tmuxinator && echo "✓ tmuxinator installed" || echo "✗ tmuxinator missing"
+command -v gh && echo "✓ GitHub CLI installed" || echo "✗ GitHub CLI missing"
+command -v code && echo "✓ VSCode installed" || command -v cursor && echo "✓ Cursor installed" || echo "✗ VSCode/Cursor missing"
+```
+
+**注**: `setup_ai_dev_sample.sh` スクリプトは実行時に自動的に前提条件をチェックします。
 
 ---
 

@@ -31,6 +31,96 @@ if [[ "$PROJECT_ROOT" == "$SCRIPT_DIR" ]]; then
     exit 1
 fi
 
+# Check prerequisites
+check_prerequisites() {
+    echo -e "${BLUE}[INFO]${NC} Checking prerequisites..."
+    local missing_tools=()
+    local warnings=()
+
+    # Required tools
+    if ! command -v docker >/dev/null 2>&1; then
+        missing_tools+=("docker")
+    fi
+
+    if ! command -v git >/dev/null 2>&1; then
+        missing_tools+=("git")
+    fi
+
+    # Check for VSCode or Cursor
+    if ! command -v code >/dev/null 2>&1 && ! command -v cursor >/dev/null 2>&1; then
+        missing_tools+=("vscode or cursor")
+    fi
+
+    # Recommended tools (warnings only)
+    if ! command -v tmux >/dev/null 2>&1; then
+        warnings+=("tmux (required for tmuxinator workflow)")
+    fi
+
+    if ! command -v tmuxinator >/dev/null 2>&1; then
+        warnings+=("tmuxinator (required for AI dev session templates)")
+    fi
+
+    if ! command -v gh >/dev/null 2>&1; then
+        warnings+=("gh (GitHub CLI - required for PR monitoring)")
+    fi
+
+    # Report missing required tools
+    if [[ ${#missing_tools[@]} -gt 0 ]]; then
+        echo -e "${RED}[ERROR]${NC} Missing required tools:"
+        for tool in "${missing_tools[@]}"; do
+            echo -e "  - ${RED}✗${NC} $tool"
+        done
+        echo ""
+        echo -e "${YELLOW}[HELP]${NC} Install missing tools:"
+        for tool in "${missing_tools[@]}"; do
+            case "$tool" in
+                "docker")
+                    echo -e "  brew install --cask docker"
+                    ;;
+                "git")
+                    echo -e "  brew install git"
+                    ;;
+                "vscode or cursor")
+                    echo -e "  brew install --cask visual-studio-code  # or"
+                    echo -e "  brew install --cask cursor"
+                    ;;
+            esac
+        done
+        echo ""
+        echo -e "${BLUE}[INFO]${NC} See $(dirname "$SCRIPT_DIR")/README_ai_dev.md#前提条件 for details"
+        exit 1
+    fi
+
+    # Report warnings for recommended tools
+    if [[ ${#warnings[@]} -gt 0 ]]; then
+        echo -e "${YELLOW}[WARNING]${NC} Missing recommended tools:"
+        for warning in "${warnings[@]}"; do
+            echo -e "  - ${YELLOW}!${NC} $warning"
+        done
+        echo ""
+        echo -e "${YELLOW}[HELP]${NC} Install recommended tools:"
+        echo -e "  brew install tmux tmuxinator gh"
+        echo ""
+        echo -e "${YELLOW}[NOTE]${NC} You can continue without these, but some features will be unavailable"
+        echo ""
+    fi
+
+    # Check Docker daemon
+    if command -v docker >/dev/null 2>&1; then
+        if ! docker info >/dev/null 2>&1; then
+            echo -e "${RED}[ERROR]${NC} Docker daemon is not running"
+            echo -e "${YELLOW}[HELP]${NC} Start Docker Desktop and try again"
+            exit 1
+        fi
+    fi
+
+    echo -e "${GREEN}[✓]${NC} Prerequisites check completed"
+    echo ""
+}
+
+# Run prerequisite check
+check_prerequisites
+
 # Confirm with user
 echo -e "${YELLOW}[CONFIRM]${NC} This will deploy AI development configuration files to:"
 echo -e "  ${PROJECT_ROOT}"
