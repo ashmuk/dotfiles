@@ -1,0 +1,28 @@
+# Tmuxinator Configuration for AI Development Session
+#
+# IMPORTANT: This file is intentionally named 'ai_dev.yml' instead of '.tmuxinator.yml'
+#
+# NAMING SIDE EFFECT WARNING:
+# When a file is named '.tmuxinator.yml' in the project root, running 'tmuxinator --version'
+# will automatically execute this configuration and start the tmux session as a side effect!
+# This causes issues with health checks and diagnostic scripts that simply want to verify
+# tmuxinator is installed without starting development sessions.
+#
+# To use this configuration:
+#   tmuxinator start -p ai_dev.yml
+#   OR
+#   tmuxinator start ai_dev  (if moved to ~/.config/tmuxinator/ai_dev.yml)
+#
+# Session name: ai-dev
+# Purpose: 4-pane development environment with parallel processes
+
+name: ai-dev
+root: .
+windows:
+  - dev:
+      layout: tiled
+      panes:
+        - make run
+        - make test
+        - make aider-refactor
+        - echo "Monitor: use 'gh pr status --watch' after pushing"

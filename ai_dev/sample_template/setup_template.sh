@@ -255,7 +255,7 @@ ${BLUE}Files deployed:${NC}
   dot.github/            → .github/
   dot.vscode/            → .vscode/
   dot.aider.conf.yml     → .aider.conf.yml
-  dot.tmuxinator.yml     → .tmuxinator.yml
+  dot.ai_dev.yml         → ai_dev.yml
   dot.gitignore          → .gitignore
   dot.pre-commit-config.yaml → .pre-commit-config.yaml
   dot.env.example        → .env
@@ -288,7 +288,7 @@ ${BLUE}Next Steps:${NC}
    ${BLUE}make test${NC}
 
 6. ${YELLOW}Start tmux Session:${NC}
-   ${BLUE}tmuxinator start -p .tmuxinator.yml${NC}
+   ${BLUE}tmuxinator start -p ai_dev.yml${NC}
 
 7. ${YELLOW}Try AI-Assisted Development:${NC}
    ${BLUE}make aider-plan${NC}

@@ -66,7 +66,7 @@ echo ""
 echo -e "  ${BLUE}Next steps:${NC}"
 echo -e "    • Run ${GREEN}source /home/vscode/.venv/bin/activate${NC} to activate the venv"
 echo -e "    • Run ${GREEN}make health-check${NC} to verify the environment"
-echo -e "    • Run ${GREEN}tmuxinator start ai-dev${NC} to launch the development session"
+echo -e "    • Run ${GREEN}tmuxinator start -p ai_dev.yml${NC} to launch the development session"
 echo ""
 
 exit 0

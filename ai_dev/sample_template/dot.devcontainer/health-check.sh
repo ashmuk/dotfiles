@@ -198,7 +198,7 @@ check_file() {
 }
 
 check_file ".aider.conf.yml" "false"
-check_file ".tmuxinator.yml" "false"
+check_file "ai_dev.yml" "false"
 check_file "Makefile" "false"
 check_file ".env" "false"
 check_file ".gitignore" "false"
