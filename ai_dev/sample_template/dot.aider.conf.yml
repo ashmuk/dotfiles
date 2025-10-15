@@ -1,4 +1,5 @@
-model: claude-sonnet-4-5-20250929
+model: claude-haiku-4-5-20251001
+  #model: claude-haiku-4-5-20251001
 auto-commits: true
 dirty-commits: true
 edit-format: diff
@@ -11,10 +12,12 @@ show-release-notes: false
 check-update: false
 
 # Weak model for simple tasks
-weak-model: claude-sonnet-4-20250514
+weak-model: claude-haiku-4-5-20251001
 
 # Editor model for applying edits
-editor-model: gpt-5-codex
+editor-model: claude-haiku-4-5-20251001
+  #editor-model: claude-sonnet-4-5-20250929
+  #editor-model: gpt-5-codex
 
 # Auto-include prompt files as read-only context
 read:
