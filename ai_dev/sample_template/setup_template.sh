@@ -8,12 +8,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="${1:-}"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Colors (use $'\033' for proper escape sequence interpretation)
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+BLUE=$'\033[0;34m'
+NC=$'\033[0m'
 
 print_header() {
   echo ""
@@ -225,7 +225,7 @@ print_success "scripts/ directory ready"
 
 # Bootstrap agent configuration
 print_header "Bootstrapping Agent Configuration"
-AGENT_SETUP_SCRIPT="$(dirname "$SCRIPT_DIR")/agent/setup_agent.sh"
+AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/agent/setup_agent.sh"
 if [ -f "$AGENT_SETUP_SCRIPT" ]; then
   print_info "Running agent setup script..."
   bash "$AGENT_SETUP_SCRIPT" "$TARGET_DIR" || print_warning "Agent setup encountered issues (non-critical)"
