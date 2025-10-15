@@ -181,6 +181,13 @@ if [ -f "$SCRIPT_DIR/Makefile" ]; then
   print_success "Makefile copied"
 fi
 
+# Copy requirements.txt (doesn't have dot. prefix)
+if [ -f "$SCRIPT_DIR/requirements.txt" ]; then
+  backup_if_exists "requirements.txt"
+  cp "$SCRIPT_DIR/requirements.txt" requirements.txt
+  print_success "requirements.txt copied"
+fi
+
 # Create .env from dot.env.example
 if [ ! -f ".env" ]; then
   if [ -f "$SCRIPT_DIR/dot.env.example" ]; then
@@ -252,6 +259,7 @@ ${BLUE}Files deployed:${NC}
   dot.pre-commit-config.yaml → .pre-commit-config.yaml
   dot.env.example        → .env
   Makefile               → Makefile
+  requirements.txt       → requirements.txt
   app/                   → app/
   tests/                 → tests/
   prompts/               → prompts/
