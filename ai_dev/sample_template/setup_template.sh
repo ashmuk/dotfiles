@@ -41,7 +41,8 @@ print_error() {
 # Convert dot.* filename to .* (hidden)
 convert_dotname() {
   local src="$1"
-  local basename=$(basename "$src")
+  local basename
+  basename=$(basename "$src")
 
   if [[ "$basename" == dot.* ]]; then
     # Remove 'dot.' prefix and add '.' prefix
