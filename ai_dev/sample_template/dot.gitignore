@@ -56,3 +56,4 @@ logs/
 
 # tmux
 .tmux/
+.aider*

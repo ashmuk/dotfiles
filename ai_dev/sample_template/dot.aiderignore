@@ -1,0 +1,22 @@
+# Aider ignore file
+# Patterns follow .gitignore syntax
+# See: https://aider.chat/docs/config/aiderignore.html
+
+# Version control
+.git/
+
+# Cache directories
+.cache/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Dependencies
+node_modules/
+
+# Virtual environment
+.venv/
+
+# Test coverage reports
+htmlcov/
+.coverage

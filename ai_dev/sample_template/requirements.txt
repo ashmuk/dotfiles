@@ -1,0 +1,21 @@
+# Core Python Dependencies for AI Development Template
+# Generated: 2025-10-15
+
+# Web Framework
+fastapi==0.119.0
+uvicorn==0.37.0
+httpx==0.28.1
+
+# Testing
+pytest==8.4.2
+pytest-cov==6.0.0
+coverage==7.10.7
+
+# Code Quality
+ruff==0.14.0
+
+# AI Development Tool
+aider-chat==0.86.1
+
+# Git Hooks
+pre-commit==4.3.0

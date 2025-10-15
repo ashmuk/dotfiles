@@ -1,10 +1,10 @@
-FROM --platform=linux/arm64 mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install only missing tools (base image already has: git, curl, jq, make, bash, sudo)
 RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
  && apt-get install -y --no-install-recommends \
-      tmux python3 python3-venv python3-pip ruby-full \
+      tmux python3 python3-venv python3-pip ruby-full vim iputils-ping \
  && rm -rf /var/lib/apt/lists/*
 
 # Install tmuxinator (as vscode user)

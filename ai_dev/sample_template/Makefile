@@ -37,7 +37,11 @@ aider-plan:
 	aider --message "Scan the repo and create a test plan at tests/TESTPLAN.md focusing on API health and CRUD coverage" --yes
 
 aider-refactor:
-	aider --message "Refactor app/main.py to add /todos endpoints with in-memory store and make tests pass; keep style with ruff and add missing tests." --yes
+	aider --yes \
+		--read prompts/refactor.md \
+		app/main.py \
+		tests/test_health.py \
+		--message "Refactor app/main.py to add /todos endpoints with in-memory store and make tests pass. Create tests/test_main.py with tests for the new endpoints. Keep style with ruff."
 
 # Local CI with act
 ci-local:

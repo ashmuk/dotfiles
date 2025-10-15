@@ -5,8 +5,6 @@
 # Usage: ./health-check.sh
 # Exit codes: 0 = healthy, 1 = unhealthy
 
-set -e
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -105,12 +103,27 @@ print_header "Development Tools"
 check_tool() {
   local tool=$1
   local required=$2
+  local tool_path=""
+
   print_check "$tool"
+
+  # Check system PATH first
   if command -v "$tool" >/dev/null 2>&1; then
+    tool_path=$(command -v "$tool")
+  # Check virtual environment
+  elif [ -f "/home/vscode/.venv/bin/$tool" ]; then
+    tool_path="/home/vscode/.venv/bin/$tool"
+  fi
+
+  if [ -n "$tool_path" ]; then
     local version
-    version=$(${tool} --version 2>&1 | head -1 || echo "unknown")
+    version=$("$tool_path" --version 2>&1 | head -1 || echo "unknown")
     print_pass
     print_info "$version"
+    # Show location if it's in venv
+    if [[ "$tool_path" == *".venv"* ]]; then
+      print_info "Location: venv"
+    fi
   else
     if [ "$required" = "true" ]; then
       print_fail "Not installed (required)"
@@ -248,21 +261,23 @@ fi
 # 7. Network Connectivity
 print_header "Network Connectivity"
 
-check_connectivity() {
-  local host=$1
+check_http_connectivity() {
+  local url=$1
   local name=$2
   print_check "$name connectivity"
-  if ping -c 1 -W 2 "$host" >/dev/null 2>&1; then
+  if curl -s -o /dev/null --connect-timeout 3 --max-time 5 "$url" 2>/dev/null; then
     print_pass
+    print_info "Reachable via HTTP/HTTPS"
   else
-    print_warn "Cannot reach $host"
+    print_warn "Cannot reach $url"
+    print_info "Check network or firewall settings"
   fi
 }
 
-check_connectivity "8.8.8.8" "Internet"
-check_connectivity "api.anthropic.com" "Anthropic API"
-check_connectivity "api.openai.com" "OpenAI API"
-check_connectivity "github.com" "GitHub"
+check_http_connectivity "https://www.google.com" "Internet"
+check_http_connectivity "https://api.anthropic.com" "Anthropic API"
+check_http_connectivity "https://api.openai.com" "OpenAI API"
+check_http_connectivity "https://github.com" "GitHub"
 
 # 8. Summary
 print_header "Health Check Summary"

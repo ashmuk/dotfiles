@@ -1,4 +1,4 @@
-model: claude-sonnet-4-5-20250514
+model: claude-sonnet-4-5-20250929
 auto-commits: true
 dirty-commits: true
 edit-format: diff
@@ -6,12 +6,11 @@ git: true
 gitignore: true
 suggest-shell-commands: false
 
-exclude:
-  - .git/
-  - .cache/
-  - __pycache__/
-  - node_modules/
-  - .venv/
-  - .pytest_cache/
-  - .ruff_cache/
-  - htmlcov/
+# Auto-include prompt files as read-only context
+read:
+  - prompts/01_basic_setup.md
+  - prompts/02_ai_workflow.md
+  - prompts/03_tmux_integration.md
+  - prompts/04_full_workflow.md
+  - prompts/README_prompts.md
+  - prompts/refactor.md
