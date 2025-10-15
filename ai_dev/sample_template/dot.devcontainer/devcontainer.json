@@ -1,0 +1,32 @@
+{
+  "name": "ai-dev-template",
+  "dockerComposeFile": "compose.yml",
+  "service": "ai-dev-template",
+  "workspaceFolder": "/work",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "timonwong.shellcheck",
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-mermaid",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+  "runArgs": [
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges:true"
+  ],
+  "mounts": [
+    "source=${localWorkspaceFolder}/.cache,target=/home/vscode/.cache,type=bind"
+  ],
+  "postCreateCommand": "bash -c 'python3 -m venv /home/vscode/.venv && /home/vscode/.venv/bin/pip install -U pip fastapi uvicorn pytest ruff httpx aider-chat coverage pre-commit && ln -sf /work/.devcontainer/tmux/tmux.conf /home/vscode/.tmux.conf'",
+  "postStartCommand": "echo 'source /home/vscode/.venv/bin/activate' >> /home/vscode/.bashrc"
+}

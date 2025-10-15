@@ -1,0 +1,196 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Aider: Plan Development",
+      "type": "shell",
+      "command": "make aider-plan",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "detail": "Generate development plan using Aider AI"
+    },
+    {
+      "label": "Aider: Auto-Refactor",
+      "type": "shell",
+      "command": "make aider-refactor",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "detail": "Auto-refactor code using Aider AI"
+    },
+    {
+      "label": "CI: Run Local Tests",
+      "type": "shell",
+      "command": "make ci-local",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "detail": "Run GitHub Actions locally using act"
+    },
+    {
+      "label": "Test: Run All Tests",
+      "type": "shell",
+      "command": "make test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "detail": "Run project tests (pytest)"
+    },
+    {
+      "label": "Lint: Check Code Quality",
+      "type": "shell",
+      "command": "make lint",
+      "problemMatcher": [
+        {
+          "owner": "ruff",
+          "fileLocation": ["relative", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+): (\\w+) (.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        }
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "detail": "Run linter (ruff)"
+    },
+    {
+      "label": "Format: Auto-Format Code",
+      "type": "shell",
+      "command": "make format",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "detail": "Auto-format code (ruff)"
+    },
+    {
+      "label": "Setup: Install Dependencies",
+      "type": "shell",
+      "command": "make setup",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true
+      },
+      "detail": "Install project dependencies and tools"
+    },
+    {
+      "label": "Clean: Remove Build Artifacts",
+      "type": "shell",
+      "command": "make clean",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "Clean build artifacts and cache"
+    },
+    {
+      "label": "Health Check: Verify Environment",
+      "type": "shell",
+      "command": "make health-check",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "detail": "Verify DevContainer environment and dependencies"
+    },
+    {
+      "label": "Pre-commit: Install Hooks",
+      "type": "shell",
+      "command": "make pre-commit-install",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "Install pre-commit git hooks"
+    },
+    {
+      "label": "Pre-commit: Run All Hooks",
+      "type": "shell",
+      "command": "make pre-commit-run",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true
+      },
+      "detail": "Run all pre-commit hooks on all files"
+    }
+  ]
+}

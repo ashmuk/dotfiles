@@ -1,0 +1,17 @@
+model: claude-sonnet-4-5-20250514
+auto-commits: true
+dirty-commits: true
+edit-format: diff
+git: true
+gitignore: true
+suggest-shell-commands: false
+
+exclude:
+  - .git/
+  - .cache/
+  - __pycache__/
+  - node_modules/
+  - .venv/
+  - .pytest_cache/
+  - .ruff_cache/
+  - htmlcov/

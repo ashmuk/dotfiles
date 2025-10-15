@@ -1,0 +1,32 @@
+services:
+  ai-dev-template:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: container-ai-dev-template
+    command: sleep infinity
+    user: vscode
+    working_dir: /work
+    volumes:
+      - ..:/work:rw,cached
+    environment:
+      - OPENAI_API_KEY
+      - ANTHROPIC_API_KEY
+      - GITHUB_TOKEN
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "3.0"
+          memory: "4g"
+    profiles:
+      - default
+
+  dev-nonet:
+    extends: ai-dev-template
+    network_mode: "none"
+    profiles:
+      - no-net
