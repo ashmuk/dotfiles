@@ -22,8 +22,6 @@ services:
         limits:
           cpus: "3.0"
           memory: "4g"
-    profiles:
-      - default
 
   dev-nonet:
     extends: ai-dev-template
