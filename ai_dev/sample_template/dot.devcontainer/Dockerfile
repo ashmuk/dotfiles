@@ -16,8 +16,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
  && npm install -g @devcontainers/cli \
  && rm -rf /var/lib/apt/lists/*
 
-# Install act (GitHub Actions runner) - Go binary for arm64
-RUN curl -fsSL https://github.com/nektos/act/releases/latest/download/act_Linux_arm64.tar.gz -o /tmp/act.tar.gz \
+# Install act (GitHub Actions runner) - Multi-arch compatible
+RUN ARCH=$(dpkg --print-architecture) \
+ && if [ "$ARCH" = "arm64" ]; then ACT_ARCH="arm64"; \
+    elif [ "$ARCH" = "amd64" ]; then ACT_ARCH="x86_64"; \
+    else ACT_ARCH="$ARCH"; fi \
+ && curl -fsSL https://github.com/nektos/act/releases/latest/download/act_Linux_${ACT_ARCH}.tar.gz -o /tmp/act.tar.gz \
  && tar -xzf /tmp/act.tar.gz -C /usr/local/bin act \
  && rm /tmp/act.tar.gz \
  && chmod +x /usr/local/bin/act
