@@ -6,11 +6,11 @@
 
 set -e
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Colors for output (use $'\033' for proper escape sequence interpretation)
+GREEN=$'\033[0;32m'
+BLUE=$'\033[0;34m'
+YELLOW=$'\033[1;33m'
+NC=$'\033[0m' # No Color
 
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -19,7 +19,7 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Step 1: Create Python virtual environment
-echo -e "${BLUE}[1/4]${NC} Creating Python virtual environment..."
+echo -e "${BLUE}[1/5]${NC} Creating Python virtual environment..."
 if [ -d "/home/vscode/.venv" ]; then
     echo -e "${YELLOW}  → Virtual environment already exists, skipping${NC}"
 else
@@ -29,13 +29,13 @@ fi
 
 # Step 2: Upgrade pip
 echo ""
-echo -e "${BLUE}[2/4]${NC} Upgrading pip..."
+echo -e "${BLUE}[2/5]${NC} Upgrading pip..."
 /home/vscode/.venv/bin/pip install -U pip --quiet
 echo -e "${GREEN}  ✓ Pip upgraded${NC}"
 
 # Step 3: Install Python packages from requirements.txt
 echo ""
-echo -e "${BLUE}[3/4]${NC} Installing Python packages..."
+echo -e "${BLUE}[3/5]${NC} Installing Python packages..."
 if [ -f "/work/requirements.txt" ]; then
     echo -e "  → This may take 2-5 minutes on first run..."
     echo -e "  → Installing packages (showing progress):"
@@ -49,12 +49,24 @@ fi
 
 # Step 4: Set up tmux configuration
 echo ""
-echo -e "${BLUE}[4/4]${NC} Setting up tmux configuration..."
+echo -e "${BLUE}[4/5]${NC} Setting up tmux configuration..."
 if [ -f "/work/.devcontainer/tmux/tmux.conf" ]; then
     ln -sf /work/.devcontainer/tmux/tmux.conf /home/vscode/.tmux.conf
     echo -e "${GREEN}  ✓ tmux configuration symlinked${NC}"
 else
     echo -e "${YELLOW}  ⚠ tmux.conf not found, skipping${NC}"
+fi
+
+# Step 5: Enable vi mode in bash
+echo ""
+echo -e "${BLUE}[5/5]${NC} Enabling vi mode in bash..."
+if ! grep -q "set -o vi" /home/vscode/.bashrc; then
+    echo "" >> /home/vscode/.bashrc
+    echo "# Enable vi mode for command line editing" >> /home/vscode/.bashrc
+    echo "set -o vi" >> /home/vscode/.bashrc
+    echo -e "${GREEN}  ✓ vi mode enabled in .bashrc${NC}"
+else
+    echo -e "${YELLOW}  → vi mode already enabled, skipping${NC}"
 fi
 
 # Summary

@@ -5,6 +5,7 @@ edit-format: diff
 git: true
 gitignore: true
 suggest-shell-commands: false
+browser: false
 
 # Weak model for simple tasks
 weak-model: claude-sonnet-4
