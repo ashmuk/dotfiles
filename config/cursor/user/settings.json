@@ -1,4 +1,7 @@
 {
+    "editor.fontSize": 14, // Tool default was 12
+//    "terminal.integrated.fontSize": 14 // Tool default was 12
+
     "window.commandCenter": true,
     "workbench.colorTheme": "Solarized Dark",
 
