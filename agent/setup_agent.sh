@@ -51,7 +51,6 @@ DOT_DIRECTORIES=(
 )
 OTHER_DIRS=(
     "mcp"
-    "prompts"
 )
 
 # Copy files
@@ -84,7 +83,7 @@ for dir in "${DOT_DIRECTORIES[@]}"; do
     fi
 done
 
-# Copy directories
+# Copy directories (simple copy if not present)
 echo -e "\n${GREEN}Copying directories...${NC}"
 for dir in "${OTHER_DIRS[@]}"; do
     if [ -d "$SCRIPT_DIR/$dir" ]; then
@@ -98,6 +97,32 @@ for dir in "${OTHER_DIRS[@]}"; do
         echo -e "${YELLOW}  ⚠ Skipping $dir/ (not found in source)${NC}"
     fi
 done
+
+# Merge-copy prompts directory: copy only missing files
+SRC_PROMPTS_DIR="$SCRIPT_DIR/prompts"
+DST_PROMPTS_DIR="$TARGET_DIR/prompts"
+if [ -d "$SRC_PROMPTS_DIR" ]; then
+    echo -e "\n${GREEN}Syncing prompts directory (copy missing files)...${NC}"
+    if [ ! -d "$DST_PROMPTS_DIR" ]; then
+        cp -r "$SRC_PROMPTS_DIR" "$DST_PROMPTS_DIR"
+        echo -e "  ✓ Copied prompts/"
+    else
+        while IFS= read -r -d '' src_file; do
+            rel_path="${src_file#"$SRC_PROMPTS_DIR/"}"
+            dst_file="$DST_PROMPTS_DIR/$rel_path"
+            dst_dir="$(dirname "$dst_file")"
+            if [ ! -e "$dst_file" ]; then
+                mkdir -p "$dst_dir"
+                cp "$src_file" "$dst_file"
+                echo -e "  ✓ Copied prompts/$rel_path"
+            else
+                echo -e "${YELLOW}  ⚠ Skipping prompts/$rel_path (already exists)${NC}"
+            fi
+        done < <(find "$SRC_PROMPTS_DIR" -type f -print0)
+    fi
+else
+    echo -e "${YELLOW}  ⚠ Skipping prompts/ (not found in source)${NC}"
+fi
 
 echo -e "\n${GREEN}✓ Bootstrap complete!${NC}"
 echo -e "\n${YELLOW}Next steps:${NC}"

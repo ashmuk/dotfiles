@@ -6,9 +6,12 @@ git: true
 gitignore: true
 suggest-shell-commands: false
 browser: false
+gui: false
+show-release-notes: false
+check-update: false
 
 # Weak model for simple tasks
-weak-model: claude-sonnet-4
+weak-model: claude-sonnet-4-20250514
 
 # Editor model for applying edits
 editor-model: gpt-5-codex
