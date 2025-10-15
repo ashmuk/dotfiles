@@ -210,9 +210,30 @@ else
   print_info "tests/ directory exists, skipping"
 fi
 
+# Copy prompts directory if prompts/ doesn't exist
+if [ ! -d "prompts" ]; then
+  print_info "Copying AI prompts..."
+  cp -r "$SCRIPT_DIR/prompts" prompts/
+  print_success "Sample prompts/ copied"
+else
+  print_info "prompts/ directory exists, skipping"
+fi
+
 # Create scripts directory
 mkdir -p scripts
 print_success "scripts/ directory ready"
+
+# Bootstrap agent configuration
+print_header "Bootstrapping Agent Configuration"
+AGENT_SETUP_SCRIPT="$(dirname "$SCRIPT_DIR")/agent/setup_agent.sh"
+if [ -f "$AGENT_SETUP_SCRIPT" ]; then
+  print_info "Running agent setup script..."
+  bash "$AGENT_SETUP_SCRIPT" "$TARGET_DIR" || print_warning "Agent setup encountered issues (non-critical)"
+  print_success "Agent configuration bootstrapped"
+else
+  print_warning "Agent setup script not found at $AGENT_SETUP_SCRIPT"
+  print_info "Skipping agent bootstrap (optional)"
+fi
 
 print_header "Setup Complete!"
 
@@ -233,6 +254,10 @@ ${BLUE}Files deployed:${NC}
   Makefile               → Makefile
   app/                   → app/
   tests/                 → tests/
+  prompts/               → prompts/
+
+${BLUE}Agent configuration (CLAUDE.md, AGENTS.md, .cursor/):${NC}
+  Bootstrapped via agent/setup_agent.sh
 
 ${BLUE}Next Steps:${NC}
 
@@ -259,6 +284,10 @@ ${BLUE}Next Steps:${NC}
 7. ${YELLOW}Try AI-Assisted Development:${NC}
    ${BLUE}make aider-plan${NC}
    ${BLUE}make aider-refactor${NC}
+
+8. ${YELLOW}Review Agent Configuration:${NC}
+   ${BLUE}cat CLAUDE.md${NC}  # Project-specific AI guidelines
+   ${BLUE}cat AGENTS.md${NC}  # Agent collaboration patterns
 
 ${BLUE}Documentation:${NC}
   - DevContainer: .devcontainer/devcontainer.json
