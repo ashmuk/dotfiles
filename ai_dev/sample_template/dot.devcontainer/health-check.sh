@@ -71,11 +71,11 @@ else
 fi
 
 print_check "Working directory"
-if [ -d "/work" ]; then
+if [ -d "/workspace" ]; then
   print_pass
-  print_info "Working directory: /work"
+  print_info "Working directory: /workspace"
 else
-  print_warn "Expected /work directory not found"
+  print_warn "Expected /workspace directory not found"
   print_info "Current directory: $(pwd)"
 fi
 
@@ -89,9 +89,9 @@ fi
 
 # Check for virtual environment
 print_check "Python virtual environment"
-if [ -d "/home/vscode/.venv" ]; then
+if [ -d "/home/ashmuk/.venv" ]; then
   print_pass
-  print_info "Virtual environment: /home/vscode/.venv"
+  print_info "Virtual environment: /home/ashmuk/.venv"
 else
   print_warn "Virtual environment not found"
   print_info "Run postCreateCommand to create it"
@@ -111,8 +111,8 @@ check_tool() {
   if command -v "$tool" >/dev/null 2>&1; then
     tool_path=$(command -v "$tool")
   # Check virtual environment
-  elif [ -f "/home/vscode/.venv/bin/$tool" ]; then
-    tool_path="/home/vscode/.venv/bin/$tool"
+  elif [ -f "/home/ashmuk/.venv/bin/$tool" ]; then
+    tool_path="/home/ashmuk/.venv/bin/$tool"
   fi
 
   if [ -n "$tool_path" ]; then

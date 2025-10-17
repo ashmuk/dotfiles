@@ -2,9 +2,9 @@
 
 # Setup - Install dependencies in virtual environment
 setup:
-	@if [ -d "/home/vscode/.venv" ]; then \
-		/home/vscode/.venv/bin/pip install -U pip; \
-		/home/vscode/.venv/bin/pip install -U fastapi uvicorn pytest ruff httpx aider-chat coverage pre-commit; \
+	@if [ -d "/home/ashmuk/.venv" ]; then \
+		/home/ashmuk/.venv/bin/pip install -U pip; \
+		/home/ashmuk/.venv/bin/pip install -U fastapi uvicorn pytest ruff httpx aider-chat coverage pre-commit; \
 	else \
 		echo "Virtual environment not found. Run postCreateCommand first."; \
 		exit 1; \
@@ -31,6 +31,43 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
 	rm -rf .pytest_cache .ruff_cache .coverage htmlcov
+
+# Hard clean - Remove all AI dev template files (destructive!)
+clean-hard: clean
+	@echo ""
+	@printf "\033[0;31m[DANGER]\033[0m This will remove ALL AI development template files!\n"
+	@printf "\033[0;31m[DANGER]\033[0m This includes project files, configurations, and caches!\n"
+	@printf "\033[1;33m[WARNING]\033[0m Files to be removed:\n"
+	@echo "  - Directories: .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp"
+	@echo "  - Files: .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt .aider* .ai_dev*.yml"
+	@echo ""
+	@printf "\033[0;31mAre you ABSOLUTELY sure? Type 'yes' to confirm: \033[0m"; \
+	read confirm && [ "$$confirm" = "yes" ] || exit 1
+	@echo ""
+	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template directories...\n"
+	@rm -rf .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp
+	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template configuration files...\n"
+	@rm -f .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt
+	@printf "\033[0;34m[INFO]\033[0m Removing aider configuration files...\n"
+	@rm -f .aider* .ai_dev*.yml
+	@printf "\033[0;32m[SUCCESS]\033[0m Hard cleanup completed\n"
+	@echo ""
+	@printf "\033[1;33m[NEXT ACTIONS]\033[0m Recommended cleanup steps:\n"
+	@echo "  1. Check git log to review recent commits:"
+	@printf "     \033[0;34mgit log --oneline -10\033[0m\n"
+	@echo ""
+	@echo "  2. If you need to remove recent commits, use:"
+	@printf "     \033[0;34mgit reset --soft HEAD~n\033[0m  # Keep changes staged\n"
+	@printf "     \033[0;34mgit reset --mixed HEAD~n\033[0m # Keep changes unstaged (default)\n"
+	@printf "     \033[0;34mgit reset --hard HEAD~n\033[0m  # Discard all changes (destructive!)\n"
+	@echo ""
+	@echo "  3. Check for remaining template files:"
+	@printf "     \033[0;34mgit status\033[0m\n"
+	@echo ""
+	@echo "  4. If satisfied, force push to remote (if needed):"
+	@printf "     \033[0;34mgit push --force-with-lease\033[0m\n"
+	@echo ""
+	@printf "\033[1;33m[TIP]\033[0m Replace 'n' with the number of commits to undo\n"
 
 # AI Development Tasks
 aider-plan:

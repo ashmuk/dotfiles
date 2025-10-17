@@ -231,6 +231,20 @@ fi
 mkdir -p scripts
 print_success "scripts/ directory ready"
 
+# Copy Claude Code settings
+print_header "Setting up Claude Code Configuration"
+CLAUDE_SETTINGS_SRC="$(dirname "$(dirname "$SCRIPT_DIR")")/config/claude/settings.json"
+if [ -f "$CLAUDE_SETTINGS_SRC" ]; then
+  print_info "Copying Claude Code settings..."
+  mkdir -p .claude
+  backup_if_exists ".claude/settings.json"
+  cp "$CLAUDE_SETTINGS_SRC" .claude/settings.json
+  print_success "Claude Code settings.json copied to .claude/"
+else
+  print_warning "Claude settings not found at $CLAUDE_SETTINGS_SRC"
+  print_info "Skipping Claude settings (optional)"
+fi
+
 # Bootstrap agent configuration
 print_header "Bootstrapping Agent Configuration"
 AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/agent/setup_agent.sh"
@@ -264,6 +278,7 @@ ${BLUE}Files deployed:${NC}
   app/                   → app/
   tests/                 → tests/
   prompts/               → prompts/
+  .claude/settings.json  → Claude Code configuration
 
 ${BLUE}Agent configuration (CLAUDE.md, AGENTS.md, .cursor/):${NC}
   Bootstrapped via agent/setup_agent.sh

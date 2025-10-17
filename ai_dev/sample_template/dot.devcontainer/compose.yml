@@ -1,20 +1,25 @@
 services:
-  ai-dev-template:
+  ai_dev_container:
     build:
       context: .
       dockerfile: Dockerfile
-    image: container-ai-dev-template
+      args:
+        CLAUDE_CODE_VERSION: "latest"
+        GIT_DELTA_VERSION: "0.18.2"
+        ZSH_IN_DOCKER_VERSION: "1.2.0"
+    image: container-ai-dev-sandbox
     command: sleep infinity
-    user: vscode
-    working_dir: /work
+    user: ashmuk
+    working_dir: /workspace
     volumes:
-      - ..:/work:rw,cached
+      - ..:/workspace:rw,cached
     environment:
       - OPENAI_API_KEY
       - ANTHROPIC_API_KEY
       - GITHUB_TOKEN
-    cap_drop:
-      - ALL
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -24,7 +29,7 @@ services:
           memory: "4g"
 
   dev-nonet:
-    extends: ai-dev-template
+    extends: ai_dev_container
     network_mode: "none"
     profiles:
       - no-net

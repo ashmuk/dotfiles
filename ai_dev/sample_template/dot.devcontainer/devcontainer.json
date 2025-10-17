@@ -1,9 +1,9 @@
 {
-  "name": "ai-dev-template",
+  "name": "AI Dev Sandbox",
   "dockerComposeFile": "compose.yml",
-  "service": "ai-dev-template",
-  "workspaceFolder": "/work",
-  "remoteUser": "vscode",
+  "service": "ai_dev_container",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "ashmuk",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -19,19 +19,44 @@
         "eamodio.gitlens",
         "ms-vscode.makefile-tools",
         "anthropic.claude-code",
-        "openai.chatgpt"
-      ]
+        "openai.chatgpt",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          }
+        }
+      }
     }
   },
   "runArgs": [
-    "--cap-drop=ALL",
-    "--security-opt=no-new-privileges:true"
+    "--cap-add=NET_ADMIN",
+    "--cap-add=NET_RAW"
   ],
   "mounts": [
-    "source=${localWorkspaceFolder}/.cache,target=/home/vscode/.cache,type=bind",
-    "source=/etc/localtime,target=/etc/localtime,type=bind,readonly",
-    "source=/etc/timezone,target=/etc/timezone,type=bind,readonly"
+    "source=${localWorkspaceFolder}/.cache,target=/home/ashmuk/.cache,type=bind",
+    "source=ai-dev-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=ai-dev-claude-config-${devcontainerId},target=/home/ashmuk/.claude,type=volume"
   ],
-  "postCreateCommand": "bash /work/.devcontainer/post-create.sh",
-  "postStartCommand": "grep -q '/home/vscode/.venv/bin/activate' /home/vscode/.bashrc || echo 'source /home/vscode/.venv/bin/activate' >> /home/vscode/.bashrc"
+  "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096",
+    "CLAUDE_CONFIG_DIR": "/home/ashmuk/.claude",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+  },
+  "postCreateCommand": "bash /workspace/.devcontainer/post-create.sh",
+  "postStartCommand": "grep -q '/home/ashmuk/.venv/bin/activate' /home/ashmuk/.bashrc || echo 'source /home/ashmuk/.venv/bin/activate' >> /home/ashmuk/.bashrc; sudo /usr/local/bin/init-firewall.sh || true",
+  "waitFor": "postStartCommand"
 }
