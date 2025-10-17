@@ -159,5 +159,5 @@
     "cacheEnabled": true,
     "cacheTTL": 3600
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": false
 }
