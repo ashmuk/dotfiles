@@ -1,0 +1,54 @@
+# Tmuxinator Configuration for AI Development Session (Single Window Layout)
+#
+# IMPORTANT: This file is intentionally named 'ai_dev_02.yml' instead of '.tmuxinator.yml'
+#
+# NAMING SIDE EFFECT WARNING:
+# When a file is named '.tmuxinator.yml' in the project root, running 'tmuxinator --version'
+# will automatically execute this configuration and start the tmux session as a side effect!
+# This causes issues with health checks and diagnostic scripts that simply want to verify
+# tmuxinator is installed without starting development sessions.
+#
+# To use this configuration:
+#   tmuxinator start -p ai_dev_02.yml
+#   OR
+#   tmuxinator start ai_dev_02  (if moved to ~/.config/tmuxinator/ai_dev_02.yml)
+#
+# Session name: ai-dev-single
+# Purpose: AI-orchestrated development environment - ALL panes in ONE window
+#
+# Pane Layout Strategy (Single Window):
+#   Window 0 (only window):
+#     - Pane 0:0 - User interaction (free for manual commands, run claude_run.sh)
+#     - Pane 0:1 - AI Task Manager (always running, monitors queue)
+#     - Pane 0:2 - Server (make run)
+#     - Pane 0:3 - Tests (make test)
+#     - Pane 0:4 - Monitor (watch logs, git status, etc.)
+#
+# Visual Layout:
+#   ┌─────────────────────────────┬─────────────────────────────┐
+#   │ Pane 0:0 - USER             │ Pane 0:2 - SERVER           │
+#   │ (claude_run.sh here)        │ (make run)                  │
+#   ├─────────────────────────────┼─────────────────────────────┤
+#   │ Pane 0:1 - TASK MANAGER     │ Pane 0:3 - TESTS            │
+#   │ (ai_task_manager.sh)        │ (make test)                 │
+#   ├─────────────────────────────┴─────────────────────────────┤
+#   │ Pane 0:4 - MONITOR                                        │
+#   │ (logs, git status, custom watch commands)                 │
+#   └───────────────────────────────────────────────────────────┘
+
+name: ai-dev-single
+root: .
+windows:
+  - main:
+      layout: tiled
+      panes:
+        # Pane 0:0 - User interaction zone (free for manual commands)
+        - echo "Pane 0:0 - USER INTERACTION. Run './scripts/claude_run.sh \"your prompt\"' to trigger AI orchestration."
+        # Pane 0:1 - Task manager zone (reserved, always running)
+        - ./scripts/ai_task_manager.sh
+        # Pane 0:2 - Server
+        - echo "Pane 0:2 - SERVER. Run 'make run' to start the server." && bash
+        # Pane 0:3 - Tests
+        - echo "Pane 0:3 - TESTS. Run 'make test' to run tests." && bash
+        # Pane 0:4 - Monitor
+        - echo "Pane 0:4 - MONITOR. Run 'tail -f logs/ai-task.log' or 'watch git status'." && bash

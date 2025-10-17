@@ -1,0 +1,47 @@
+# Tmuxinator Configuration for AI Development Session (Multi-Window Layout)
+#
+# IMPORTANT: This file is intentionally named 'ai_dev_01.yml' instead of '.tmuxinator.yml'
+#
+# NAMING SIDE EFFECT WARNING:
+# When a file is named '.tmuxinator.yml' in the project root, running 'tmuxinator --version'
+# will automatically execute this configuration and start the tmux session as a side effect!
+# This causes issues with health checks and diagnostic scripts that simply want to verify
+# tmuxinator is installed without starting development sessions.
+#
+# To use this configuration:
+#   tmuxinator start -p ai_dev_01.yml
+#   OR
+#   tmuxinator start ai_dev_01  (if moved to ~/.config/tmuxinator/ai_dev_01.yml)
+#
+# Session name: ai-dev-multi
+# Purpose: AI-orchestrated development environment with MULTIPLE windows
+#
+# Pane Layout Strategy (Multi-Window):
+#   Window 0 (main):
+#     - Pane 0:0 - User interaction (free for manual commands)
+#     - Pane 0:1 - AI Task Manager (always running)
+#     - Pane 0:2+ - Dynamically created by AI orchestration
+#
+#   Window 1 (dev):
+#     - Development panes (server, tests, etc.)
+#
+# Use ai_dev_02.yml for single-window layout (see everything at a glance)
+
+name: ai-dev-multi
+root: .
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        # Pane 0:0 - User interaction zone (free for manual commands)
+        - echo "Pane 0:0 - User interaction zone. Run './scripts/claude_run.sh \"your prompt\"' to trigger AI orchestration."
+        # Pane 0:1 - Task manager zone (reserved, always running)
+        - ./scripts/ai_task_manager.sh
+        # Note: Panes 0:2+ will be created dynamically by AI orchestration
+  - dev:
+      layout: tiled
+      panes:
+        - make run
+        - make test
+        - make aider-refactor
+        - echo "Monitor: use 'gh pr status --watch' after pushing"
