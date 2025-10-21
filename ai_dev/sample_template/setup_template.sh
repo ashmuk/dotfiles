@@ -227,8 +227,34 @@ else
   print_info "prompts/ directory exists, skipping"
 fi
 
-# Create scripts directory
+# Copy Claude-tmux documentation
+print_info "Copying Claude-tmux documentation..."
+if [ -f "$SCRIPT_DIR/CLAUDE_TMUX_PROTOCOL.md" ]; then
+  cp "$SCRIPT_DIR/CLAUDE_TMUX_PROTOCOL.md" .
+  print_success "CLAUDE_TMUX_PROTOCOL.md copied"
+fi
+if [ -f "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" ]; then
+  cp "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" .
+  print_success "CLAUDE_ORCHESTRATION_GUIDE.md copied"
+fi
+if [ -f "$SCRIPT_DIR/QUICKSTART_DEMO.md" ]; then
+  cp "$SCRIPT_DIR/QUICKSTART_DEMO.md" .
+  print_success "QUICKSTART_DEMO.md copied"
+fi
+
+# Create scripts directory and copy Claude-tmux scripts
+print_info "Copying Claude-tmux orchestration scripts..."
 mkdir -p scripts
+if [ -f "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" ]; then
+  cp "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" scripts/
+  chmod +x scripts/claude-tmux-bridge.sh
+  print_success "claude-tmux-bridge.sh copied"
+fi
+if [ -f "$SCRIPT_DIR/scripts/claude-orchestrator-poc.sh" ]; then
+  cp "$SCRIPT_DIR/scripts/claude-orchestrator-poc.sh" scripts/
+  chmod +x scripts/claude-orchestrator-poc.sh
+  print_success "claude-orchestrator-poc.sh copied"
+fi
 print_success "scripts/ directory ready"
 
 # Copy Claude Code settings
@@ -278,7 +304,11 @@ ${BLUE}Files deployed:${NC}
   app/                   → app/
   tests/                 → tests/
   prompts/               → prompts/
+  scripts/               → scripts/ (claude-tmux bridge + POC)
   .claude/settings.json  → Claude Code configuration
+  CLAUDE_TMUX_PROTOCOL.md          → Protocol specification
+  CLAUDE_ORCHESTRATION_GUIDE.md    → Usage guide
+  QUICKSTART_DEMO.md               → Quick demo instructions
 
 ${BLUE}Agent configuration (CLAUDE.md, AGENTS.md, .cursor/):${NC}
   Bootstrapped via agent/setup_agent.sh
@@ -305,11 +335,16 @@ ${BLUE}Next Steps:${NC}
 6. ${YELLOW}Start tmux Session:${NC}
    ${BLUE}tmuxinator start -p ai_dev.yml${NC}
 
-7. ${YELLOW}Try AI-Assisted Development:${NC}
+7. ${YELLOW}Test Claude-tmux Orchestration (NEW!):${NC}
+   ${BLUE}./scripts/claude-orchestrator-poc.sh${NC}    # Full demo
+   ${BLUE}make claude-demo${NC}                       # Quick demo
+   See QUICKSTART_DEMO.md for details
+
+8. ${YELLOW}Try AI-Assisted Development:${NC}
    ${BLUE}make aider-plan${NC}
    ${BLUE}make aider-refactor${NC}
 
-8. ${YELLOW}Review Agent Configuration:${NC}
+9. ${YELLOW}Review Agent Configuration:${NC}
    ${BLUE}cat CLAUDE.md${NC}  # Project-specific AI guidelines
    ${BLUE}cat AGENTS.md${NC}  # Agent collaboration patterns
 

@@ -1,4 +1,6 @@
 .PHONY: setup run test lint format clean aider-plan aider-refactor ci-local health-check
+.PHONY: claude-session-create claude-session-list claude-session-kill
+.PHONY: claude-pane-create claude-pane-exec claude-pane-capture claude-demo
 
 # Setup - Install dependencies in virtual environment
 setup:
@@ -94,3 +96,81 @@ pre-commit-install:
 
 pre-commit-run:
 	pre-commit run --all-files
+
+# ============================================================================
+# Claude-tmux Integration (MVP)
+# ============================================================================
+
+# Bridge script path
+BRIDGE = ./scripts/claude-tmux-bridge.sh
+
+# Session management
+claude-session-create:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-session-create SESSION=<name>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) session-create $(SESSION)
+
+claude-session-list:
+	@$(BRIDGE) session-list
+
+claude-session-kill:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-session-kill SESSION=<name>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) session-kill $(SESSION)
+
+# Pane management
+claude-pane-create:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-pane-create SESSION=<name> LABEL=<label>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-create $(SESSION) $(LABEL)
+
+claude-pane-exec:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ] || [ -z "$(CMD)" ]; then \
+		echo "Usage: make claude-pane-exec SESSION=<name> PANE=<id> CMD='<command>'"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-exec $(SESSION) $(PANE) "$(CMD)"
+
+claude-pane-capture:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ]; then \
+		echo "Usage: make claude-pane-capture SESSION=<name> PANE=<id> [LINES=20]"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-capture $(SESSION) $(PANE) $(LINES)
+
+# Demo: Complete workflow
+claude-demo:
+	@echo "=== Claude-tmux MVP Demo ==="
+	@echo ""
+	@echo "Step 1: Creating session 'demo-session'..."
+	@$(BRIDGE) session-create demo-session
+	@sleep 1
+	@echo ""
+	@echo "Step 2: Creating additional panes..."
+	@$(BRIDGE) pane-create demo-session tests
+	@$(BRIDGE) pane-create demo-session logs
+	@sleep 1
+	@echo ""
+	@echo "Step 3: Executing commands in panes..."
+	@$(BRIDGE) pane-exec demo-session 0 "echo 'Server pane: make run would go here'"
+	@$(BRIDGE) pane-exec demo-session 1 "echo 'Tests pane: make test would go here'"
+	@$(BRIDGE) pane-exec demo-session 2 "echo 'Logs pane: tail -f logs/app.log'"
+	@sleep 2
+	@echo ""
+	@echo "Step 4: Capturing pane outputs..."
+	@$(BRIDGE) pane-capture demo-session 0 5
+	@echo ""
+	@$(BRIDGE) pane-capture demo-session 1 5
+	@echo ""
+	@echo "Step 5: Session info..."
+	@$(BRIDGE) session-list
+	@echo ""
+	@echo "=== Demo complete! ==="
+	@echo "To attach: tmux attach -t demo-session"
+	@echo "To kill: make claude-session-kill SESSION=demo-session"
