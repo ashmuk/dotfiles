@@ -1,6 +1,8 @@
 .PHONY: setup run test lint format clean aider-plan aider-refactor ci-local health-check
 .PHONY: claude-session-create claude-session-list claude-session-kill
-.PHONY: claude-pane-create claude-pane-exec claude-pane-capture claude-demo
+.PHONY: claude-pane-create claude-pane-exec claude-pane-capture claude-pane-kill
+.PHONY: claude-pane-wait claude-pane-count claude-pane-list claude-state-sync
+.PHONY: claude-demo claude-demo-phase1 claude-demo-phase2
 
 # Setup - Install dependencies in virtual environment
 setup:
@@ -144,7 +146,43 @@ claude-pane-capture:
 	fi
 	@$(BRIDGE) pane-capture $(SESSION) $(PANE) $(LINES)
 
-# Demo: Complete workflow
+# Phase 1 - Lifecycle Management
+claude-pane-kill:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ]; then \
+		echo "Usage: make claude-pane-kill SESSION=<name> PANE=<id>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-kill $(SESSION) $(PANE)
+
+claude-pane-wait:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ]; then \
+		echo "Usage: make claude-pane-wait SESSION=<name> PANE=<id> [TIMEOUT=30]"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-wait $(SESSION) $(PANE) $(TIMEOUT)
+
+claude-pane-count:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-pane-count SESSION=<name>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-count $(SESSION)
+
+claude-pane-list:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-pane-list SESSION=<name>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-list-json $(SESSION)
+
+claude-state-sync:
+	@if [ -z "$(SESSION)" ]; then \
+		echo "Usage: make claude-state-sync SESSION=<name>"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) state-sync $(SESSION)
+
+# Demo: Basic MVP workflow
 claude-demo:
 	@echo "=== Claude-tmux MVP Demo ==="
 	@echo ""
@@ -174,3 +212,47 @@ claude-demo:
 	@echo "=== Demo complete! ==="
 	@echo "To attach: tmux attach -t demo-session"
 	@echo "To kill: make claude-session-kill SESSION=demo-session"
+
+# Demo: Phase 1 Capabilities (MVP+ 1.5)
+claude-demo-phase1:
+	@echo "=== Claude-tmux Phase 1 Demo (MVP+ 1.5) ==="
+	@echo "New: Lifecycle management, state queries, decision helpers"
+	@echo ""
+	@$(BRIDGE) session-create phase1-demo
+	@$(BRIDGE) pane-create phase1-demo worker
+	@$(BRIDGE) pane-exec phase1-demo 1 "sleep 3 && echo 'TASK COMPLETED'"
+	@echo "Waiting for task completion..."
+	@$(BRIDGE) pane-wait phase1-demo 1 10
+	@echo ""
+	@echo "Checking pattern..."
+	@if $(BRIDGE) pane-has-pattern phase1-demo 1 "COMPLETED"; then \
+		echo "✅ Pattern found! Cleaning up..."; \
+		$(BRIDGE) pane-kill phase1-demo 1; \
+	fi
+	@echo ""
+	@echo "Final state:"
+	@$(BRIDGE) pane-count phase1-demo
+	@$(BRIDGE) session-kill phase1-demo
+	@echo "=== Phase 1 Demo Complete ==="
+
+# Demo: Phase 2 Capabilities (MVP+ 2.0)
+claude-demo-phase2:
+	@echo "=== Claude-tmux Phase 2 Demo (MVP+ 2.0) ==="
+	@echo "New: Timeouts, metadata, custom layouts"
+	@echo ""
+	@$(BRIDGE) session-create phase2-demo
+	@$(BRIDGE) pane-create-with-layout phase2-demo server main-horizontal
+	@$(BRIDGE) pane-metadata-set phase2-demo 0 "role" "primary-server"
+	@$(BRIDGE) pane-exec phase2-demo 0 "sleep 2 && echo 'SERVER READY'"
+	@echo "Watching for server ready..."
+	@if $(BRIDGE) pane-watch-timeout phase2-demo 0 "READY" 5; then \
+		echo "✅ Server started successfully"; \
+	fi
+	@echo ""
+	@echo "Metadata:"
+	@$(BRIDGE) pane-metadata-get phase2-demo 0 "role"
+	@echo ""
+	@echo "Detailed pane list:"
+	@$(BRIDGE) pane-list-detailed phase2-demo
+	@$(BRIDGE) session-kill phase2-demo
+	@echo "=== Phase 2 Demo Complete ==="
