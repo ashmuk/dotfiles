@@ -819,6 +819,119 @@ pane_create_with_layout() {
     json_output "success" "pane-create-with-layout" "$session_name" "$new_pane_id" "Pane created with $layout layout"
 }
 
+# =============================================================================
+# PHASE 3.0: Real-Time Streaming Commands
+# =============================================================================
+
+# PHASE 3.0: Stream new output continuously (like tail -f)
+pane_stream() {
+    local session_name="$1"
+    local pane_id="$2"
+    local filter="${3:-cat}"
+
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        log_error "Session '$session_name' not found"
+        json_output "error" "pane-stream" "$session_name" "$pane_id" "Session not found"
+        return 1
+    fi
+
+    if ! tmux list-panes -t "$session_name" -F "#{pane_index}" | grep -q "^${pane_id}$"; then
+        log_error "Pane $pane_id not found in session '$session_name'"
+        json_output "error" "pane-stream" "$session_name" "$pane_id" "Pane not found"
+        return 1
+    fi
+
+    log_info "Streaming output from pane $pane_id (filter: $filter)..."
+    log_info "Press Ctrl+C to stop streaming"
+
+    # Get initial baseline
+    local last_line_count
+    last_line_count=$(tmux capture-pane -t "${session_name}:.${pane_id}" -p | wc -l)
+
+    # Stream new lines in real-time
+    while true; do
+        local current_line_count
+        current_line_count=$(tmux capture-pane -t "${session_name}:.${pane_id}" -p | wc -l)
+
+        # If new lines appeared, capture and output them
+        if [ "$current_line_count" -gt "$last_line_count" ]; then
+            local new_line_count=$((current_line_count - last_line_count))
+
+            # Capture only the new lines
+            local new_output
+            new_output=$(tmux capture-pane -t "${session_name}:.${pane_id}" -p | tail -n "$new_line_count")
+
+            # Apply filter and output
+            if [ -n "$new_output" ]; then
+                echo "$new_output" | eval "$filter"
+            fi
+
+            last_line_count=$current_line_count
+        fi
+
+        # Check if pane still exists
+        if ! tmux list-panes -t "$session_name" -F "#{pane_index}" 2>/dev/null | grep -q "^${pane_id}$"; then
+            log_warn "Pane $pane_id exited"
+            break
+        fi
+
+        sleep 0.1  # 100ms for real-time feel
+    done
+
+    json_output "success" "pane-stream" "$session_name" "$pane_id" "Stream ended"
+}
+
+# PHASE 3.0: Tail last N lines and follow (like tail -f)
+pane_tail() {
+    local session_name="$1"
+    local pane_id="$2"
+    local lines="${3:-50}"
+
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        log_error "Session '$session_name' not found"
+        json_output "error" "pane-tail" "$session_name" "$pane_id" "Session not found"
+        return 1
+    fi
+
+    if ! tmux list-panes -t "$session_name" -F "#{pane_index}" | grep -q "^${pane_id}$"; then
+        log_error "Pane $pane_id not found in session '$session_name'"
+        json_output "error" "pane-tail" "$session_name" "$pane_id" "Pane not found"
+        return 1
+    fi
+
+    log_info "Tailing last $lines lines from pane $pane_id..."
+    log_info "Press Ctrl+C to stop tailing"
+
+    # First, output the last N lines
+    tmux capture-pane -t "${session_name}:.${pane_id}" -p -S "-${lines}"
+
+    # Then stream new output
+    local last_line_count
+    last_line_count=$(tmux capture-pane -t "${session_name}:.${pane_id}" -p | wc -l)
+
+    while true; do
+        local current_line_count
+        current_line_count=$(tmux capture-pane -t "${session_name}:.${pane_id}" -p | wc -l)
+
+        # If new lines appeared, output them
+        if [ "$current_line_count" -gt "$last_line_count" ]; then
+            local new_line_count=$((current_line_count - last_line_count))
+            tmux capture-pane -t "${session_name}:.${pane_id}" -p | tail -n "$new_line_count"
+            last_line_count=$current_line_count
+        fi
+
+        # Check if pane still exists
+        if ! tmux list-panes -t "$session_name" -F "#{pane_index}" 2>/dev/null | grep -q "^${pane_id}$"; then
+            log_warn "Pane $pane_id exited"
+            break
+        fi
+
+        sleep 0.1  # 100ms for real-time feel
+    done
+
+    json_output "success" "pane-tail" "$session_name" "$pane_id" "Tail ended"
+}
+
 # Help/Usage
 show_usage() {
     cat <<EOF
@@ -859,6 +972,10 @@ Phase 2 - Advanced Features:
   pane-create-with-layout <session> [label] [layout]   Create with custom layout
     Layouts: tiled, main-horizontal, main-vertical, even-horizontal, even-vertical
 
+Phase 3.0 - Real-Time Streaming:
+  pane-stream <session> <pane> [filter]  Stream new output continuously (like tail -f)
+  pane-tail <session> <pane> [lines]     Show last N lines and follow (default: 50)
+
 Examples:
   # Basic workflow
   $0 session-create dev
@@ -883,6 +1000,11 @@ Examples:
   if $0 pane-has-pattern dev 0 "ERROR"; then
     echo "Error detected!"
   fi
+
+  # Phase 3.0: Real-time streaming
+  $0 pane-stream dev 0                    # Stream all new output
+  $0 pane-stream dev 0 "grep ERROR"       # Stream filtered output
+  $0 pane-tail dev 0 100                  # Show last 100 lines and follow
 
 EOF
 }
@@ -980,6 +1102,14 @@ main() {
         pane-create-with-layout)
             [ $# -lt 2 ] && { log_error "Missing session name"; show_usage; exit 1; }
             pane_create_with_layout "$2" "${3:-pane}" "${4:-tiled}"
+            ;;
+        pane-stream)
+            [ $# -lt 3 ] && { log_error "Missing arguments"; show_usage; exit 1; }
+            pane_stream "$2" "$3" "${4:-cat}"
+            ;;
+        pane-tail)
+            [ $# -lt 3 ] && { log_error "Missing arguments"; show_usage; exit 1; }
+            pane_tail "$2" "$3" "${4:-50}"
             ;;
         help|--help|-h)
             show_usage

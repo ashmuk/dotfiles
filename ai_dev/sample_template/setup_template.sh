@@ -237,25 +237,39 @@ if [ -f "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" ]; then
   cp "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" .
   print_success "CLAUDE_ORCHESTRATION_GUIDE.md copied"
 fi
+if [ -f "$SCRIPT_DIR/DAEMON_GUIDE.md" ]; then
+  cp "$SCRIPT_DIR/DAEMON_GUIDE.md" .
+  print_success "DAEMON_GUIDE.md copied"
+fi
 if [ -f "$SCRIPT_DIR/QUICKSTART_DEMO.md" ]; then
   cp "$SCRIPT_DIR/QUICKSTART_DEMO.md" .
   print_success "QUICKSTART_DEMO.md copied"
 fi
 
 # Create scripts directory and copy Claude-tmux scripts
-print_info "Copying Claude-tmux orchestration scripts..."
+print_info "Copying Claude-tmux orchestration scripts (Phase 3.0)..."
 mkdir -p scripts
 if [ -f "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" ]; then
   cp "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" scripts/
   chmod +x scripts/claude-tmux-bridge.sh
-  print_success "claude-tmux-bridge.sh copied"
+  print_success "claude-tmux-bridge.sh copied (Phase 3.0 with streaming)"
+fi
+if [ -f "$SCRIPT_DIR/scripts/claude-tmux-daemon.sh" ]; then
+  cp "$SCRIPT_DIR/scripts/claude-tmux-daemon.sh" scripts/
+  chmod +x scripts/claude-tmux-daemon.sh
+  print_success "claude-tmux-daemon.sh copied (event-driven daemon)"
 fi
 if [ -f "$SCRIPT_DIR/scripts/claude-orchestrator-poc.sh" ]; then
   cp "$SCRIPT_DIR/scripts/claude-orchestrator-poc.sh" scripts/
   chmod +x scripts/claude-orchestrator-poc.sh
   print_success "claude-orchestrator-poc.sh copied"
 fi
-print_success "scripts/ directory ready"
+if [ -f "$SCRIPT_DIR/scripts/claude-phase3-demo.sh" ]; then
+  cp "$SCRIPT_DIR/scripts/claude-phase3-demo.sh" scripts/
+  chmod +x scripts/claude-phase3-demo.sh
+  print_success "claude-phase3-demo.sh copied (Phase 3.0 demo)"
+fi
+print_success "scripts/ directory ready with Phase 3.0 features"
 
 # Copy Claude Code settings
 print_header "Setting up Claude Code Configuration"
@@ -304,10 +318,11 @@ ${BLUE}Files deployed:${NC}
   app/                   → app/
   tests/                 → tests/
   prompts/               → prompts/
-  scripts/               → scripts/ (claude-tmux bridge + POC)
+  scripts/               → scripts/ (Phase 3.0: bridge, daemon, demos)
   .claude/settings.json  → Claude Code configuration
-  CLAUDE_TMUX_PROTOCOL.md          → Protocol specification
-  CLAUDE_ORCHESTRATION_GUIDE.md    → Usage guide
+  CLAUDE_TMUX_PROTOCOL.md          → Protocol specification (Phase 3.0)
+  CLAUDE_ORCHESTRATION_GUIDE.md    → Usage guide (Phase 3.0)
+  DAEMON_GUIDE.md                  → Event daemon guide (NEW!)
   QUICKSTART_DEMO.md               → Quick demo instructions
 
 ${BLUE}Agent configuration (CLAUDE.md, AGENTS.md, .cursor/):${NC}
@@ -335,10 +350,13 @@ ${BLUE}Next Steps:${NC}
 6. ${YELLOW}Start tmux Session:${NC}
    ${BLUE}tmuxinator start -p ai_dev.yml${NC}
 
-7. ${YELLOW}Test Claude-tmux Orchestration (NEW!):${NC}
-   ${BLUE}./scripts/claude-orchestrator-poc.sh${NC}    # Full demo
-   ${BLUE}make claude-demo${NC}                       # Quick demo
-   See QUICKSTART_DEMO.md for details
+7. ${YELLOW}Test Claude-tmux Orchestration (Phase 3.0):${NC}
+   ${BLUE}make claude-demo${NC}                       # Basic demo
+   ${BLUE}make claude-demo-phase1${NC}                # Phase 1 features
+   ${BLUE}make claude-demo-phase2${NC}                # Phase 2 features
+   ${BLUE}make claude-demo-phase3${NC}                # Phase 3.0 features (NEW!)
+   ${BLUE}./scripts/claude-phase3-demo.sh${NC}        # Full Phase 3.0 demo
+   See DAEMON_GUIDE.md for event-driven workflows
 
 8. ${YELLOW}Try AI-Assisted Development:${NC}
    ${BLUE}make aider-plan${NC}

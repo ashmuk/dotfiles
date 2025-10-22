@@ -44,14 +44,23 @@ clean-hard: clean
 	@printf "\033[1;33m[WARNING]\033[0m Files to be removed:\n"
 	@echo "  - Directories: .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp"
 	@echo "  - Files: .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt .aider* .ai_dev*.yml"
+	@echo "  - Claude-tmux docs: CLAUDE_TMUX_PROTOCOL.md CLAUDE_ORCHESTRATION_GUIDE.md DAEMON_GUIDE.md QUICKSTART_DEMO.md"
+	@echo "  - Phase 3.0 temp files: /tmp/claude-tmux-* (daemon state, events, logs)"
 	@echo ""
 	@printf "\033[0;31mAre you ABSOLUTELY sure? Type 'yes' to confirm: \033[0m"; \
 	read confirm && [ "$$confirm" = "yes" ] || exit 1
 	@echo ""
+	@printf "\033[0;34m[INFO]\033[0m Stopping Claude-tmux daemon (if running)...\n"
+	@-$(DAEMON) stop 2>/dev/null || true
+	@printf "\033[0;34m[INFO]\033[0m Removing Phase 3.0 temporary files...\n"
+	@rm -rf /tmp/claude-tmux-events /tmp/claude-tmux-states
+	@rm -f /tmp/claude-tmux-daemon.log /tmp/claude-tmux-daemon.pid
 	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template directories...\n"
 	@rm -rf .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp
 	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template configuration files...\n"
 	@rm -f .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt
+	@printf "\033[0;34m[INFO]\033[0m Removing Claude-tmux documentation...\n"
+	@rm -f CLAUDE_TMUX_PROTOCOL.md CLAUDE_ORCHESTRATION_GUIDE.md DAEMON_GUIDE.md QUICKSTART_DEMO.md
 	@printf "\033[0;34m[INFO]\033[0m Removing aider configuration files...\n"
 	@rm -f .aider* .ai_dev*.yml
 	@printf "\033[0;32m[SUCCESS]\033[0m Hard cleanup completed\n"
@@ -256,3 +265,89 @@ claude-demo-phase2:
 	@$(BRIDGE) pane-list-detailed phase2-demo
 	@$(BRIDGE) session-kill phase2-demo
 	@echo "=== Phase 2 Demo Complete ==="
+
+#------------------------------------------------------------------------------
+# Phase 3.0 Commands (Event-Driven & Real-Time Streaming)
+#------------------------------------------------------------------------------
+
+DAEMON = ./scripts/claude-tmux-daemon.sh
+
+# Daemon lifecycle commands
+claude-daemon-start:
+	@echo "Starting Claude-tmux event daemon..."
+	@$(DAEMON) start $(SESSION)
+
+claude-daemon-stop:
+	@echo "Stopping Claude-tmux event daemon..."
+	@$(DAEMON) stop
+
+claude-daemon-status:
+	@$(DAEMON) status
+
+claude-daemon-logs:
+	@$(DAEMON) logs $(LINES)
+
+claude-daemon-restart:
+	@echo "Restarting Claude-tmux event daemon..."
+	@$(DAEMON) restart $(SESSION)
+
+# Event subscription commands
+claude-event-subscribe-pattern:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ] || [ -z "$(PATTERN)" ]; then \
+		echo "Usage: make claude-event-subscribe-pattern SESSION=<name> PANE=<id> PATTERN=<regex> [CALLBACK=<cmd>]"; \
+		exit 1; \
+	fi
+	@$(DAEMON) subscribe $(SESSION) pattern-match $(PANE) "$(PATTERN)" "$(CALLBACK)"
+
+claude-event-subscribe-timeout:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ] || [ -z "$(TIMEOUT)" ]; then \
+		echo "Usage: make claude-event-subscribe-timeout SESSION=<name> PANE=<id> TIMEOUT=<seconds> [CALLBACK=<cmd>]"; \
+		exit 1; \
+	fi
+	@$(DAEMON) subscribe $(SESSION) timeout $(PANE) $(TIMEOUT) "$(CALLBACK)"
+
+# Real-time streaming commands
+claude-pane-stream:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ]; then \
+		echo "Usage: make claude-pane-stream SESSION=<name> PANE=<id> [FILTER=<cmd>]"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-stream $(SESSION) $(PANE) "$(FILTER)"
+
+claude-pane-tail:
+	@if [ -z "$(SESSION)" ] || [ -z "$(PANE)" ]; then \
+		echo "Usage: make claude-pane-tail SESSION=<name> PANE=<id> [LINES=<n>]"; \
+		exit 1; \
+	fi
+	@$(BRIDGE) pane-tail $(SESSION) $(PANE) $(LINES)
+
+# Demo: Phase 3.0 Capabilities (Event-Driven + Streaming)
+claude-demo-phase3:
+	@echo "=== Claude-tmux Phase 3.0 Demo (Event-Driven + Streaming) ==="
+	@echo "New: Real-time streaming, event daemon, callbacks"
+	@echo ""
+	@echo "Step 1: Starting event daemon..."
+	@$(DAEMON) start
+	@sleep 1
+	@echo ""
+	@echo "Step 2: Creating session and pane..."
+	@$(BRIDGE) session-create phase3-demo
+	@$(BRIDGE) pane-create phase3-demo worker
+	@echo ""
+	@echo "Step 3: Subscribing to pattern events..."
+	@$(DAEMON) subscribe phase3-demo pattern-match 0 "COMPLETE" "echo 'Task completed callback triggered!'"
+	@echo ""
+	@echo "Step 4: Starting background task..."
+	@$(BRIDGE) pane-exec phase3-demo 0 "for i in 1 2 3; do echo 'Processing step' \$$i; sleep 1; done; echo 'COMPLETE'"
+	@echo ""
+	@echo "Step 5: Streaming output in real-time (5 seconds)..."
+	@timeout 5 $(BRIDGE) pane-stream phase3-demo 0 || true
+	@echo ""
+	@echo "Step 6: Checking daemon status..."
+	@$(DAEMON) status
+	@echo ""
+	@echo "Cleanup..."
+	@$(BRIDGE) session-kill phase3-demo
+	@$(DAEMON) stop
+	@echo ""
+	@echo "=== Phase 3.0 Demo Complete ==="
