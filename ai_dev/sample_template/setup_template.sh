@@ -249,6 +249,8 @@ fi
 # Create scripts directory and copy Claude-tmux scripts
 print_info "Copying Claude-tmux orchestration scripts (Phase 3.0)..."
 mkdir -p scripts
+
+# Copy main orchestration scripts
 if [ -f "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" ]; then
   cp "$SCRIPT_DIR/scripts/claude-tmux-bridge.sh" scripts/
   chmod +x scripts/claude-tmux-bridge.sh
@@ -264,11 +266,16 @@ if [ -f "$SCRIPT_DIR/scripts/claude-orchestrator-poc.sh" ]; then
   chmod +x scripts/claude-orchestrator-poc.sh
   print_success "claude-orchestrator-poc.sh copied"
 fi
-if [ -f "$SCRIPT_DIR/scripts/claude-phase3-demo.sh" ]; then
-  cp "$SCRIPT_DIR/scripts/claude-phase3-demo.sh" scripts/
-  chmod +x scripts/claude-phase3-demo.sh
-  print_success "claude-phase3-demo.sh copied (Phase 3.0 demo)"
+
+# Copy demo scripts directory
+if [ -d "$SCRIPT_DIR/scripts/demo" ]; then
+  print_info "Copying Phase 3.0 demo scripts..."
+  mkdir -p scripts/demo
+  cp -r "$SCRIPT_DIR/scripts/demo/"* scripts/demo/
+  chmod +x scripts/demo/*.sh 2>/dev/null || true
+  print_success "Phase 3.0 demo scripts copied (3 demos)"
 fi
+
 print_success "scripts/ directory ready with Phase 3.0 features"
 
 # Copy Claude Code settings
@@ -318,7 +325,8 @@ ${BLUE}Files deployed:${NC}
   app/                   → app/
   tests/                 → tests/
   prompts/               → prompts/
-  scripts/               → scripts/ (Phase 3.0: bridge, daemon, demos)
+  scripts/               → scripts/ (Phase 3.0: bridge, daemon, POC)
+    └── demo/            → scripts/demo/ (3 Phase 3.0 demos)
   .claude/settings.json  → Claude Code configuration
   CLAUDE_TMUX_PROTOCOL.md          → Protocol specification (Phase 3.0)
   CLAUDE_ORCHESTRATION_GUIDE.md    → Usage guide (Phase 3.0)
@@ -351,11 +359,13 @@ ${BLUE}Next Steps:${NC}
    ${BLUE}tmuxinator start -p ai_dev.yml${NC}
 
 7. ${YELLOW}Test Claude-tmux Orchestration (Phase 3.0):${NC}
-   ${BLUE}make claude-demo${NC}                       # Basic demo
-   ${BLUE}make claude-demo-phase1${NC}                # Phase 1 features
-   ${BLUE}make claude-demo-phase2${NC}                # Phase 2 features
-   ${BLUE}make claude-demo-phase3${NC}                # Phase 3.0 features (NEW!)
-   ${BLUE}./scripts/claude-phase3-demo.sh${NC}        # Full Phase 3.0 demo
+   ${BLUE}make claude-demo${NC}                          # Basic demo
+   ${BLUE}make claude-demo-phase1${NC}                   # Phase 1 features
+   ${BLUE}make claude-demo-phase2${NC}                   # Phase 2 features
+   ${BLUE}make claude-demo-phase3${NC}                   # Phase 3.0 features (NEW!)
+   ${BLUE}./scripts/demo/claude-phase3-demo.sh${NC}      # Full Phase 3.0 demo
+   ${BLUE}./scripts/demo/claude-phase3a-simple-demo.sh${NC}  # Simplified demo
+   ${BLUE}./scripts/demo/demo-event-driven-quick.sh${NC} # Quick event demo
    See DAEMON_GUIDE.md for event-driven workflows
 
 8. ${YELLOW}Try AI-Assisted Development:${NC}
