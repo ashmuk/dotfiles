@@ -107,10 +107,12 @@
       "Read(./target/**)",
       "Read(./node_modules/**)",
       "Read(./.git/objects/**)",
-      "Bash(curl:* | bash)",
-      "Bash(wget:* | sh)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
       "Bash(rm -rf /)",
-      "Bash(:(){ :|:& };:)",
+      "OgkoKSB7IDp8OiYgfTs6",  // base64(:(){ :|:& };:) for Fork Bomb
+      "Bash(fork:*)",
+      "Bash(bomb:*)",
       "Bash(nc:*)",
       "Bash(netcat:*)",
       "Bash(telnet:*)"
@@ -135,29 +137,6 @@
   "disabledMcpjsonServers": [],
   "_comment_git": "Git設定",
   "includeCoAuthoredBy": true,
-  "_comment_additional_settings": "追加の推奨設定",
-  "autoSave": true,
-  "autoFormat": true,
-  "confirmBeforeExecute": true,
-  "maxFileSize": "10MB",
-  "excludePatterns": [
-    "**/*.log",
-    "**/*.tmp",
-    "**/coverage/**",
-    "**/.DS_Store"
-  ],
-  "_comment_logging": "ロギング設定",
-  "logging": {
-    "level": "info",
-    "file": "~/.claude/logs/claude-code.log",
-    "maxFiles": 10,
-    "maxSize": "10MB"
-  },
-  "_comment_performance": "パフォーマンス設定",
-  "performance": {
-    "maxConcurrentOperations": 5,
-    "cacheEnabled": true,
-    "cacheTTL": 3600
-  },
-  "alwaysThinkingEnabled": false
+  "_comment_thinking": "常時思考モードを有効化",
+  "alwaysThinkingEnabled": true
 }
