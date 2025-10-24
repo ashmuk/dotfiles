@@ -116,3 +116,7 @@ RUN chmod +x /usr/local/bin/init-firewall.sh && \
 USER ${USERNAME}
 
 WORKDIR /workspace
+
+# Alias
+RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"
+
