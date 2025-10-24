@@ -842,6 +842,7 @@ setopt SHARE_HISTORY
 setopt CORRECT
 setopt NO_BEEP
 setopt INTERACTIVE_COMMENTS
+setopt PROMPT_SUBST
 
 # =============================================================================
 # Auto completion
@@ -865,10 +866,25 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # zsh prompt (colored / 2-line)
 ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
+
+# Git branch name function
+git_branch() {
+  local branch
+  # Return no string if in directory does not have HEAD
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -n $branch ]]; then
+    echo "%F{yellow}(${branch})%f"
+  fi
+}
+
 # shellcheck disable=SC2034  # PROMPT_BASE is used in zsh prompt system
-PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n %F{green}%~%f"$'\n'"%# "
+#PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n %F{green}%~%f"$'\n'"%# "
+# Base prompt (with git branch)
+PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n $(git_branch) %F{green}%~%f"$'\n'"%# "
+
 # shellcheck disable=SC2034  # PROMPT is used by zsh
-PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
+#PROMPT="%F{green}[INSERT]%f $PROMPT_BASE"
+PROMPT='%F{green}[INSERT]%f ${PROMPT_BASE}' # Do not expand variables when substituted by single quote
 
 # Enable vi mode
 bindkey -v
@@ -877,12 +893,19 @@ bindkey -v
 # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system in case branches
 function zle-keymap-select {
   case $KEYMAP in
-    vicmd) PROMPT="%F{red}[NORMAL]%f $PROMPT_BASE" ;;
-    main|viins) PROMPT="%F{green}[INSERT]%f $PROMPT_BASE" ;;
+    vicmd)  PROMPT='%F{red}[NORMAL]%f ${PROMPT_BASE}' ;;
+    main|viins) PROMPT='%F{green}[INSERT]%f ${PROMPT_BASE}' ;;
   esac
   zle reset-prompt
 }
 zle -N zle-keymap-select
+
+# Optional: update prompt after each command (useful when switching git dirs)
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd update_prompt
+function update_prompt {
+  PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n $(git_branch) %F{green}%~%f"$'\n'"%# "
+}
 
 # =============================================================================
 # Theme
