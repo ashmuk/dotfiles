@@ -227,23 +227,15 @@ else
   print_info "prompts/ directory exists, skipping"
 fi
 
-# Copy Claude-tmux documentation
-print_info "Copying Claude-tmux documentation..."
-if [ -f "$SCRIPT_DIR/CLAUDE_TMUX_PROTOCOL.md" ]; then
-  cp "$SCRIPT_DIR/CLAUDE_TMUX_PROTOCOL.md" .
-  print_success "CLAUDE_TMUX_PROTOCOL.md copied"
-fi
-if [ -f "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" ]; then
-  cp "$SCRIPT_DIR/CLAUDE_ORCHESTRATION_GUIDE.md" .
-  print_success "CLAUDE_ORCHESTRATION_GUIDE.md copied"
-fi
-if [ -f "$SCRIPT_DIR/DAEMON_GUIDE.md" ]; then
-  cp "$SCRIPT_DIR/DAEMON_GUIDE.md" .
-  print_success "DAEMON_GUIDE.md copied"
-fi
-if [ -f "$SCRIPT_DIR/QUICKSTART_DEMO.md" ]; then
-  cp "$SCRIPT_DIR/QUICKSTART_DEMO.md" .
-  print_success "QUICKSTART_DEMO.md copied"
+# Copy documentation directory
+print_info "Copying documentation directory..."
+if [ -d "$SCRIPT_DIR/docs" ]; then
+  backup_if_exists "docs"
+  mkdir -p docs
+  cp -r "$SCRIPT_DIR/docs/"* docs/
+  print_success "docs/ directory copied (10 documentation files)"
+else
+  print_warning "docs/ directory not found, skipping"
 fi
 
 # Create scripts directory and copy Claude-tmux scripts
@@ -280,13 +272,15 @@ print_success "scripts/ directory ready with Phase 3.0 features"
 
 # Copy Claude Code settings
 print_header "Setting up Claude Code Configuration"
-CLAUDE_SETTINGS_SRC="$(dirname "$(dirname "$SCRIPT_DIR")")/config/claude/settings.json"
-if [ -f "$CLAUDE_SETTINGS_SRC" ]; then
-  print_info "Copying Claude Code settings..."
-  mkdir -p .claude
-  backup_if_exists ".claude/settings.json"
-  cp "$CLAUDE_SETTINGS_SRC" .claude/settings.json
-  print_success "Claude Code settings.json copied to .claude/"
+CLAUDE_SETTINGS_SRC="$(dirname "$(dirname "$SCRIPT_DIR")")/config/claude/"
+if [ -f "$CLAUDE_SETTINGS_SRC/settings.json" ]; then
+  print_info "Copying Claude Code settings and relative files..."
+  mkdir -p dot.claude
+  backup_if_exists "dot.claude/settings.json"
+  backup_if_exists "dot.claude/statusline.sh"
+  cp "$CLAUDE_SETTINGS_SRC/settings.json" dot.claude/settings.json
+  cp "$CLAUDE_SETTINGS_SRC/statusline.sh" dot.claude/statusline.sh
+  print_success "Claude Code settings and relatives copied to dot.claude/"
 else
   print_warning "Claude settings not found at $CLAUDE_SETTINGS_SRC"
   print_info "Skipping Claude settings (optional)"
@@ -327,11 +321,18 @@ ${BLUE}Files deployed:${NC}
   prompts/               → prompts/
   scripts/               → scripts/ (Phase 3.0: bridge, daemon, POC)
     └── demo/            → scripts/demo/ (3 Phase 3.0 demos)
+  docs/                  → docs/ (10 documentation files)
+    ├── ARCHITECTURE.md              → Design documentation
+    ├── CLAUDE_ORCHESTRATION_GUIDE.md → Usage guide (Phase 3.0)
+    ├── CLAUDE_TMUX_PROTOCOL.md      → Protocol specification (Phase 3.0)
+    ├── MIGRATION_MVP_TO_MVP2.md     → Migration guide
+    ├── QUICKSTART_DEMO.md           → Quick demo instructions
+    ├── SETUP_DEPLOYMENT_GUIDE.md    → Setup guide
+    ├── TEMPLATE_NAMING.md           → Naming conventions
+    ├── TEST_DEPLOYMENT.md           → Test deployment
+    ├── TMUX_INTEGRATION.md          → tmux documentation
+    └── USAGE.md                     → Usage guide
   .claude/settings.json  → Claude Code configuration
-  CLAUDE_TMUX_PROTOCOL.md          → Protocol specification (Phase 3.0)
-  CLAUDE_ORCHESTRATION_GUIDE.md    → Usage guide (Phase 3.0)
-  DAEMON_GUIDE.md                  → Event daemon guide (NEW!)
-  QUICKSTART_DEMO.md               → Quick demo instructions
 
 ${BLUE}Agent configuration (CLAUDE.md, AGENTS.md, .cursor/):${NC}
   Bootstrapped via agent/setup_agent.sh
