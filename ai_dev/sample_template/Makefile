@@ -60,6 +60,7 @@ clean-hard: clean
 	@rm -f .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt
 	@printf "\033[0;34m[INFO]\033[0m Removing aider configuration files...\n"
 	@rm -f .aider* .ai_dev*.yml
+	@rm -rf dot.claude/
 	@printf "\033[0;32m[SUCCESS]\033[0m Hard cleanup completed\n"
 	@echo ""
 	@printf "\033[1;33m[NEXT ACTIONS]\033[0m Recommended cleanup steps:\n"
