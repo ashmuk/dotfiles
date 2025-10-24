@@ -15,7 +15,7 @@ cleanup() {
     # Check if any other tmux sessions exist
     local other_sessions=0
     if tmux list-sessions 2>/dev/null | grep -v "^${SESSION}:" > /dev/null 2>&1; then
-        other_sessions=$(tmux list-sessions 2>/dev/null | grep -v "^${SESSION}:" | wc -l)
+        other_sessions=$(tmux list-sessions 2>/dev/null | grep -vc "^${SESSION}:")
     fi
 
     if [ "$other_sessions" -eq 0 ]; then
@@ -73,7 +73,7 @@ sleep 3
 
 # Wait for ANALYSIS trigger
 echo "Waiting for ANALYSIS trigger..."
-for i in {1..20}; do
+for _ in {1..20}; do
     if $BRIDGE pane-capture "$SESSION" 0 50 2>/dev/null | grep -q "TRIGGER:ANALYSIS"; then
         echo "✓ Event detected: ANALYSIS"
         break
@@ -97,7 +97,7 @@ sleep 4
 
 # Wait for BUILD trigger
 echo "Waiting for BUILD trigger..."
-for i in {1..20}; do
+for _ in {1..20}; do
     if $BRIDGE pane-capture "$SESSION" 0 50 2>/dev/null | grep -q "TRIGGER:BUILD"; then
         echo "✓ Event detected: BUILD"
         break
@@ -122,7 +122,7 @@ sleep 4
 
 # Wait for DEPLOY trigger
 echo "Waiting for DEPLOY trigger..."
-for i in {1..20}; do
+for _ in {1..20}; do
     if $BRIDGE pane-capture "$SESSION" 0 50 2>/dev/null | grep -q "TRIGGER:DEPLOY"; then
         echo "✓ Event detected: DEPLOY"
         break
@@ -159,7 +159,7 @@ echo "Session '$SESSION' is still running."
 echo "Attach with: tmux attach -t $SESSION"
 echo ""
 echo "Press Enter to cleanup..."
-read
+read -r
 
 # Cleanup will be handled by the EXIT trap
 echo "✓ Cleanup complete"

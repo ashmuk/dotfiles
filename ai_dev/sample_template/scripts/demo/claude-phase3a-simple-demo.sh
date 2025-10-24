@@ -12,9 +12,7 @@ DAEMON="$SCRIPT_DIR/claude-tmux-daemon.sh"
 SESSION="demo-phase3a"
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
@@ -39,7 +37,7 @@ cleanup() {
     # Check if any other tmux sessions exist
     local other_sessions=0
     if tmux list-sessions 2>/dev/null | grep -v "^${SESSION}:" > /dev/null 2>&1; then
-        other_sessions=$(tmux list-sessions 2>/dev/null | grep -v "^${SESSION}:" | wc -l)
+        other_sessions=$(tmux list-sessions 2>/dev/null | grep -vc "^${SESSION}:")
     fi
 
     if [ "$other_sessions" -eq 0 ]; then
@@ -372,7 +370,7 @@ SCRIPT
     info "View daemon logs: ${BOLD}$DAEMON logs 50${NC}"
     echo ""
 
-    read -p "Press Enter to cleanup and exit (or Ctrl+C to keep session)..."
+    read -r -p "Press Enter to cleanup and exit (or Ctrl+C to keep session)..."
 }
 
 main "$@"

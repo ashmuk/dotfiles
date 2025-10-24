@@ -136,6 +136,9 @@ check_timeouts() {
     local now
     now=$(date +%s)
 
+    # Collect expired pane IDs
+    local expired_panes=()
+
     # Read registered timeouts
     while IFS='|' read -r pane_id deadline callback; do
         [ -z "$pane_id" ] && continue
@@ -151,10 +154,15 @@ check_timeouts() {
                 log_info "Executed timeout callback: $callback"
             fi
 
-            # Remove this timeout
-            sed -i.bak "/^${pane_id}|/d" "$timeouts_file"
+            # Mark for removal
+            expired_panes+=("$pane_id")
         fi
     done < "$timeouts_file"
+
+    # Remove expired timeouts after reading the file
+    for pane_id in "${expired_panes[@]}"; do
+        sed -i.bak "/^${pane_id}|/d" "$timeouts_file"
+    done
 }
 
 # Publish event to event queue

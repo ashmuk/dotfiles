@@ -7,7 +7,7 @@ set -euo pipefail
 # Configuration
 STATE_DIR="/tmp/claude-tmux-states"
 MAX_PANES=10
-SESSION_TIMEOUT=7200  # 2 hours in seconds
+SESSION_TIMEOUT=3600  # 1 hour in seconds
 
 # Colors for output
 RED='\033[0;31m'
@@ -507,7 +507,7 @@ state_sync() {
 
     # Create empty state file if it doesn't exist
     if [ ! -f "$state_file" ]; then
-        echo '{"session_name":"'$session_name'","created_at":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","panes":[]}' > "$state_file"
+        echo '{"session_name":"'"$session_name"'","created_at":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","panes":[]}' > "$state_file"
     fi
 
     # Save existing state to temp file for merging
