@@ -890,6 +890,7 @@ bindkey -v
 # Display indicator of vi mode in prompt
 # shellcheck disable=SC2034  # PROMPT is used by zsh prompt system in case branches
 function zle-keymap-select {
+  # shellcheck disable=SC2016  # PROMPT_BASE to be expanded when updated
   case $KEYMAP in
     vicmd)  PROMPT='%F{red}[NORMAL]%f ${PROMPT_BASE}' ;;
     main|viins) PROMPT='%F{green}[INSERT]%f ${PROMPT_BASE}' ;;
@@ -902,6 +903,7 @@ zle -N zle-keymap-select
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd update_prompt
 function update_prompt {
+  # shellcheck disable=SC2034  # PROMPT_BASE is used in zsh prompt system
   PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n $(git_branch) %F{green}%~%f"$'\n'"%# "
 }
 
