@@ -352,9 +352,9 @@ Track major prompt updates:
 ## Related Documentation
 
 - [README.md](../README.md) - Template overview
-- [ARCHITECTURE.md](../ARCHITECTURE.md) - Design decisions
-- [USAGE.md](../USAGE.md) - Detailed usage guide
-- [TMUX_INTEGRATION.md](../TMUX_INTEGRATION.md) - tmux documentation
+- [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - Design decisions
+- [USAGE.md](../docs/USAGE.md) - Detailed usage guide
+- [TMUX_INTEGRATION.md](../docs/TMUX_INTEGRATION.md) - tmux documentation
 
 ## Contributing
 

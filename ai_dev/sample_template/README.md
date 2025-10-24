@@ -82,11 +82,20 @@ sample_template/
 ├── dot.env.example         # → Deployed as .env
 ├── dot.gitignore           # → Deployed as .gitignore
 ├── dot.pre-commit-config.yaml # → Deployed as .pre-commit-config.yaml
+├── docs/                   # Documentation directory
+│   ├── ARCHITECTURE.md     # Design documentation
+│   ├── CLAUDE_ORCHESTRATION_GUIDE.md  # Claude-tmux orchestration
+│   ├── CLAUDE_TMUX_PROTOCOL.md        # Protocol specification
+│   ├── MIGRATION_MVP_TO_MVP2.md       # Migration guide
+│   ├── QUICKSTART_DEMO.md             # Quick demo
+│   ├── SETUP_DEPLOYMENT_GUIDE.md      # Setup guide
+│   ├── TEMPLATE_NAMING.md             # Naming conventions
+│   ├── TEST_DEPLOYMENT.md             # Test deployment
+│   ├── TMUX_INTEGRATION.md            # tmux documentation
+│   └── USAGE.md                       # Usage guide
 ├── Makefile                # Deployed as-is
 ├── setup_template.sh       # Deployment script
-├── README.md               # This file
-├── ARCHITECTURE.md         # Design documentation
-└── USAGE.md                # Usage guide
+└── README.md               # This file
 ```
 
 **After deployment (hidden dot-files):**

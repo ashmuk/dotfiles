@@ -42,9 +42,8 @@ clean-hard: clean
 	@printf "\033[0;31m[DANGER]\033[0m This will remove ALL AI development template files!\n"
 	@printf "\033[0;31m[DANGER]\033[0m This includes project files, configurations, and caches!\n"
 	@printf "\033[1;33m[WARNING]\033[0m Files to be removed:\n"
-	@echo "  - Directories: .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp"
+	@echo "  - Directories: .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp docs"
 	@echo "  - Files: .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt .aider* .ai_dev*.yml"
-	@echo "  - Claude-tmux docs: CLAUDE_TMUX_PROTOCOL.md CLAUDE_ORCHESTRATION_GUIDE.md DAEMON_GUIDE.md QUICKSTART_DEMO.md"
 	@echo "  - Phase 3.0 temp files: /tmp/claude-tmux-* (daemon state, events, logs)"
 	@echo ""
 	@printf "\033[0;31mAre you ABSOLUTELY sure? Type 'yes' to confirm: \033[0m"; \
@@ -56,11 +55,9 @@ clean-hard: clean
 	@rm -rf /tmp/claude-tmux-events /tmp/claude-tmux-states
 	@rm -f /tmp/claude-tmux-daemon.log /tmp/claude-tmux-daemon.pid
 	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template directories...\n"
-	@rm -rf .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp
+	@rm -rf .cache .claude .codex .coverage .cursor .devcontainer .github .pytest_cache .vscode app prompts scripts tests mcp docs
 	@printf "\033[0;34m[INFO]\033[0m Removing AI dev template configuration files...\n"
 	@rm -f .gitignore .pre-commit-config.yaml AGENTS.md CLAUDE.md ai_dev.yml Makefile requirements.txt
-	@printf "\033[0;34m[INFO]\033[0m Removing Claude-tmux documentation...\n"
-	@rm -f CLAUDE_TMUX_PROTOCOL.md CLAUDE_ORCHESTRATION_GUIDE.md DAEMON_GUIDE.md QUICKSTART_DEMO.md
 	@printf "\033[0;34m[INFO]\033[0m Removing aider configuration files...\n"
 	@rm -f .aider* .ai_dev*.yml
 	@printf "\033[0;32m[SUCCESS]\033[0m Hard cleanup completed\n"
