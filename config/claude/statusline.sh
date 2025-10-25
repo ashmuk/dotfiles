@@ -2,31 +2,67 @@
 # ~/.claude/statusline.sh
 # Claude Code status line with MCP check
 
-# Git ブランチ
-BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "no-git")
+# Read JSON input from stdin
+input=$(cat)
 
-# Python バージョン
-PY=$(python3 --version 2>/dev/null | cut -d' ' -f2)
+# Helper functions for common extractions
+get_model_name() { echo "$input" | jq -r '.model.display_name'; }
+get_current_dir() { echo "$input" | jq -r '.workspace.current_dir'; }
+get_project_dir() { echo "$input" | jq -r '.workspace.project_dir'; }
+get_version() { echo "$input" | jq -r '.version'; }
+get_cost() { echo "$input" | jq -r '.cost.total_cost_usd'; }
+get_duration() { echo "$input" | jq -r '.cost.total_duration_ms'; }
+get_lines_added() { echo "$input" | jq -r '.cost.total_lines_added'; }
+get_lines_removed() { echo "$input" | jq -r '.cost.total_lines_removed'; }
 
-# Java バージョン（1行目のみ）
-JAVA=$(java -version 2>&1 | head -n 1 | sed 's/"//g')
+# Claude model 
+MODEL=$(get_model_name)
 
-# シェル
+# Project directory
+target=$(get_project_dir)
+if [[ "$target" == $HOME* ]]; then
+  PRJ_DIR="~${target#$HOME}"
+else
+  PRJ_DIR="$target"
+fi
+
+
+# Show git branch if in a git repo
+GIT_BRANCH=""
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    BRANCH=$(git branch --show-current 2>/dev/null)
+    if [ -n "$BRANCH" ]; then
+        GIT_BRANCH=" 🌿 $BRANCH"
+    fi
+fi
+
+# Python
+if command -v python3 >/dev/null 2>&1; then
+  PY=$(python3 --version 2>/dev/null | cut -d' ' -f2)
+fi
+
+# Java
+if command -v java >/dev/null 2>&1; then
+  JAVA_FULL=$(java -version 2>&1 | head -n 1 | sed 's/"//g')
+  JAVA=$(echo "$JAVA_FULL" | grep -Eo '[0-9]+(\.[0-9]+)*' | head -n 1)
+fi
+
+# Shell
 SHELL_NAME=$(basename "$SHELL")
 
 # CI 環境判定
 if [ -n "$CI" ]; then
-  CI_STATUS="CI:$CI"
+  CI_STATUS="$CI"
 else
   CI_STATUS="local"
 fi
 
-# === MCP サーバー確認 ===
+# Check MCP Servers
 MCP_STATUS=""
 MCP_CONFIG="$PWD/.mcp.json"
 
 if [ -f "$MCP_CONFIG" ]; then
-  # .mcp.json 内のコマンドを抽出して存在チェック
+  # .mcp.json to be checked to extract content 
   SERVER_CMDS=$(jq -r '.servers | to_entries[] | .value.command // empty' "$MCP_CONFIG" 2>/dev/null)
 
   for CMD in $SERVER_CMDS; do
@@ -40,5 +76,5 @@ else
   MCP_STATUS="no-mcp"
 fi
 
-# 出力
-echo "[${BRANCH}] | Py:${PY:-NA} | ${JAVA:-Java NA} | Sh:${SHELL_NAME} | ${CI_STATUS} | MCP:${MCP_STATUS}"
+# Display statusline
+echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | Py:${PY:-NA} | Java:${JAVA:-NA} | Sh:${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
