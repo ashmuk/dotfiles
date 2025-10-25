@@ -18,6 +18,19 @@ get_lines_removed() { echo "$input" | jq -r '.cost.total_lines_removed'; }
 # Claude model 
 MODEL=$(get_model_name)
 
+# Cost
+COST=$(get_cost)
+
+# Duration (ms -> min)
+DUR_MS=$(get_duration)
+DURATION=$(awk -v msec="$DUR_MS" 'BEGIN { printf "%.4f", msec / 60000 }')
+
+# Lines added
+L_ADDED=$(get_lines_added)
+
+# Lines removed
+L_REMOVED=$(get_lines_removed)
+
 # Project directory
 target=$(get_project_dir)
 if [[ "$target" == $HOME* ]]; then
@@ -77,4 +90,4 @@ else
 fi
 
 # Display statusline
-echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | Py:${PY:-NA} | Java:${JAVA:-NA} | Sh:${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
+echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | C:${COST} | D:${DURATION} | A:${L_ADDED} | R:${L_REMOVED} | Py:${PY:-NA} | Java:${JAVA:-NA} | Sh:${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
