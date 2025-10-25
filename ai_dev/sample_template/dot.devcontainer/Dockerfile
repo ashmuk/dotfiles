@@ -117,13 +117,13 @@ USER ${USERNAME}
 
 WORKDIR /workspace
 
+# Create claude settings for user level
+RUN ln -sf ${WORKDIR}/dot.claude/statusline.sh /home/${USERNAME}/.claude/statusline.sh
+RUN ln -sf ${WORKDIR}/dot.claude/settings.json /home/${USERNAME}/.claude/settings.json
+
 # Alias
 RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"
 
 # Enable vi mode
 RUN echo "bindkey -v" >> "/home/${USERNAME}/.zshrc"
-
-# Create claude settings for user level
-RUN ln -sf ${WORKDIR}/dot.claude/settings.json /home/${USERNAME}/.claude/settings.json
-RUN ln -sf ${WORKDIR}/dot.claude/statusline.sh /home/${USERNAME}/.claude/statusline.sh
 
