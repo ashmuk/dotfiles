@@ -19,11 +19,12 @@ get_lines_removed() { echo "$input" | jq -r '.cost.total_lines_removed'; }
 MODEL=$(get_model_name)
 
 # Cost
-COST=$(get_cost)
+COST_RAW=$(get_cost)
+COST=$(awk -v cst="$COST_RAW" 'BEGIN {printf "%.3f", cst}')
 
 # Duration (ms -> min)
 DUR_MS=$(get_duration)
-DURATION=$(awk -v msec="$DUR_MS" 'BEGIN { printf "%.4f", msec / 60000 }')
+DURATION=$(awk -v msec="$DUR_MS" 'BEGIN { printf "%.2f", msec / 60000 }')
 
 # Lines added
 L_ADDED=$(get_lines_added)
@@ -90,4 +91,4 @@ else
 fi
 
 # Display statusline
-echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | C:${COST} | D:${DURATION} | A:${L_ADDED} | R:${L_REMOVED} | Py:${PY:-NA} | Java:${JAVA:-NA} | Sh:${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
+echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | \$${COST:-0.0} | ${DURATION} mins | A:${L_ADDED} | R:${L_REMOVED} | Py:${PY:-NA} | Java:${JAVA:-NA} | ${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
