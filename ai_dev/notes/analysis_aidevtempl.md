@@ -216,7 +216,7 @@ Referring to `analysis_note_by_claudecode-202510151515.txt`:
 #### 🟡 Moderate:
 2. **Agent bootstrap dependency** (setup_template.sh:236)
    ```bash
-   AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/agent/setup_agent.sh"
+   AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/templates/agent/setup_agent.sh"
    ```
    - Assumes specific dotfiles structure
    - Fails silently if missing
@@ -452,7 +452,7 @@ if [ -f "$AGENT_SETUP_SCRIPT" ]; then
   }
 else
   print_info "Agent setup script not found (optional feature)"
-  print_info "To enable: Install agent configuration from ~/dotfiles/agent/"
+  print_info "To enable: Install agent configuration from ~/dotfiles/templates/agent/"
 fi
 ```
 

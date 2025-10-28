@@ -20,7 +20,7 @@ This guide provides a template for organizing agent-based development using:
 - **prompts/**: Shared prompt templates (copy to project root; Cursor has isolated copies)
 
 ```text
-agent/                      # Template directory (this location in dotfiles)
+templates/agent/            # Template directory (location in ~/dotfiles/)
 ├─ README_agent.md          # This file (Claude Code / Codex guide)
 ├─ README_cursor.md         # Cursor AI-specific guide (see this for Cursor setup)
 │
@@ -54,18 +54,18 @@ agent/                      # Template directory (this location in dotfiles)
 cd <your-project-root>
 
 # Copy policy files
-cp ~/dotfiles/agent/CLAUDE.md ./
-cp ~/dotfiles/agent/AGENTS.md ./
+cp ~/dotfiles/templates/agent/CLAUDE.md ./
+cp ~/dotfiles/templates/agent/AGENTS.md ./
 
 # Copy and rename codex (add dot prefix)
-cp -r ~/dotfiles/agent/codex ./.codex
+cp -r ~/dotfiles/templates/agent/codex ./.codex
 
 # Copy and rename cursor (add dot prefix)
-cp -r ~/dotfiles/agent/cursor ./.cursor
+cp -r ~/dotfiles/templates/agent/cursor ./.cursor
 
 # Copy shared resources
-cp -r ~/dotfiles/agent/prompts ./
-cp -r ~/dotfiles/agent/mcp ./
+cp -r ~/dotfiles/templates/agent/prompts ./
+cp -r ~/dotfiles/templates/agent/mcp ./
 
 # Customize CLAUDE.md and AGENTS.md for your project
 ```

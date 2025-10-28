@@ -2,7 +2,7 @@
 
 # bootstrap_agent.sh
 # Copies agent configuration files and directories to a new project root
-# Usage: Run from the agent/ directory or provide path to project root
+# Usage: Run from the templates/agent/ directory or provide path to project root
 #   ./bootstrap_agent.sh [target_directory]
 
 set -euo pipefail
@@ -30,9 +30,9 @@ if [ ! -d "$TARGET_DIR" ]; then
     exit 1
 fi
 
-# Prevent copying to the agent directory itself
+# Prevent copying to the templates/agent directory itself
 if [ "$(realpath "$TARGET_DIR")" = "$(realpath "$SCRIPT_DIR")" ]; then
-    echo -e "${RED}Error: Cannot bootstrap to the agent directory itself${NC}"
+    echo -e "${RED}Error: Cannot bootstrap to the templates/agent directory itself${NC}"
     exit 1
 fi
 

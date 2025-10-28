@@ -288,7 +288,7 @@ fi
 
 # Bootstrap agent configuration
 print_header "Bootstrapping Agent Configuration"
-AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/agent/setup_agent.sh"
+AGENT_SETUP_SCRIPT="$(dirname "$(dirname "$SCRIPT_DIR")")/templates/agent/setup_agent.sh"
 if [ -f "$AGENT_SETUP_SCRIPT" ]; then
   print_info "Running agent setup script..."
   bash "$AGENT_SETUP_SCRIPT" "$TARGET_DIR" || print_warning "Agent setup encountered issues (non-critical)"

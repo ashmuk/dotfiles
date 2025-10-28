@@ -279,8 +279,8 @@ install-vscode: validate ## Install VS Code configuration
 install-agent: validate ## Install agent configuration templates to ~/.config/agent
 	@echo "$(BLUE)[INFO]$(NC) Installing agent configuration templates..."
 	@mkdir -p $(HOME_DIR)/.config/agent
-	@ln -sf $(DOTFILES_DIR)/agent/AGENTS.md $(HOME_DIR)/.config/agent/AGENTS.md
-	@ln -sf $(DOTFILES_DIR)/agent/CLAUDE.md $(HOME_DIR)/.config/agent/CLAUDE.md
+	@ln -sf $(DOTFILES_DIR)/templates/agent/AGENTS.md $(HOME_DIR)/.config/agent/AGENTS.md
+	@ln -sf $(DOTFILES_DIR)/templates/agent/CLAUDE.md $(HOME_DIR)/.config/agent/CLAUDE.md
 	@echo "$(GREEN)[SUCCESS]$(NC) Agent templates installed to ~/.config/agent/"
 	@echo "$(BLUE)[INFO]$(NC) Templates available at:"
 	@echo "  - $(HOME_DIR)/.config/agent/AGENTS.md"

@@ -1,0 +1,32 @@
+services:
+  ai_dev_container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CLAUDE_CODE_VERSION: latest
+        GIT_DELTA_VERSION: 0.18.2
+        ZSH_IN_DOCKER_VERSION: 1.2.0
+    image: container-ai-dev-sandbox
+    command: sleep infinity
+    user: ashmuk
+    working_dir: /workspace
+    volumes:
+    - ..:/workspace:rw,cached
+    environment:
+      DEV_PROFILE: web
+    cap_add:
+    - NET_ADMIN
+    - NET_RAW
+    security_opt:
+    - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '3.0'
+          memory: 4g
+  dev-nonet:
+    extends: ai_dev_container
+    network_mode: none
+    profiles:
+    - no-net
