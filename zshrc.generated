@@ -882,6 +882,7 @@ git_branch() {
 PROMPT_BASE="%F{cyan}zsh-${ZSH_VER}-%n $(git_branch) %F{green}%~%f"$'\n'"%# "
 
 # shellcheck disable=SC2034  # PROMPT is used by zsh
+# shellcheck disable=SC2016  # Variable expansion intentionally deferred for zsh PROMPT_SUBST
 PROMPT='%F{green}[INSERT]%f ${PROMPT_BASE}' # Do not expand variables when substituted by single quote
 
 # Enable vi mode
