@@ -105,11 +105,6 @@
       "Bash(telnet:*)"
     ],
     "additionalDirectories": [
-      "../docs/",
-      "../shared/",
-      "~/templates/",
-      "~/.config/claude/",
-      "~/dotfiles/"
     ]
   },
   "enableAllProjectMcpServers": true,
