@@ -20,7 +20,7 @@ MODEL=$(get_model_name)
 
 # Cost
 COST_RAW=$(get_cost)
-COST=$(awk -v cst="$COST_RAW" 'BEGIN {printf "%.3f", cst}')
+COST=$(awk -v cst="$COST_RAW" 'BEGIN {printf "%.2f", cst}')
 
 # Duration (ms -> min)
 DUR_MS=$(get_duration)
@@ -90,5 +90,10 @@ else
   MCP_STATUS="no-mcp"
 fi
 
+# Status line format
+STATUS_LINE="
+| ${MODEL:-NA} | \$${COST:-0.0} | ${DURATION} mins | A:${L_ADDED} | R:${L_REMOVED} | 
+| ${SHELL_NAME} (${PRJ_DIR}${GIT_BRANCH}) | Py:${PY:-NA} | Java:${JAVA:-NA} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
+
 # Display statusline
-echo "(${PRJ_DIR}${GIT_BRANCH}) | ${MODEL:-NA} | \$${COST:-0.0} | ${DURATION} mins | A:${L_ADDED} | R:${L_REMOVED} | Py:${PY:-NA} | Java:${JAVA:-NA} | ${SHELL_NAME} | CI:${CI_STATUS} | MCP:${MCP_STATUS}"
+echo "$STATUS_LINE"
