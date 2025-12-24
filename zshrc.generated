@@ -150,8 +150,9 @@ elif command -v /usr/local/bin/du >/dev/null 2>&1; then
     du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
     [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/du, du_command='$du_command'" >&2
   fi
-elif [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+elif [ -d "$test_dir" ] && command du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
   # Default GNU du (test last, as it's the slowest check)
+  # Use 'command du' to bypass any aliases defined earlier in this parsing unit
   du_command="du ${du_options:-} --max-depth=1"
   [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using GNU du, du_command='$du_command'" >&2
 else
@@ -865,6 +866,7 @@ setopt PROMPT_SUBST
 # Performance optimization: use completion cache to speed up startup
 autoload -Uz compinit
 # Only run full compinit if completion cache is older than 24 hours
+# shellcheck disable=SC1036,SC1072,SC1073,SC1009  # zsh-specific glob qualifier syntax
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
   compinit
 else
