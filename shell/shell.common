@@ -27,7 +27,6 @@ fi
 export HISTSIZE=10000
 export SAVEHIST=10000
 export HISTFILESIZE=20000
-export HISTCONTROL=ignoreboth:erasedups
 
 # Editor settings
 export EDITOR=vim

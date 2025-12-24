@@ -10,6 +10,8 @@
 # Bash-specific Settings
 # =============================================================================
 
+export HISTCONTROL=ignoreboth:erasedups
+
 # Enable programmable completion
 if [[ -f /usr/local/etc/bash_completion ]]; then
   # shellcheck disable=SC1091
