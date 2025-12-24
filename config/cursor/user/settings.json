@@ -1,11 +1,16 @@
 {
-    "editor.fontSize": 14, // Tool default was 12
-//    "terminal.integrated.fontSize": 14 // Tool default was 12
+    "editor.fontSize": 14,
 
     "window.commandCenter": true,
-    "workbench.colorTheme": "Solarized Dark",
 
+    "workbench.preferredDarkColorTheme": "Solarized Dark",
+
+    "workbench.colorTheme": "Solarized Dark",
+    "terminal.integrated.colorScheme": "Solarized Dark",
+
+    "terminal.integrated.drawBoldTextInBrightColors": false,
     "terminal.integrated.gpuAcceleration": "off",
+
     "window.systemColorTheme": "dark",
     "window.autoDetectColorScheme": false,
     "window.titleBarStyle": "custom",
@@ -13,50 +18,43 @@
     "redhat.telemetry.enabled": true,
 
     "vim.hlsearch": true,
-    "vim.highlightSearch": true,          // 検索マッチをハイライト（hlsearch とほぼ同義）
+    "vim.highlightSearch": true,
     "vim.incsearch": true,
     "vim.ignorecase": true,
     "vim.smartcase": true,
     "vim.searchHighlightColor": "rgba(255, 255, 255, 0.7)",
     "vim.searchHighlightTextColor": "rgba(0, 43, 54, 1.0)",
 
-    "vim.useSystemClipboard": true,       // OS クリップボードを使う
-    "vim.useCtrlKeys": true,              // Ctrl 系キー (Ctrl+f など) を有効化
-    "vim.handleKeys": {                   // VS Code 側のキーを上書きするかどうか
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.handleKeys": {
         "<C-a>": true,
         "<C-b>": true,
         "<C-f>": true
     },
-//    "vim.insertModeKeyBindings": [ ... ], // 挿入モード用のキーバインド定義
-//    "vim.normalModeKeyBindings": [ ... ]  // ノーマルモード用のキーバインド定義
 
-    "vim.statusBarColorControl": true,    // モードごとにステータスバーの色を変える
-    "vim.enableNeovim": false,             // Neovim バイナリ連携を無効（Cursor は推奨: false）
+    "vim.statusBarColorControl": true,
+    "vim.enableNeovim": false,
 
-    "vim.useCtrlKeys": true,              // Ctrl キーの有効化
-    "vim.leader": "<space>",              // リーダーキー定義
-    "vim.easymotion": true,               // EasyMotion の有効化
+    "vim.leader": "<space>",
+    "vim.easymotion": true,
 
     "vim.normalModeKeyBindingsNonRecursive": [
         {
             "before": ["<Esc>", "<Esc>"],
             "commands": [":nohl"]
         }
-    ]
+    ],
 
-    "workbench.activityBar.orientation": "vertical"
+    "workbench.activityBar.orientation": "vertical",
 
     "workbench.colorCustomizations": {
-        "terminal.background": "#00000000",
-
         "editor.findMatchHighlight": "rgba(255, 235, 59, 0.5)",
         "editor.findMatchHighlightBorder": "rgba(0, 0, 0, 1.0)",
-
         "editor.wordHighlight": "rgba(255, 235, 59, 0.5)",
         "editor.wordHighlightBorder": "rgba(0, 0, 0, 1.0)",
         "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
         "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
-
         "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)",
         "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)"
     },
@@ -102,5 +100,6 @@
         "**/*.pyc": true,
         "**/__pycache__": true
     },
-    "diffEditor.ignoreTrimWhitespace": false
+    "diffEditor.ignoreTrimWhitespace": false,
+    "terminal.integrated.minimumContrastRatio": 1
 }
