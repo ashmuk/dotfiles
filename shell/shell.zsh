@@ -35,8 +35,14 @@ setopt PROMPT_SUBST
 # =============================================================================
 
 # Enable auto completion
+# Performance optimization: use completion cache to speed up startup
 autoload -Uz compinit
-compinit
+# Only run full compinit if completion cache is older than 24 hours
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C  # Skip check, use cache (much faster)
+fi
 
 # Show auto completion like 'menu'
 zstyle ':completion:*' menu select
@@ -51,14 +57,55 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # =============================================================================
 
 # zsh prompt (colored / 2-line)
-ZSH_VER=$(zsh --version | head -n1 | awk '{print $2}')
+# Performance optimization: use built-in ZSH_VERSION instead of running zsh --version
+ZSH_VER="${ZSH_VERSION%.*}"
 
 # Git branch name function
+# Performance optimization: cache git branch with 2-second timeout to avoid slow git calls on every prompt
 git_branch() {
-  local branch
-  # Return no string if in directory does not have HEAD
-  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-  if [[ -n $branch ]]; then
+  local branch cache_file="/tmp/zsh_git_branch_$$"
+  local cache_age current_dir_hash
+  
+  # Use directory hash for per-directory caching (portable hash generation)
+  if command -v md5sum >/dev/null 2>&1; then
+    current_dir_hash=$(echo "$PWD" | md5sum 2>/dev/null | cut -d' ' -f1)
+  elif command -v md5 >/dev/null 2>&1; then
+    current_dir_hash=$(echo "$PWD" | md5 -q 2>/dev/null)
+  else
+    # Fallback: use process ID if no hash command available
+    current_dir_hash="$$"
+  fi
+  cache_file="/tmp/zsh_git_branch_${current_dir_hash:-$$}"
+  
+  # Check cache (if exists and < 2 seconds old)
+  if [[ -f "$cache_file" ]]; then
+    # Get file modification time (portable across systems)
+    if [[ "$OSTYPE" == darwin* ]]; then
+      cache_age=$(($(date +%s) - $(stat -f %m "$cache_file" 2>/dev/null || echo 0)))
+    else
+      cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0)))
+    fi
+    if [[ $cache_age -lt 2 ]]; then
+      branch=$(cat "$cache_file" 2>/dev/null)
+      if [[ -n "$branch" ]]; then
+        echo "%F{yellow}(${branch})%f"
+        return
+      fi
+    fi
+  fi
+  
+  # Get branch (with timeout for large repos - 0.5 second max)
+  # Use timeout command if available, otherwise rely on git's own timeout
+  if command -v timeout >/dev/null 2>&1; then
+    branch=$(timeout 0.5 git symbolic-ref --short HEAD 2>/dev/null || echo "")
+  else
+    # Fallback: use git directly (may be slow in large repos)
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+  fi
+  
+  # Cache result (only if we got a branch)
+  if [[ -n "$branch" ]]; then
+    echo "$branch" > "$cache_file" 2>/dev/null
     echo "%F{yellow}(${branch})%f"
   fi
 }
