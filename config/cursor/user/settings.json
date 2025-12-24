@@ -56,7 +56,12 @@
         "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
         "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
         "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)",
-        "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)"
+        "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)",
+        "statusBar.background": "#005f5f",
+        "statusBar.noFolderBackground": "#005f5f",
+        "statusBar.debuggingBackground": "#005f5f",
+        "statusBar.foreground": "#ffffff",
+        "statusBar.debuggingForeground": "#ffffff"
     },
 
     "makefile.configureOnOpen": false,
