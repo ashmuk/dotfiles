@@ -14,11 +14,14 @@
 # =============================================================================
 
 # Add common paths
-export PATH="/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
-# Homebrew (Intel/macOS 用) 調整
+# Build PATH efficiently (performance optimization: single export)
+_path_parts=("/usr/local/bin" "$HOME/bin" "$HOME/.local/bin")
 if [[ -d /opt/homebrew/bin ]]; then
-  export PATH="/opt/homebrew/bin:$PATH"
+  _path_parts=("/opt/homebrew/bin" "${_path_parts[@]}")
 fi
+_new_path="$(IFS=:; echo "${_path_parts[*]}"):$PATH"
+export PATH="$_new_path"
+unset _path_parts _new_path
 
 # =============================================================================
 # Basic Shell Settings
@@ -35,19 +38,22 @@ export VISUAL=vim
 
 # Language settings
 # Set locale only if available to avoid warnings
-if locale -a 2>/dev/null | grep -q "ja_JP.UTF-8"; then
+# Cache locale list to avoid running locale -a multiple times (performance optimization)
+_available_locales=$(locale -a 2>/dev/null)
+if echo "$_available_locales" | grep -q "ja_JP.UTF-8"; then
     export LANG=ja_JP.UTF-8
     export LC_ALL=ja_JP.UTF-8
 else
     # Fallback to C.UTF-8 or en_US.UTF-8
-    if locale -a 2>/dev/null | grep -q "C.UTF-8"; then
+    if echo "$_available_locales" | grep -q "C.UTF-8"; then
         export LANG=C.UTF-8
         export LC_ALL=C.UTF-8
-    elif locale -a 2>/dev/null | grep -q "en_US.UTF-8"; then
+    elif echo "$_available_locales" | grep -q "en_US.UTF-8"; then
         export LANG=en_US.UTF-8
         export LC_ALL=en_US.UTF-8
     fi
 fi
+unset _available_locales
 
 # =============================================================================
 # Grep Configuration
@@ -119,27 +125,35 @@ du_command="du ${du_options:-} -d 1"
 [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Initial du_command='$du_command'" >&2
 
 # Check if du supports GNU-style --max-depth option
-# Use a safer test directory that should exist everywhere
+# Performance optimization: check command existence first, test only if needed
 test_dir="${TMPDIR:-/tmp}"
-if [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
-  # GNU du
+# Check for GNU du variants first (faster than running actual commands)
+if command -v gdu >/dev/null 2>&1; then
+  # GNU du as gdu - test only if command exists
+  if [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+    # shellcheck disable=SC2139  # Alias is defined here but used later, not in same parsing unit
+    alias du='gdu'
+    du_command="gdu ${du_options:-} --max-depth=1"
+    [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using gdu, du_command='$du_command'" >&2
+  fi
+elif command -v /opt/homebrew/bin/du >/dev/null 2>&1; then
+  # GNU du in /opt/homebrew/bin - test only if command exists
+  if [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+    alias du='/opt/homebrew/bin/du'
+    du_command="/opt/homebrew/bin/du ${du_options:-} --max-depth=1"
+    [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/du, du_command='$du_command'" >&2
+  fi
+elif command -v /usr/local/bin/du >/dev/null 2>&1; then
+  # GNU du in /usr/local/bin - test only if command exists
+  if [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+    alias du='/usr/local/bin/du'
+    du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
+    [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/du, du_command='$du_command'" >&2
+  fi
+elif [ -d "$test_dir" ] && du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
+  # Default GNU du (test last, as it's the slowest check)
   du_command="du ${du_options:-} --max-depth=1"
   [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using GNU du, du_command='$du_command'" >&2
-elif command -v gdu >/dev/null 2>&1 && [ -d "$test_dir" ] && gdu --max-depth=1 "$test_dir" >/dev/null 2>&1; then
-  # GNU du as gdu
-  alias du='gdu'
-  du_command="gdu ${du_options:-} --max-depth=1"
-  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using gdu, du_command='$du_command'" >&2
-elif command -v /usr/local/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /usr/local/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
-  # GNU du in /usr/local/bin
-  alias du='/usr/local/bin/du'
-  du_command="/usr/local/bin/du ${du_options:-} --max-depth=1"
-  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /usr/local/bin/du, du_command='$du_command'" >&2
-elif command -v /opt/homebrew/bin/du >/dev/null 2>&1 && [ -d "$test_dir" ] && /opt/homebrew/bin/du --max-depth=1 "$test_dir" >/dev/null 2>&1; then
-  # GNU du in /opt/homebrew/bin
-  alias du='/opt/homebrew/bin/du'
-  du_command="/opt/homebrew/bin/du ${du_options:-} --max-depth=1"
-  [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using /opt/homebrew/bin/du, du_command='$du_command'" >&2
 else
   [[ "${DEBUG_SHELL_COMMON:-}" == "1" ]] && echo "DEBUG: Using default du, du_command='$du_command'" >&2
 fi
