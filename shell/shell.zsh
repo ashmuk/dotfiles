@@ -38,6 +38,7 @@ setopt PROMPT_SUBST
 # Performance optimization: use completion cache to speed up startup
 autoload -Uz compinit
 # Only run full compinit if completion cache is older than 24 hours
+# shellcheck disable=SC1036,SC1072,SC1073,SC1009  # zsh-specific glob qualifier syntax
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
   compinit
 else
