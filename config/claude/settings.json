@@ -1,10 +1,4 @@
 {
-  "model": "claude-sonnet-4-5-20250929",
-  "outputStyle": "Explanatory",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
   "env": {
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "BASH_MAX_TIMEOUT_MS": "300000",
@@ -17,8 +11,8 @@
     "CLAUDE_CODE_HISTORY_SIZE": "1000",
     "CLAUDE_CODE_RETRY_ATTEMPTS": "3"
   },
+  "includeCoAuthoredBy": true,
   "permissions": {
-    "defaultMode": "acceptEdits",
     "allow": [
       "Read(~/.zshrc)",
       "Read(~/.bashrc)",
@@ -50,33 +44,6 @@
       "Bash(make status:*)",
       "Bash(make test:*)"
     ],
-    "ask": [
-      "Bash(git push:*)",
-      "Bash(git pull:*)",
-      "Bash(git fetch:*)",
-      "Bash(npm publish:*)",
-      "Bash(mvn deploy:*)",
-      "Bash(gradle publish:*)",
-      "Bash(cargo publish:*)",
-      "Bash(poetry publish:*)",
-      "Bash(docker push:*)",
-      "Bash(docker run:*)",
-      "Bash(kubectl apply:*)",
-      "Bash(kubectl delete:*)",
-      "Bash(pip install:*)",
-      "Bash(npm install:*)",
-      "Bash(yarn add:*)",
-      "Bash(cargo install:*)",
-      "Bash(psql:*)",
-      "Bash(mysql:*)",
-      "Bash(mongosh:*)",
-      "Bash(sudo:*)",
-      "Bash(rm -rf:*)",
-      "Bash(chmod:*)",
-      "Bash(chown:*)",
-      "Bash(make install:*)",
-      "Bash(make clean:*)"
-    ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
@@ -104,8 +71,35 @@
       "Bash(netcat:*)",
       "Bash(telnet:*)"
     ],
-    "additionalDirectories": [
-    ]
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(npm publish:*)",
+      "Bash(mvn deploy:*)",
+      "Bash(gradle publish:*)",
+      "Bash(cargo publish:*)",
+      "Bash(poetry publish:*)",
+      "Bash(docker push:*)",
+      "Bash(docker run:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl delete:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(yarn add:*)",
+      "Bash(cargo install:*)",
+      "Bash(psql:*)",
+      "Bash(mysql:*)",
+      "Bash(mongosh:*)",
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(make install:*)",
+      "Bash(make clean:*)"
+    ],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
@@ -115,5 +109,9 @@
     "sqlite"
   ],
   "disabledMcpjsonServers": [],
-  "includeCoAuthoredBy": true
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "outputStyle": "Explanatory"
 }
