@@ -217,10 +217,10 @@ is not read really. Is my understanding correct? How did you get 'claude' called
   ⎿  [SUCCESS] Command sent to pane 0 in session 'claude-live-demo'
 
 ⏺ Bash(sleep 1 && ./scripts/claude-tmux-bridge.sh pane-capture claude-live-demo 0 10 2>&1 | grep -A 1 '"output"' | head -3)
-  ⎿   "output": "\n[INSERT] zsh-5.9-hmukai ~/dotfiles/ai_dev/sample_template\n%\n[INSERT] zsh-5.9-hmukai ~/dotfiles/ai_dev/sample_template\n%
+  ⎿   "output": "\n[INSERT] zsh-5.9-hmukai ~/dotfiles/templates/ai_dev/sample_template\n%\n[INSERT] zsh-5.9-hmukai ~/dotfiles/templates/ai_dev/sample_template\n%
      echo 'Claude is orchestrating this\\!'; date\nClaude is orchestrating this\\!\n2025年 10月21日 火曜日 10時04分34秒 JST\n[INSERT]
     zsh-5.9-hmukai ~
-    /dotfiles/ai_dev/sample_template\n%\n",
+    /dotfiles/templates/ai_dev/sample_template\n%\n",
       "timestamp": "2025-10-21T01:04:42Z"
 
 

@@ -2,7 +2,7 @@
 
 **Date:** 2025-10-22
 **Source:** ~/Cursor/ai_dev_test (sandbox)
-**Destination:** ~/dotfiles/ai_dev/sample_template
+**Destination:** ~/dotfiles/templates/ai_dev/sample_template
 **Phase:** MVP 3.0 - Event-Driven & Real-Time Streaming
 
 ---

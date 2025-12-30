@@ -465,7 +465,7 @@ services:
 
 ```bash
 cd /path/to/your/project
-~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
+~/dotfiles/templates/ai_dev/sample/setup_ai_dev_sample.sh
 ```
 
 スクリプトは自動的に:

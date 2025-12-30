@@ -60,7 +60,7 @@ convert_dotname() {
 ### Viewing Template Files
 ```bash
 # In template directory - all visible
-ls ~/dotfiles/ai_dev/sample_template/
+ls ~/dotfiles/templates/ai_dev/sample_template/
 # Output shows: dot.devcontainer/ dot.github/ dot.vscode/ etc.
 
 # No special commands needed - visible in Finder/Explorer

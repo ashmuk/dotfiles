@@ -6,14 +6,17 @@ This directory contains reusable templates for bootstrapping new projects and en
 
 ```
 templates/
-└── agent/              # AI agent configuration templates
-    ├── CLAUDE.md       # Project policy template for Claude Code
-    ├── AGENTS.md       # Agent role definitions
-    ├── codex/          # Codex AI runtime configuration
-    ├── cursor/         # Cursor IDE templates
-    ├── prompts/        # Shared prompt templates
-    ├── mcp/            # Model Context Protocol tool definitions
-    └── setup_agent.sh  # Bootstrap script for deploying templates
+├── agent/              # AI agent configuration templates
+│   ├── CLAUDE.md       # Project policy template for Claude Code
+│   ├── AGENTS.md       # Agent role definitions
+│   ├── codex/          # Codex AI runtime configuration
+│   ├── cursor/         # Cursor IDE templates
+│   ├── prompts/        # Shared prompt templates
+│   ├── mcp/            # Model Context Protocol tool definitions
+│   └── setup_agent.sh  # Bootstrap script for deploying templates
+└── ai_dev/             # AI development tooling and project templates
+    ├── sample_template/ # Production-ready AI dev template
+    └── notes/          # Development notes and analysis
 ```
 
 ## Usage
@@ -34,7 +37,7 @@ make install-agent
 ~/dotfiles/templates/agent/setup_agent.sh /path/to/your-project
 
 # Option 2: Use with AI dev template
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/your-project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/your-project
 ```
 
 See [templates/agent/README_agent.md](agent/README_agent.md) for detailed documentation.
@@ -52,5 +55,5 @@ When adding new template categories to this directory:
 ## Related Directories
 
 - **`config/`** - Personal environment configurations (tmux, vim, shell, etc.)
-- **`ai_dev/`** - AI development tooling and project templates
+- **`templates/ai_dev/`** - AI development tooling and project templates
 - **`templates/`** - Reusable templates for distribution to projects (you are here)

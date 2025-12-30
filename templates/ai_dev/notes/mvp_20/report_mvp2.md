@@ -102,7 +102,7 @@
   cat MIGRATION_MVP_TO_MVP2.md
 
   Deploy to your projects:
-  ~/dotfiles/ai_dev/sample_template/setup_template.sh ~/your-project
+  ~/dotfiles/templates/ai_dev/sample_template/setup_template.sh ~/your-project
 
   ---
   🏆 Achievement Unlocked

@@ -32,7 +32,7 @@ A production-ready template for AI-driven development combining:
 
 ```bash
 # From dotfiles directory
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/your-project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/your-project
 ```
 
 ### 2. Configure Environment

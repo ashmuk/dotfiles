@@ -42,7 +42,7 @@ Quick access to common operations:
 
 ```bash
 # Step 1: Deploy template
-~/dotfiles/ai_dev/sample_template/setup_template.sh ~/projects/my-app
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh ~/projects/my-app
 
 # Step 2: Configure
 cd ~/projects/my-app

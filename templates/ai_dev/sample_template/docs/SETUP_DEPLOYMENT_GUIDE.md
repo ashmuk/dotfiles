@@ -83,7 +83,7 @@ README.md                →  README.md
 
 ```bash
 # From dotfiles directory
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/your-project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/your-project
 ```
 
 ### Step 2: Confirmation
@@ -293,7 +293,7 @@ If you want to restore the template:
 
 ```bash
 # Re-deploy the template
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/project
 ```
 
 ## Troubleshooting
@@ -311,7 +311,7 @@ chmod +x .devcontainer/*.sh
 ```bash
 # Check script output for warnings
 # Re-run deployment:
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/project
 ```
 
 ### Backed Up Files Interfering
@@ -338,7 +338,7 @@ To update an existing project with new template changes:
 1. **Backup your work** (commit to git)
 2. **Re-run setup script**
    ```bash
-   ~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/project
+   ~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/project
    ```
 3. **Review `.backup` files**
    - Compare your customizations
@@ -395,4 +395,4 @@ These files should generally be kept in sync with template:
 ---
 
 **Last Updated:** 2025-10-16 (v2.1)
-**Maintained by:** dotfiles/ai_dev/sample_template/
+**Maintained by:** dotfiles/templates/ai_dev/sample_template/

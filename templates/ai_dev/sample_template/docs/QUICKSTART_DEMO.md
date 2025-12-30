@@ -7,7 +7,7 @@
 Open iTerm2 and run:
 
 ```bash
-cd ~/dotfiles/ai_dev/sample_template
+cd ~/dotfiles/templates/ai_dev/sample_template
 ./scripts/claude-orchestrator-poc.sh
 ```
 
@@ -34,7 +34,7 @@ Press `Ctrl+C` to exit and auto-cleanup.
 ### Option 2: Run the Makefile Demo (Simpler)
 
 ```bash
-cd ~/dotfiles/ai_dev/sample_template
+cd ~/dotfiles/templates/ai_dev/sample_template
 make claude-demo
 ```
 
@@ -62,7 +62,7 @@ make claude-session-kill SESSION=demo-session
 ### Option 3: Manual Step-by-Step (Educational)
 
 ```bash
-cd ~/dotfiles/ai_dev/sample_template
+cd ~/dotfiles/templates/ai_dev/sample_template
 
 # 1. Create a session
 ./scripts/claude-tmux-bridge.sh session-create my-demo

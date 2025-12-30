@@ -261,7 +261,7 @@ Referring to `analysis_note_by_claudecode-202510151515.txt`:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   AI Dev Template Setup
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ℹ Template source: /Users/hmukai/dotfiles/ai_dev/sample_template
+ℹ Template source: /Users/hmukai/dotfiles/templates/ai_dev/sample_template
 ℹ Target directory: /path/to/project
 ```
 
@@ -838,7 +838,7 @@ Phase 3 (Planned): Full Autonomy 📋
 ### Deployment
 ```bash
 # Deploy template to new project
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/project
 
 # Open in DevContainer
 cd /path/to/project

@@ -253,7 +253,7 @@ cp ~/dotfiles/config/tmux/tmuxinator/ai-dev.yml ~/.tmuxinator/
 cd ~/work/your-project
 
 # スクリプトを実行（自動的にドット付きファイル名で展開）
-~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
+~/dotfiles/templates/ai_dev/sample/setup_ai_dev_sample.sh
 ```
 
 ### 方法2: 手動コピー
@@ -262,20 +262,20 @@ cd ~/work/your-project
 cd ~/work/your-project
 
 # DevContainer 設定
-cp -r ~/dotfiles/ai_dev/sample/devcontainer .devcontainer
+cp -r ~/dotfiles/templates/ai_dev/sample/devcontainer .devcontainer
 
 # AI/開発ツール設定
-cp ~/dotfiles/ai_dev/sample/aider.conf.yml .aider.conf.yml
-cp ~/dotfiles/ai_dev/sample/Makefile .
-cp ~/dotfiles/ai_dev/sample/gitignore .gitignore
-cp ~/dotfiles/ai_dev/sample/pre-commit-config.yaml .pre-commit-config.yaml
+cp ~/dotfiles/templates/ai_dev/sample/aider.conf.yml .aider.conf.yml
+cp ~/dotfiles/templates/ai_dev/sample/Makefile .
+cp ~/dotfiles/templates/ai_dev/sample/gitignore .gitignore
+cp ~/dotfiles/templates/ai_dev/sample/pre-commit-config.yaml .pre-commit-config.yaml
 
 # 環境変数（.envは編集が必要）
-cp ~/dotfiles/ai_dev/sample/env.example .env
+cp ~/dotfiles/templates/ai_dev/sample/env.example .env
 
 # GitHub Actions
 mkdir -p .github/workflows
-cp ~/dotfiles/ai_dev/sample/github/workflows/ci.yml .github/workflows/
+cp ~/dotfiles/templates/ai_dev/sample/github/workflows/ci.yml .github/workflows/
 ```
 
 ---
@@ -325,7 +325,7 @@ tmux source-file ~/.tmux.conf
 cd ~/work/your-project
 
 # ブートストラップスクリプトを実行（推奨）
-~/dotfiles/ai_dev/sample/setup_ai_dev_sample.sh
+~/dotfiles/templates/ai_dev/sample/setup_ai_dev_sample.sh
 ```
 
 スクリプトは以下を自動的に行います:

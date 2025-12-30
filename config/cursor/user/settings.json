@@ -1,110 +1,110 @@
 {
-    "editor.fontSize": 14,
+  "editor.fontSize": 14,
 
-    "window.commandCenter": true,
+  "window.commandCenter": true,
 
-    "workbench.preferredDarkColorTheme": "Solarized Dark",
+  "workbench.preferredDarkColorTheme": "Solarized Dark",
 
-    "workbench.colorTheme": "Solarized Dark",
-    "terminal.integrated.colorScheme": "Solarized Dark",
+  "workbench.colorTheme": "Solarized Dark",
+  "terminal.integrated.colorScheme": "Solarized Dark",
 
-    "terminal.integrated.drawBoldTextInBrightColors": false,
-    "terminal.integrated.gpuAcceleration": "off",
+  "terminal.integrated.drawBoldTextInBrightColors": false,
+  "terminal.integrated.gpuAcceleration": "off",
 
-    "window.systemColorTheme": "dark",
-    "window.autoDetectColorScheme": false,
-    "window.titleBarStyle": "custom",
-    "git.autofetch": true,
-    "redhat.telemetry.enabled": true,
+  "window.systemColorTheme": "dark",
+  "window.autoDetectColorScheme": false,
+  "window.titleBarStyle": "custom",
+  "git.autofetch": true,
+  "redhat.telemetry.enabled": true,
 
-    "vim.hlsearch": true,
-    "vim.highlightSearch": true,
-    "vim.incsearch": true,
-    "vim.ignorecase": true,
-    "vim.smartcase": true,
-    "vim.searchHighlightColor": "rgba(255, 255, 255, 0.7)",
-    "vim.searchHighlightTextColor": "rgba(0, 43, 54, 1.0)",
+  "vim.hlsearch": true,
+  "vim.highlightSearch": true,
+  "vim.incsearch": true,
+  "vim.ignorecase": true,
+  "vim.smartcase": true,
+  "vim.searchHighlightColor": "rgba(255, 255, 255, 0.7)",
+  "vim.searchHighlightTextColor": "rgba(0, 43, 54, 1.0)",
 
-    "vim.useSystemClipboard": true,
-    "vim.useCtrlKeys": true,
-    "vim.handleKeys": {
-        "<C-a>": true,
-        "<C-b>": true,
-        "<C-f>": true
-    },
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.handleKeys": {
+    "<C-a>": true,
+    "<C-b>": true,
+    "<C-f>": true
+  },
 
-    "vim.statusBarColorControl": true,
-    "vim.enableNeovim": false,
+  "vim.statusBarColorControl": true,
+  "vim.enableNeovim": false,
 
-    "vim.leader": "<space>",
-    "vim.easymotion": true,
+  "vim.leader": "<space>",
+  "vim.easymotion": true,
 
-    "vim.normalModeKeyBindingsNonRecursive": [
-        {
-            "before": ["<Esc>", "<Esc>"],
-            "commands": [":nohl"]
-        }
-    ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<Esc>", "<Esc>"],
+      "commands": [":nohl"]
+    }
+  ],
 
-    "workbench.activityBar.orientation": "vertical",
+  "workbench.activityBar.orientation": "vertical",
 
-    "workbench.colorCustomizations": {
-        "editor.findMatchHighlight": "rgba(255, 235, 59, 0.5)",
-        "editor.findMatchHighlightBorder": "rgba(0, 0, 0, 1.0)",
-        "editor.wordHighlight": "rgba(255, 235, 59, 0.5)",
-        "editor.wordHighlightBorder": "rgba(0, 0, 0, 1.0)",
-        "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
-        "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
-        "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)",
-        "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)",
-        "statusBar.background": "#005f5f",
-        "statusBar.noFolderBackground": "#005f5f",
-        "statusBar.debuggingBackground": "#005f5f",
-        "statusBar.foreground": "#ffffff",
-        "statusBar.debuggingForeground": "#ffffff"
-    },
+  "workbench.colorCustomizations": {
+    "editor.findMatchHighlight": "rgba(255, 235, 59, 0.5)",
+    "editor.findMatchHighlightBorder": "rgba(0, 0, 0, 1.0)",
+    "editor.wordHighlight": "rgba(255, 235, 59, 0.5)",
+    "editor.wordHighlightBorder": "rgba(0, 0, 0, 1.0)",
+    "editor.wordHighlightStrong": "rgba(255, 215, 0, 0.6)",
+    "editor.wordHighlightStrongBorder": "rgba(0, 0, 0, 1.0)",
+    "editor.selectionHighlight": "rgba(255, 235, 59, 0.4)",
+    "editor.selectionHighlightBorder": "rgba(100, 149, 237, 0.4)",
+    "statusBar.background": "#005f5f",
+    "statusBar.noFolderBackground": "#005f5f",
+    "statusBar.debuggingBackground": "#005f5f",
+    "statusBar.foreground": "#ffffff",
+    "statusBar.debuggingForeground": "#ffffff"
+  },
 
-    "makefile.configureOnOpen": false,
+  "makefile.configureOnOpen": false,
 
-    "files.associations": {
-        "shell.*": "shellscript",
-        "aliases.*": "shellscript",
-        ".bashrc": "shellscript",
-        ".zshrc": "shellscript",
-        ".profile": "shellscript",
-        "*.sh": "shellscript",
-        "*.bash": "shellscript",
-        "*.zsh": "shellscript",
-        "*.fish": "shellscript",
-        "*.ps1": "powershell",
+  "files.associations": {
+    "shell.*": "shellscript",
+    "aliases.*": "shellscript",
+    ".bashrc": "shellscript",
+    ".zshrc": "shellscript",
+    ".profile": "shellscript",
+    "*.sh": "shellscript",
+    "*.bash": "shellscript",
+    "*.zsh": "shellscript",
+    "*.fish": "shellscript",
+    "*.ps1": "powershell",
 
-        "*gitignore*": "ignore",
-        "*gitconfig*": "git-config",
-        "*gitattributes*": "git-commit",
+    "*gitignore*": "ignore",
+    "*gitconfig*": "git-config",
+    "*gitattributes*": "git-commit",
 
-        ".vimrc": "viml",
-        "vimrc.*": "viml",
-        "mappings.common": "viml",
+    ".vimrc": "viml",
+    "vimrc.*": "viml",
+    "mappings.common": "viml",
 
-        "*.conf": "ini",
-        "config": "ini",
+    "*.conf": "ini",
+    "config": "ini",
 
-        "*.json": "json",
-        "*.yaml": "yaml",
-        "*.yml": "yaml",
+    "*.json": "json",
+    "*.yaml": "yaml",
+    "*.yml": "yaml",
 
-        "Dockerfile*": "dockerfile",
-        "*.log": "log"
-    },
+    "Dockerfile*": "dockerfile",
+    "*.log": "log"
+  },
 
-    "files.exclude": {
-        "**/.DS_Store": true,
-        "**/node_modules": true,
-        "**/.git": true,
-        "**/bower_components": true,
-        "**/*.pyc": true,
-        "**/__pycache__": true
-    },
-    "diffEditor.ignoreTrimWhitespace": false,
-    "terminal.integrated.minimumContrastRatio": 1
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/bower_components": true,
+    "**/*.pyc": true,
+    "**/__pycache__": true
+  },
+  "diffEditor.ignoreTrimWhitespace": false,
+  "terminal.integrated.minimumContrastRatio": 1
 }

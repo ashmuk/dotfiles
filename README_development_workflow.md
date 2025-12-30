@@ -140,6 +140,6 @@ vim .env
 
 ## See Also
 
-- [AI Development Setup Guide](ai_dev/README_ai_dev.md)
+- [AI Development Setup Guide](templates/ai_dev/README_ai_dev.md)
 - [tmux Configuration](config/tmux/README_tmux.md)
 - [Pre-commit Documentation](https://pre-commit.com/)

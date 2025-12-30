@@ -18,10 +18,10 @@ cd /path/to/your-existing-project
 
 ```bash
 # From anywhere, run:
-~/dotfiles/ai_dev/sample_template/setup_template.sh ~/sandbox/claude-tmux-test
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh ~/sandbox/claude-tmux-test
 
 # Or if you're already in target directory:
-~/dotfiles/ai_dev/sample_template/setup_template.sh .
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh .
 ```
 
 **What this does:**
@@ -92,7 +92,7 @@ If you want to add Claude-tmux to an existing project:
 
 ```bash
 # Deploy to your project
-~/dotfiles/ai_dev/sample_template/setup_template.sh /path/to/your-project
+~/dotfiles/templates/ai_dev/sample_template/setup_template.sh /path/to/your-project
 
 # Review what was backed up
 ls -la /path/to/your-project/*.backup
@@ -191,7 +191,7 @@ make claude-demo
 ### "setup_template.sh: command not found"
 ```bash
 # Make it executable
-chmod +x ~/dotfiles/ai_dev/sample_template/setup_template.sh
+chmod +x ~/dotfiles/templates/ai_dev/sample_template/setup_template.sh
 ```
 
 ### "Permission denied" when running scripts
