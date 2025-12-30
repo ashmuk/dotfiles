@@ -12,11 +12,22 @@
 - docs/analytics/       # reports (JSON/MD)
 - docs/decisions/       # ADRs / decisions
 
-## Quick commands (fill in actual ones)
-- Setup:  `...`
-- Lint:   `...`
-- Test:   `...`
-- Build:  `...`
+## Quick commands
+### Agent/AI workflows
+- Sync: `make sync` (generate + sync .agent → .claude/.cursor)
+- Check: `make sync-check` (sync + show git status)
+- Skills: `make sync-codex-skills` (sync Codex skills)
+
+### DevContainer
+- Start: `devcontainer up --workspace-folder .`
+- Stop: `devcontainer down --workspace-folder .`
+- Rebuild: `devcontainer up --workspace-folder . --remove-existing-container --build-no-cache`
+
+### Project-specific (add your own)
+- Setup: `...` (e.g., `npm install`, `pip install -r requirements.txt`)
+- Lint: `...` (e.g., `npm run lint`, `ruff check`)
+- Test: `...` (e.g., `npm test`, `pytest`)
+- Build: `...` (e.g., `npm run build`, `docker build`)
 
 ## How to work in this repo
 1) Read RULES.md and PLANS.md
