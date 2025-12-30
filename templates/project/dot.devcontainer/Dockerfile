@@ -23,7 +23,7 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
       libxcb1 libxkbcommon0 libasound2t64 libpango-1.0-0 \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install tmuxinator (as ashmuk user)
+# Install tmuxinator
 RUN gem install tmuxinator
 
 # Install Node.js and devcontainer CLI
@@ -56,12 +56,12 @@ RUN ARCH=$(dpkg --print-architecture) && \
  dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
  rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
 
-# Create ashmuk user from existing vscode user
-ARG USERNAME=ashmuk
+# Create developer user from existing vscode user
+ARG USERNAME=developer
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Rename vscode user to ashmuk
+# Rename vscode user to developer
 RUN usermod -l ${USERNAME} vscode && \
  usermod -d /home/${USERNAME} -m ${USERNAME} && \
  groupmod -n ${USERNAME} vscode && \

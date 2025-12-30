@@ -74,6 +74,6 @@ jobs:
       - name: Deployment summary
         run: |
           echo "✅ Deployment completed successfully!"
-          echo "🌐 Site: https://hisamukai.net"
+          echo "🌐 Site: ${{ secrets.SITE_URL }}"
           echo "📦 S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
           echo "🚀 CloudFront Distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"

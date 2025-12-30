@@ -25,26 +25,14 @@ fi
 # Note: Cursor rules are generated directly to .cursor/rules by gen_cursor_rules_from_commands.py
 # No sync needed from .agent/cursor/rules
 
-# 3) Codex skills
-# For now: keep them in-repo under .agent/codex/skills (single source)
-# Optionally validate presence of SKILL.md
-if [[ -d "${SRC_AGENT}/codex/skills" ]]; then
-  echo "[sync] Codex skills: validating SKILL.md files under ${SRC_AGENT}/codex/skills"
-  missing=0
-  while IFS= read -r -d '' dir; do
-    if [[ ! -f "${dir}/SKILL.md" ]]; then
-      echo "[warn] missing SKILL.md in: ${dir}"
-      missing=1
-    fi
-  done < <(find "${SRC_AGENT}/codex/skills" -mindepth 1 -maxdepth 2 -type d -print0)
-
-  if [[ "${missing}" -eq 1 ]]; then
-    echo "[sync] Codex skills validation: WARN (missing SKILL.md)"
-  else
-    echo "[sync] Codex skills validation: OK"
-  fi
+# 3) Skills validation
+# Skills are stored in .agent/skills (single source of truth)
+if [[ -d "${SRC_AGENT}/skills" ]]; then
+  echo "[sync] Skills: validating files under ${SRC_AGENT}/skills"
+  skill_count=$(find "${SRC_AGENT}/skills" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
+  echo "[sync] Skills validation: OK (${skill_count} skill files found)"
 else
-  echo "[sync] Codex skills: no ${SRC_AGENT}/codex/skills (skip)"
+  echo "[sync] Skills: no ${SRC_AGENT}/skills (skip)"
 fi
 
 echo "[sync] done"

@@ -1,9 +1,9 @@
 {
-  "name": "Hisamukai Photo Dev",
+  "name": "Project Dev",
   "dockerComposeFile": "compose.yml",
-  "service": "photo_dev",
+  "service": "devcontainer",
   "workspaceFolder": "/workspace",
-  "remoteUser": "ashmuk",
+  "remoteUser": "developer",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -47,16 +47,16 @@
     "--cap-add=NET_RAW"
   ],
   "mounts": [
-    "source=${localWorkspaceFolder}/.cache,target=/home/ashmuk/.cache,type=bind",
-    "source=photo-dev-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=photo-dev-claude-config-${devcontainerId},target=/home/ashmuk/.claude,type=volume"
+    "source=${localWorkspaceFolder}/.cache,target=/home/developer/.cache,type=bind",
+    "source=project-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=project-claude-config-${devcontainerId},target=/home/developer/.claude,type=volume"
   ],
   "containerEnv": {
     "NODE_OPTIONS": "--max-old-space-size=4096",
-    "CLAUDE_CONFIG_DIR": "/home/ashmuk/.claude",
+    "CLAUDE_CONFIG_DIR": "/home/developer/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
   "postCreateCommand": "bash /workspace/.devcontainer/post-create.sh",
-  "postStartCommand": "grep -q '/home/ashmuk/.venv/bin/activate' /home/ashmuk/.bashrc || echo 'source /home/ashmuk/.venv/bin/activate' >> /home/ashmuk/.bashrc; sudo /usr/local/bin/init-firewall.sh || true; bash /workspace/.devcontainer/post-start.sh",
+  "postStartCommand": "grep -q '/home/developer/.venv/bin/activate' /home/developer/.bashrc || echo 'source /home/developer/.venv/bin/activate' >> /home/developer/.bashrc; sudo /usr/local/bin/init-firewall.sh || true; bash /workspace/.devcontainer/post-start.sh",
   "waitFor": "postStartCommand"
 }

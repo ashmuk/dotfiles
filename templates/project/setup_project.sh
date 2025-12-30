@@ -84,50 +84,53 @@ replace_devcontainer_names() {
   local devcontainer_dir="$1"
   local project_name="$2"
   local docker_name
-  
+
   # Sanitize project name for Docker (lowercase, dashes)
   docker_name=$(sanitize_docker_name "$project_name")
-  
+
   if [ ! -d "$devcontainer_dir" ]; then
     return
   fi
-  
+
   # Replace in devcontainer.json
   if [ -f "$devcontainer_dir/devcontainer.json" ]; then
     if command -v sed >/dev/null 2>&1; then
       if [[ "$OSTYPE" == darwin* ]]; then
-        # Replace container name
-        sed -i '' "s|\"name\": \".*\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
-        # Replace service name (photo_dev -> ${docker_name}_dev)
-        sed -i '' "s|\"service\": \".*\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
-        # Replace volume names (photo-dev -> ${docker_name}-dev)
-        sed -i '' "s|photo-dev-|${docker_name}-dev-|g" "$devcontainer_dir/devcontainer.json"
+        # Replace container name (Project Dev -> ${project_name} Dev)
+        sed -i '' "s|\"name\": \"Project Dev\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
+        # Replace service name (devcontainer -> ${docker_name}_dev)
+        sed -i '' "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
+        # Replace volume names (project- -> ${docker_name}-)
+        sed -i '' "s|project-bashhistory-|${docker_name}-bashhistory-|g" "$devcontainer_dir/devcontainer.json"
+        sed -i '' "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
       else
         # Linux sed
-        sed -i "s|\"name\": \".*\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
-        sed -i "s|\"service\": \".*\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
-        sed -i "s|photo-dev-|${docker_name}-dev-|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|\"name\": \"Project Dev\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|project-bashhistory-|${docker_name}-bashhistory-|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
       fi
     fi
   fi
-  
+
   # Replace in compose.yml
   if [ -f "$devcontainer_dir/compose.yml" ]; then
     if command -v sed >/dev/null 2>&1; then
       if [[ "$OSTYPE" == darwin* ]]; then
-        # Replace service names (photo_dev -> ${docker_name}_dev)
-        sed -i '' "s|^  photo_dev:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
-        sed -i '' "s|^  photo_dev_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
+        # Replace service names (devcontainer -> ${docker_name}_dev)
+        sed -i '' "s|^  devcontainer:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
+        sed -i '' "s|^  devcontainer_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
         # Replace extends reference
-        sed -i '' "s|extends: photo_dev|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
-        # Replace image name (hisamukai-photo-dev -> ${docker_name}-dev)
-        sed -i '' "s|image: hisamukai-photo-dev|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
+        sed -i '' "s|extends: devcontainer$|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
+        # Replace image name (project-devcontainer -> ${docker_name}-dev)
+        sed -i '' "s|image: project-devcontainer|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
+        # Replace user (developer -> keep as developer, no change needed)
       else
         # Linux sed
-        sed -i "s|^  photo_dev:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|^  photo_dev_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|extends: photo_dev|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|image: hisamukai-photo-dev|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|^  devcontainer:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|^  devcontainer_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|extends: devcontainer$|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|image: project-devcontainer|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
       fi
     fi
   fi
@@ -169,6 +172,8 @@ Template structure:
   dot.github/          → .github/
   dot.claude/          → .claude/
   dot.agent/           → .agent/
+  dot.cursor/          → .cursor/
+  dot.codex/           → .codex/
   dot.githooks/        → .githooks/
   dot.gitignore        → .gitignore
   dot.env.example      → .env
@@ -286,6 +291,20 @@ backup_if_exists ".agent"
 mkdir -p .agent
 cp -r "$SCRIPT_DIR/dot.agent/"* .agent/ 2>/dev/null || true
 print_success ".agent/ copied"
+
+# Cursor configuration
+print_info "Copying dot.cursor/ → .cursor/..."
+backup_if_exists ".cursor"
+mkdir -p .cursor/rules
+cp -r "$SCRIPT_DIR/dot.cursor/"* .cursor/ 2>/dev/null || true
+print_success ".cursor/ copied"
+
+# Codex configuration (project-level, populated by sync-codex-skills.sh)
+print_info "Copying dot.codex/ → .codex/..."
+backup_if_exists ".codex"
+mkdir -p .codex/skills
+cp -r "$SCRIPT_DIR/dot.codex/"* .codex/ 2>/dev/null || true
+print_success ".codex/ copied"
 
 # Root config files (convert dot.* to .*)
 print_info "Copying configuration files..."
@@ -426,6 +445,8 @@ ${BLUE}Files deployed:${NC}
   dot.githooks/          → .githooks/
   dot.claude/            → .claude/
   dot.agent/             → .agent/
+  dot.cursor/            → .cursor/
+  dot.codex/             → .codex/
   dot.gitignore          → .gitignore
   dot.env.example        → .env
   Makefile               → Makefile

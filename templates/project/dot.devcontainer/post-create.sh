@@ -8,8 +8,8 @@ echo "[post-create] Starting post-create setup..."
 
 # Create Python virtual environment
 echo "[post-create] Creating Python virtual environment..."
-python3 -m venv /home/ashmuk/.venv
-source /home/ashmuk/.venv/bin/activate
+python3 -m venv /home/developer/.venv
+source /home/developer/.venv/bin/activate
 
 # Upgrade pip
 echo "[post-create] Upgrading pip..."
@@ -28,37 +28,37 @@ echo "[post-create] Ensuring migration directories exist..."
 mkdir -p /workspace/migration/{analytics,assets_legacy,concept,decisions}
 
 # Add venv activation to .zshrc if not already present
-if ! grep -q "source /home/ashmuk/.venv/bin/activate" /home/ashmuk/.zshrc 2>/dev/null; then
+if ! grep -q "source /home/developer/.venv/bin/activate" /home/developer/.zshrc 2>/dev/null; then
     echo "[post-create] Adding venv activation to .zshrc..."
-    echo "source /home/ashmuk/.venv/bin/activate" >> /home/ashmuk/.zshrc
+    echo "source /home/developer/.venv/bin/activate" >> /home/developer/.zshrc
 fi
 
 # Create symbolic links for global templates in user home directory
 echo "[post-create] Creating symlinks for global templates..."
 
 # Ensure directories exist
-mkdir -p /home/ashmuk/.claude
-mkdir -p /home/ashmuk/.codex
+mkdir -p /home/developer/.claude
+mkdir -p /home/developer/.codex
 
-# Link AGENTS_global.md to /home/ashmuk/.codex/AGENTS.md
+# Link AGENTS_global.md to /home/developer/.codex/AGENTS.md
 if [ -f "/workspace/AGENTS_global.md" ]; then
-    if [ -L "/home/ashmuk/.codex/AGENTS.md" ] || [ ! -f "/home/ashmuk/.codex/AGENTS.md" ]; then
-        ln -sf /workspace/AGENTS_global.md /home/ashmuk/.codex/AGENTS.md
-        echo "[post-create] Created symlink: /home/ashmuk/.codex/AGENTS.md → /workspace/AGENTS_global.md"
+    if [ -L "/home/developer/.codex/AGENTS.md" ] || [ ! -f "/home/developer/.codex/AGENTS.md" ]; then
+        ln -sf /workspace/AGENTS_global.md /home/developer/.codex/AGENTS.md
+        echo "[post-create] Created symlink: /home/developer/.codex/AGENTS.md → /workspace/AGENTS_global.md"
     else
-        echo "[post-create] Warning: /home/ashmuk/.codex/AGENTS.md already exists (not a symlink), skipping"
+        echo "[post-create] Warning: /home/developer/.codex/AGENTS.md already exists (not a symlink), skipping"
     fi
 else
     echo "[post-create] Info: /workspace/AGENTS_global.md not found, skipping symlink"
 fi
 
-# Link CLAUDE_global.md to /home/ashmuk/.claude/CLAUDE.md
+# Link CLAUDE_global.md to /home/developer/.claude/CLAUDE.md
 if [ -f "/workspace/CLAUDE_global.md" ]; then
-    if [ -L "/home/ashmuk/.claude/CLAUDE.md" ] || [ ! -f "/home/ashmuk/.claude/CLAUDE.md" ]; then
-        ln -sf /workspace/CLAUDE_global.md /home/ashmuk/.claude/CLAUDE.md
-        echo "[post-create] Created symlink: /home/ashmuk/.claude/CLAUDE.md → /workspace/CLAUDE_global.md"
+    if [ -L "/home/developer/.claude/CLAUDE.md" ] || [ ! -f "/home/developer/.claude/CLAUDE.md" ]; then
+        ln -sf /workspace/CLAUDE_global.md /home/developer/.claude/CLAUDE.md
+        echo "[post-create] Created symlink: /home/developer/.claude/CLAUDE.md → /workspace/CLAUDE_global.md"
     else
-        echo "[post-create] Warning: /home/ashmuk/.claude/CLAUDE.md already exists (not a symlink), skipping"
+        echo "[post-create] Warning: /home/developer/.claude/CLAUDE.md already exists (not a symlink), skipping"
     fi
 else
     echo "[post-create] Info: /workspace/CLAUDE_global.md not found, skipping symlink"

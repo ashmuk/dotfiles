@@ -1,5 +1,5 @@
 services:
-  photo_dev:
+  devcontainer:
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,9 +7,9 @@ services:
         CLAUDE_CODE_VERSION: "latest"
         GIT_DELTA_VERSION: "0.18.2"
         ZSH_IN_DOCKER_VERSION: "1.2.0"
-    image: hisamukai-photo-dev
+    image: project-devcontainer
     command: sleep infinity
-    user: ashmuk
+    user: developer
     working_dir: /workspace
     volumes:
       - ..:/workspace:rw,cached
@@ -17,7 +17,7 @@ services:
       - OPENAI_API_KEY
       - ANTHROPIC_API_KEY
       - GITHUB_TOKEN
-      # Python development settings (from takanezawa pattern)
+      # Python development settings
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
     cap_add:
@@ -31,8 +31,8 @@ services:
           cpus: "3.0"
           memory: "4g"
 
-  photo_dev_nonet:
-    extends: photo_dev
+  devcontainer_nonet:
+    extends: devcontainer
     network_mode: "none"
     profiles:
       - no-net
