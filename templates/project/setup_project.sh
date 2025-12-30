@@ -168,7 +168,7 @@ Template structure:
   dot.devcontainer/    → .devcontainer/
   dot.github/          → .github/
   dot.claude/          → .claude/
-  dot.agents/          → .agents/
+  dot.agent/           → .agent/
   dot.githooks/        → .githooks/
   dot.gitignore        → .gitignore
   dot.env.example      → .env
@@ -280,12 +280,12 @@ mkdir -p .claude
 cp -r "$SCRIPT_DIR/dot.claude/"* .claude/ 2>/dev/null || true
 print_success ".claude/ copied"
 
-# Agents configuration
-print_info "Copying dot.agents/ → .agents/..."
-backup_if_exists ".agents"
-mkdir -p .agents
-cp -r "$SCRIPT_DIR/dot.agents/"* .agents/ 2>/dev/null || true
-print_success ".agents/ copied"
+# Agent configuration
+print_info "Copying dot.agent/ → .agent/..."
+backup_if_exists ".agent"
+mkdir -p .agent
+cp -r "$SCRIPT_DIR/dot.agent/"* .agent/ 2>/dev/null || true
+print_success ".agent/ copied"
 
 # Root config files (convert dot.* to .*)
 print_info "Copying configuration files..."
@@ -425,7 +425,7 @@ ${BLUE}Files deployed:${NC}
     └── PULL_REQUEST_TEMPLATE.md → .github/
   dot.githooks/          → .githooks/
   dot.claude/            → .claude/
-  dot.agents/            → .agents/
+  dot.agent/             → .agent/
   dot.gitignore          → .gitignore
   dot.env.example        → .env
   Makefile               → Makefile
