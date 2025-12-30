@@ -57,6 +57,6 @@
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
   "postCreateCommand": "bash /workspace/.devcontainer/post-create.sh",
-  "postStartCommand": "grep -q '/home/ashmuk/.venv/bin/activate' /home/ashmuk/.bashrc || echo 'source /home/ashmuk/.venv/bin/activate' >> /home/ashmuk/.bashrc; sudo /usr/local/bin/init-firewall.sh || true",
+  "postStartCommand": "grep -q '/home/ashmuk/.venv/bin/activate' /home/ashmuk/.bashrc || echo 'source /home/ashmuk/.venv/bin/activate' >> /home/ashmuk/.bashrc; sudo /usr/local/bin/init-firewall.sh || true; bash /workspace/.devcontainer/post-start.sh",
   "waitFor": "postStartCommand"
 }

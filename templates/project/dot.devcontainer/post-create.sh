@@ -33,5 +33,36 @@ if ! grep -q "source /home/ashmuk/.venv/bin/activate" /home/ashmuk/.zshrc 2>/dev
     echo "source /home/ashmuk/.venv/bin/activate" >> /home/ashmuk/.zshrc
 fi
 
+# Create symbolic links for global templates in user home directory
+echo "[post-create] Creating symlinks for global templates..."
+
+# Ensure directories exist
+mkdir -p /home/ashmuk/.claude
+mkdir -p /home/ashmuk/.codex
+
+# Link AGENTS_global.md to /home/ashmuk/.codex/AGENTS.md
+if [ -f "/workspace/AGENTS_global.md" ]; then
+    if [ -L "/home/ashmuk/.codex/AGENTS.md" ] || [ ! -f "/home/ashmuk/.codex/AGENTS.md" ]; then
+        ln -sf /workspace/AGENTS_global.md /home/ashmuk/.codex/AGENTS.md
+        echo "[post-create] Created symlink: /home/ashmuk/.codex/AGENTS.md → /workspace/AGENTS_global.md"
+    else
+        echo "[post-create] Warning: /home/ashmuk/.codex/AGENTS.md already exists (not a symlink), skipping"
+    fi
+else
+    echo "[post-create] Info: /workspace/AGENTS_global.md not found, skipping symlink"
+fi
+
+# Link CLAUDE_global.md to /home/ashmuk/.claude/CLAUDE.md
+if [ -f "/workspace/CLAUDE_global.md" ]; then
+    if [ -L "/home/ashmuk/.claude/CLAUDE.md" ] || [ ! -f "/home/ashmuk/.claude/CLAUDE.md" ]; then
+        ln -sf /workspace/CLAUDE_global.md /home/ashmuk/.claude/CLAUDE.md
+        echo "[post-create] Created symlink: /home/ashmuk/.claude/CLAUDE.md → /workspace/CLAUDE_global.md"
+    else
+        echo "[post-create] Warning: /home/ashmuk/.claude/CLAUDE.md already exists (not a symlink), skipping"
+    fi
+else
+    echo "[post-create] Info: /workspace/CLAUDE_global.md not found, skipping symlink"
+fi
+
 echo "[post-create] Setup complete!"
 echo "[post-create] Use 'claude' for standard mode or 'claude-hard' for dangerous mode"
