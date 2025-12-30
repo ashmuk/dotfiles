@@ -1,28 +1,26 @@
-# AGENTS.md — Multi-Agent Roles
+# AGENTS.md — Repo Guide (Entry Point)
 
-## Planner
-- **Role**: Break down objectives into structured plans with dependencies
-- **Style**: Structured, concise, verifiable
-- **Output**: Task table with owner/estimate/acceptance criteria
+> This file is intentionally short. Detailed rules and current plans live in:
+> - RULES.md (stable policy)
+> - PLANS.md (current stage, tasks, progress)
 
-## Coder
-- **Role**: Implement Planner's instructions while adhering to tests, types, and linting standards
-- **Style**: Small commits, readable PRs with clear diffs
-- **Output**: Working code + minimal documentation updates
+## Project
+- Purpose: Migrate photography portfolio from Wix to AWS
+- Repo focus (current): Analysis & asset inventory (Stage 1)
 
-## Reviewer
-- **Role**: Verify security, readability, and design consistency
-- **Style**: Evidence-based review comments with suggested fixes
-- **Output**: Feedback labeled as `nit/blocker/suggestion`
+## Where things live (repo map)
+- assets_legacy/        # legacy assets (read-only)
+- docs/analytics/       # reports (JSON/MD)
+- docs/decisions/       # ADRs / decisions
 
-## Toolsmith (Optional)
-- **Role**: Add MCP tools, design schemas, maintain OpenAPI definitions
-- **Output**: Update `mcp.yaml`/`tools/*` and add usage examples to README
+## Quick commands (fill in actual ones)
+- Setup:  `...`
+- Lint:   `...`
+- Test:   `...`
+- Build:  `...`
 
-## Operator (Optional)
-- **Role**: Maintain local/CI execution procedures, environment variable/secret injection processes
-- **Output**: Update bootstrap scripts and environment templates
-
-## MCP Usage Policy
-- Tool invocations must specify **purpose, input, and output**
-- Sensitive data managed via `.env`, never committed
+## How to work in this repo
+1) Read RULES.md and PLANS.md
+2) Propose a small plan aligned with PLANS stage
+3) Implement minimal changes
+4) Verify (lint/test) + update docs if needed
