@@ -461,7 +461,7 @@ The project demonstrates mature engineering practices and is ready for use. The 
 - `README.md` (591 lines)
 - `CLAUDE.md` (131 lines)
 - `AGENTS.md` (29 lines)
-- `README_development_workflow.md` (146 lines)
+- `docs/README_development_workflow.md` (146 lines)
 
 ### Implementation Files
 - `Makefile` (877 lines)
