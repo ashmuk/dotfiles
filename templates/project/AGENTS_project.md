@@ -5,8 +5,7 @@
 > - PLANS.md (current stage, tasks, progress)
 
 ## Project
-- Purpose: Migrate photography portfolio from Wix to AWS
-- Repo focus (current): Analysis & asset inventory (Stage 1)
+- Follow README.md, PLANS.md and RULES.md
 
 ## Where things live (repo map)
 - assets_legacy/        # legacy assets (read-only)
