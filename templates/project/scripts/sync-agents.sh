@@ -5,13 +5,11 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 SRC_AGENT="${PROJECT_ROOT}/.agent"
 DST_CLAUDE="${PROJECT_ROOT}/.claude/agents"
-DST_CURSOR="${PROJECT_ROOT}/.cursor/rules"
 
 echo "[sync] root=${PROJECT_ROOT}"
 
 # Ensure destination dirs exist
 mkdir -p "${DST_CLAUDE}"
-mkdir -p "${DST_CURSOR}"
 
 # 1) Claude subagents -> .claude/agents
 # Copy all md files (flat) from .agent/subagents
@@ -23,15 +21,9 @@ else
   echo "[sync] Claude: no ${SRC_AGENT}/subagents (skip)"
 fi
 
-# 2) Cursor rules -> .cursor/rules (mirror)
-if [[ -d "${SRC_AGENT}/cursor/rules" ]]; then
-  echo "[sync] Cursor: ${SRC_AGENT}/cursor/rules -> ${DST_CURSOR}"
-  rm -rf "${DST_CURSOR}"
-  mkdir -p "${DST_CURSOR}"
-  cp -R "${SRC_AGENT}/cursor/rules/." "${DST_CURSOR}/"
-else
-  echo "[sync] Cursor: no ${SRC_AGENT}/cursor/rules (skip)"
-fi
+# 2) Cursor rules
+# Note: Cursor rules are generated directly to .cursor/rules by gen_cursor_rules_from_commands.py
+# No sync needed from .agent/cursor/rules
 
 # 3) Codex skills
 # For now: keep them in-repo under .agent/codex/skills (single source)

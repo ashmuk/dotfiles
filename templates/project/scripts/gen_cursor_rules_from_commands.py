@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / ".agent" / "commands"
-DST = ROOT / ".agent" / "cursor" / "rules" / "010-commands"  # single source for cursor rules
+DST = ROOT / ".cursor" / "rules" / "010-commands"  # generate directly to .cursor/rules
 
 CODE_BLOCK_RE = re.compile(r"```bash\s*(.*?)```", re.DOTALL)
 
