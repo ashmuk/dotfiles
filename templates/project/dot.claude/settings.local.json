@@ -1,0 +1,62 @@
+{
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "BASH_MAX_TIMEOUT_MS": "300000",
+    "BASH_DEFAULT_TIMEOUT_MS": "60000",
+    "BASH_MAX_OUTPUT_LENGTH": "500000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Read(./package.json)",
+      "Read(./pyproject.toml)",
+      "Read(./requirements.txt)",
+      "Bash(python:scripts/*)",
+      "Bash(playwright:*)",
+      "Bash(pytest:*)",
+      "Bash(make validate:*)",
+      "Bash(make test:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.devcontainer/.env)",
+      "Read(./secrets/**)",
+      "Read(./**/*secret*)",
+      "Read(./**/*password*)",
+      "Read(./**/*token*)",
+      "Read(./**/*key.pem)",
+      "Read(./**/*.key)",
+      "Read(./node_modules/**)",
+      "Read(./dist/**)",
+      "Read(./.git/objects/**)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(nc:*)",
+      "Bash(netcat:*)",
+      "Bash(telnet:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ./)",
+      "Bash(rm -rf ~/)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git rm:*)",
+      "Bash(git mv:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "Bash(chmod:*)",
+      "Bash(docker run:*)",
+      "Bash(docker push:*)"
+    ]
+  }
+}

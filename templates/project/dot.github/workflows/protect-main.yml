@@ -1,0 +1,44 @@
+name: Protect Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-pr-only:
+    name: Ensure changes via PR only
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if push is from PR merge
+        run: |
+          echo "Checking if this push came from a PR merge..."
+
+          # Get the commit message
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+
+          # Check if it's a merge commit from a PR (GitHub adds this automatically)
+          if [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request|^Squash\ and\ merge\ pull\ request|^Rebase\ and\ merge\ pull\ request ]]; then
+            echo "✅ This is a PR merge - allowed"
+            exit 0
+          fi
+
+          # Check if the pusher is github-actions bot (for automated workflows)
+          if [[ "${{ github.actor }}" == "github-actions[bot]" ]]; then
+            echo "✅ Push from GitHub Actions - allowed"
+            exit 0
+          fi
+
+          # If we get here, it's a direct push - block it
+          echo "❌ ERROR: Direct pushes to main are not allowed!"
+          echo ""
+          echo "Please use the PR workflow:"
+          echo "1. Create a feature branch: git checkout -b feature/your-feature"
+          echo "2. Make your changes and commit"
+          echo "3. Push to feature branch: git push origin feature/your-feature"
+          echo "4. Create a Pull Request on GitHub"
+          echo "5. Wait for checks to pass and merge via GitHub UI"
+          echo ""
+          echo "See README.md for detailed PR workflow documentation"
+          exit 1
