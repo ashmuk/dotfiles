@@ -375,11 +375,9 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
   backup_if_exists "scripts"
   mkdir -p scripts
   cp -r "$SCRIPT_DIR/scripts/"* scripts/
-  # Set executable permissions on shell scripts
+  # Set executable permissions only on shell scripts
   chmod +x scripts/*.sh 2>/dev/null || true
-  # Set executable permissions on Python scripts
-  chmod +x scripts/*.py 2>/dev/null || true
-  print_success "scripts/ directory copied (including gen_cursor_rules_from_commands.py)"
+  print_success "scripts/ directory copied (shell scripts made executable)"
 else
   print_info "scripts/ directory not found, skipping"
 fi
