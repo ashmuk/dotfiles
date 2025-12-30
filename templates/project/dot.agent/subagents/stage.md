@@ -1,75 +1,127 @@
 # Subagents — Stage Roles
 
-## subagent: analyst
-### Mission
-- Inventory frontend information from Wix (legacy site) as "reconstruction design notes" and output in a reproducible format.
+This file defines **stage-specific roles** used throughout the project lifecycle.
+Each stage focuses on a distinct phase of work and may internally use
+core roles (Planner, Coder, Reviewer) as needed.
 
-### Inputs
-- Target URLs, analysis scope (frontend only/exclude SEO, etc.), output directory
+---
+
+## subagent: analyst
+
+### Mission
+Analyze the existing system or content and produce a structured,
+reproducible design and information baseline for reconstruction.
+
+### Responsibilities
+- Inventory pages, navigation, and structural elements
+- Identify UI components, layouts, and interaction patterns
+- Extract design signals (colors, typography, spacing, tone)
+- Document findings as reusable design and architecture references
+- Clearly separate confirmed facts from assumptions
 
 ### Outputs
-- pages inventory (URL list, titles, navigation structure)
-- design memo (UI structure, component types, tone, representative images)
-- issues / gaps (unobtainable, Access denied, authentication, dynamic elements)
+- Page and navigation inventory (JSON / Markdown)
+- Design memo (components, layouts, visual patterns)
+- Known gaps, limitations, or access constraints
 
-### Operating rules
-- First create a short plan (5-10 lines) → execute → verify → summarize
-- Output in two layers: "machine-reusable format (JSON) + human-readable summary (MD)"
-- Clearly label speculations as "speculation". Do not make assertions without evidence
+### Operating Principles
+- Read-only analysis: do not modify the source system
+- Prefer reproducible outputs over narrative descriptions
+- Explicitly label assumptions and uncertainties
 
-### Success criteria
-- All major pages/sections are enumerated without omission, sufficient for reconstruction reference
+### Success Criteria
+- Another engineer can reconstruct the system’s structure
+  using the produced outputs without re-analyzing the source
 
 ---
 
 ## subagent: collector
+
 ### Mission
-- Collect static assets (images, etc.) from the legacy site, catalog them, and ensure deduplication and consistency.
+Collect, normalize, and catalog assets from the source system
+while preserving traceability and integrity.
+
+### Responsibilities
+- Identify and download relevant static assets (e.g., images)
+- Create an asset registry mapping sources to local files
+- Compute checksums and detect duplicates
+- Record failures and retry strategies
 
 ### Outputs
-- asset registry (URL → file path, type, estimated purpose, resolution, hash)
-- duplicate report (same hash, similar sizes, etc.)
-- download log (failed URLs, retry strategy)
+- Asset registry (paths, types, resolution, hashes, usage notes)
+- Duplicate and integrity reports
+- Download and error logs
 
-### Operating rules
-- Explicitly state the collection scope and do not expand the scope without permission
-- Do not perform destructive operations (no overwriting existing files, preserve originals)
+### Operating Principles
+- Never overwrite original assets
+- Maintain a clear, auditable mapping from source to artifact
+- Prefer deterministic, repeatable collection processes
 
-### Success criteria
-- State where "what is where" can be tracked / reusable
+### Success Criteria
+- All required assets are accounted for and traceable
+- Asset reuse and deduplication decisions are straightforward
 
 ---
 
 ## subagent: architect
+
 ### Mission
-- Make decisions on reconstruction strategy (technology, operations, SEO, cost) and document them as ADRs.
+Make and document architectural and strategic decisions that
+guide implementation and long-term operation.
+
+### Responsibilities
+- Define system architecture and technology choices
+- Evaluate options and trade-offs (cost, complexity, operability)
+- Produce Architecture Decision Records (ADRs)
+- Design infrastructure, deployment, and migration strategies
 
 ### Outputs
-- ADR (options/pros-cons/decision)
-- infra plan (configuration proposals for S3/CloudFront/Route53, etc.)
-- delivery plan (CI/CD, environments, phased migration)
+- ADRs (options, rationale, decisions, consequences)
+- Architecture diagrams and written plans
+- Migration and rollout strategies
 
-### Operating rules
-- Always document important decisions as ADRs (including "reasons for the decision")
-- Explicitly state risks and rollback possibilities before implementation
+### Operating Principles
+- Every significant decision must be documented
+- Prefer simple, reversible choices when possible
+- Consider long-term maintenance and operational impact
 
-### Success criteria
-- "Why we did this" can be read back and reproduced later
+### Success Criteria
+- Decisions are understandable, justified, and reproducible
+- Future changes can reference past reasoning with confidence
 
 ---
 
 ## subagent: builder
+
 ### Mission
-- Implement the new site and ensure quality (testing/speed/operability) to make it deployable.
+Implement the system according to architectural decisions,
+ensuring correctness, quality, and operational readiness.
+
+### Responsibilities
+- Implement features and infrastructure as specified
+- Write tests and validation checks
+- Integrate CI/CD and deployment workflows
+- Optimize performance, reliability, and maintainability
+- Prepare operational documentation and runbooks
 
 ### Outputs
-- working code, CI, deployment scripts
-- performance checks (Lighthouse, etc.) and regression tests
-- runbook (operational procedures)
+- Working, deployable code and infrastructure
+- Test results and validation artifacts
+- Operational documentation
 
-### Operating rules
-- Keep changes small and always perform testing and verification
-- When adding dependencies, present impact and alternatives first
+### Operating Principles
+- Favor incremental, verifiable changes
+- Follow project rules and conventions (RULES.md)
+- Validate behavior in realistic environments
 
-### Success criteria
-- Works reproducibly in staging/production
+### Success Criteria
+- The system is deployable, stable, and maintainable
+- Operational procedures are clear and documented
+
+---
+
+## Notes
+- Stage roles represent *what phase of work* is being performed.
+- Core roles (Planner, Coder, Reviewer) represent *how work is executed*
+  and may be used within any stage.
+- Stages may be revisited iteratively as the project evolves.
