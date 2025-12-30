@@ -226,7 +226,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-vscode ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-vscode install-global-templates ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -285,6 +285,33 @@ install-agent: validate ## Install agent configuration templates to ~/.config/ag
 	@echo "$(BLUE)[INFO]$(NC) Templates available at:"
 	@echo "  - $(HOME_DIR)/.config/agent/AGENTS.md"
 	@echo "  - $(HOME_DIR)/.config/agent/CLAUDE.md"
+
+.PHONY: install-global-templates
+install-global-templates: validate ## Install global templates to user home directories
+	@echo "$(BLUE)[INFO]$(NC) Installing global templates..."
+	@if [ ! -f "$(DOTFILES_DIR)/templates/global/AGENTS_global.md" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) AGENTS_global.md not found, skipping"; \
+	else \
+		mkdir -p $(HOME_DIR)/.codex; \
+		if [ -L "$(HOME_DIR)/.codex/AGENTS.md" ] || [ ! -f "$(HOME_DIR)/.codex/AGENTS.md" ]; then \
+			ln -sf $(DOTFILES_DIR)/templates/global/AGENTS_global.md $(HOME_DIR)/.codex/AGENTS.md; \
+			echo "$(GREEN)[SUCCESS]$(NC) Created symlink: $(HOME_DIR)/.codex/AGENTS.md → $(DOTFILES_DIR)/templates/global/AGENTS_global.md"; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) $(HOME_DIR)/.codex/AGENTS.md already exists (not a symlink), skipping"; \
+		fi; \
+	fi
+	@if [ ! -f "$(DOTFILES_DIR)/templates/global/CLAUDE_global.md" ]; then \
+		echo "$(YELLOW)[WARNING]$(NC) CLAUDE_global.md not found, skipping"; \
+	else \
+		mkdir -p $(HOME_DIR)/.claude; \
+		if [ -L "$(HOME_DIR)/.claude/CLAUDE.md" ] || [ ! -f "$(HOME_DIR)/.claude/CLAUDE.md" ]; then \
+			ln -sf $(DOTFILES_DIR)/templates/global/CLAUDE_global.md $(HOME_DIR)/.claude/CLAUDE.md; \
+			echo "$(GREEN)[SUCCESS]$(NC) Created symlink: $(HOME_DIR)/.claude/CLAUDE.md → $(DOTFILES_DIR)/templates/global/CLAUDE_global.md"; \
+		else \
+			echo "$(YELLOW)[WARNING]$(NC) $(HOME_DIR)/.claude/CLAUDE.md already exists (not a symlink), skipping"; \
+		fi; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) Global templates installation completed"
 
 .PHONY: setup-wsl-bridge
 setup-wsl-bridge: ## Create Windows junction to WSL dotfiles (for WSL users)
