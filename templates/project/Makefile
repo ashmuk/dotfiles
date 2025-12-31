@@ -16,6 +16,10 @@ help:
 	@echo "  make sync              # Generate + sync .agent -> .claude/.cursor"
 	@echo "  make sync-check        # Sync then show git status"
 	@echo "  make sync-codex-skills # Sync Codex skills from .agent to .codex/skills"
+	@echo ""
+	@echo "Options:"
+	@echo "  VERBOSE=1 make init    # Show detailed command output and errors"
+	@echo "  ./scripts/init-project.sh --help  # Show all init options"
 
 # ============================================
 # Initialization
