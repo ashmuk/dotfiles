@@ -289,6 +289,15 @@ setup_remote() {
     return 0
   fi
 
+  # Check if gh CLI is available and offer to create GitHub repo
+  if command -v gh >/dev/null 2>&1; then
+    if ask_yes_no "Create a new GitHub repository using gh CLI?"; then
+      create_github_repo
+      return 0
+    fi
+  fi
+
+  # Fallback to manual remote URL entry
   local remote_url=""
   ask_input "Remote URL (e.g., git@github.com:user/repo.git)" "" remote_url
 
@@ -301,6 +310,186 @@ setup_remote() {
       branch=$(git branch --show-current)
       git push -u origin "$branch"
       print_success "Pushed to origin/$branch"
+    fi
+  fi
+}
+
+# ============================================
+# Create GitHub Repository via gh CLI
+# ============================================
+create_github_repo() {
+  local project_name
+  project_name=$(basename "$PROJECT_ROOT")
+
+  local repo_name=""
+  ask_input "Repository name" "$project_name" repo_name
+
+  # Check if repository already exists on GitHub
+  local gh_user
+  gh_user=$(gh api user --jq '.login' 2>/dev/null || echo "")
+
+  if [[ -n "$gh_user" ]]; then
+    local full_repo_name="$repo_name"
+    # If repo_name doesn't contain '/', assume it's under current user
+    if [[ "$repo_name" != *"/"* ]]; then
+      full_repo_name="$gh_user/$repo_name"
+    fi
+
+    if gh repo view "$full_repo_name" >/dev/null 2>&1; then
+      print_warning "Repository '$full_repo_name' already exists on GitHub!"
+      if ask_yes_no "Connect local project to existing repository?"; then
+        connect_existing_github_repo "$full_repo_name"
+        return 0
+      else
+        print_info "Skipping remote setup"
+        return 0
+      fi
+    fi
+  fi
+
+  local visibility="private"
+  echo ""
+  echo "Repository visibility:"
+  echo "  1) Private (default)"
+  echo "  2) Public"
+  read -p "Choose [1/2]: " -n 1 -r visibility_choice
+  echo ""
+
+  if [[ "$visibility_choice" == "2" ]]; then
+    visibility="public"
+  fi
+
+  print_step "Creating GitHub repository: $repo_name ($visibility)..."
+
+  # Ensure we're on 'main' branch before creating repo
+  ensure_main_branch
+
+  # Create the repository
+  local gh_args=("repo" "create" "$repo_name" "--$visibility" "--source=." "--remote=origin")
+
+  if ask_yes_no "Push to GitHub after creating?" "y"; then
+    gh_args+=("--push")
+  fi
+
+  if gh "${gh_args[@]}"; then
+    print_success "GitHub repository created successfully!"
+    local repo_url
+    repo_url=$(git remote get-url origin 2>/dev/null || echo "")
+    if [[ -n "$repo_url" ]]; then
+      print_info "Repository URL: $repo_url"
+    fi
+  else
+    print_error "Failed to create GitHub repository"
+    print_info "You can try manually: gh repo create $repo_name --$visibility --source=. --remote=origin"
+  fi
+}
+
+# ============================================
+# Connect to Existing GitHub Repository
+# ============================================
+connect_existing_github_repo() {
+  local full_repo_name="$1"
+
+  print_step "Connecting to existing repository: $full_repo_name"
+
+  # Get the clone URL
+  local repo_url
+  repo_url=$(gh repo view "$full_repo_name" --json sshUrl --jq '.sshUrl' 2>/dev/null)
+
+  if [[ -z "$repo_url" ]]; then
+    # Fallback to HTTPS URL
+    repo_url=$(gh repo view "$full_repo_name" --json url --jq '.url' 2>/dev/null)
+  fi
+
+  if [[ -z "$repo_url" ]]; then
+    print_error "Could not get repository URL"
+    return 1
+  fi
+
+  # Add remote
+  git remote add origin "$repo_url"
+  print_success "Remote 'origin' added: $repo_url"
+
+  # Ensure we're on 'main' branch
+  ensure_main_branch
+
+  # Check if remote has commits
+  local remote_has_commits=false
+  if git ls-remote --heads origin main >/dev/null 2>&1; then
+    if [[ -n "$(git ls-remote --heads origin main)" ]]; then
+      remote_has_commits=true
+    fi
+  fi
+
+  local local_has_commits=false
+  if git rev-parse HEAD >/dev/null 2>&1; then
+    local_has_commits=true
+  fi
+
+  if [[ "$remote_has_commits" == "true" && "$local_has_commits" == "true" ]]; then
+    print_warning "Both local and remote have commits."
+    echo ""
+    echo "Options:"
+    echo "  1) Pull remote changes first, then push (recommended if remote has important content)"
+    echo "  2) Force push local (overwrites remote - use if remote is empty/template)"
+    echo "  3) Skip - handle manually later"
+    read -p "Choose [1/2/3]: " -n 1 -r sync_choice
+    echo ""
+
+    case "$sync_choice" in
+      1)
+        print_step "Pulling remote changes..."
+        if git pull origin main --rebase --allow-unrelated-histories; then
+          print_success "Pulled remote changes"
+          if ask_yes_no "Push local commits now?" "y"; then
+            git push -u origin main
+            print_success "Pushed to origin/main"
+          fi
+        else
+          print_error "Pull failed - resolve conflicts manually"
+        fi
+        ;;
+      2)
+        if ask_yes_no "Are you sure you want to force push? This will OVERWRITE remote!" "n"; then
+          git push -u origin main --force
+          print_success "Force pushed to origin/main"
+        else
+          print_info "Skipped push"
+        fi
+        ;;
+      *)
+        print_info "Skipped - handle sync manually"
+        ;;
+    esac
+  elif [[ "$local_has_commits" == "true" ]]; then
+    if ask_yes_no "Push local commits to remote?" "y"; then
+      git push -u origin main
+      print_success "Pushed to origin/main"
+    fi
+  elif [[ "$remote_has_commits" == "true" ]]; then
+    if ask_yes_no "Pull remote commits to local?" "y"; then
+      git pull origin main
+      print_success "Pulled from origin/main"
+    fi
+  else
+    print_info "Both local and remote are empty - ready for first commit"
+  fi
+}
+
+# ============================================
+# Ensure main branch
+# ============================================
+ensure_main_branch() {
+  local current_branch
+  current_branch=$(git branch --show-current 2>/dev/null || echo "")
+
+  if [[ -z "$current_branch" ]]; then
+    # No commits yet, create main branch
+    git checkout -b main 2>/dev/null || true
+  elif [[ "$current_branch" != "main" ]]; then
+    if ask_yes_no "Current branch is '$current_branch'. Switch to 'main' for GitHub default?" "y"; then
+      git branch -m "$current_branch" main 2>/dev/null || git checkout -b main 2>/dev/null || true
+      print_success "Switched to 'main' branch"
     fi
   fi
 }

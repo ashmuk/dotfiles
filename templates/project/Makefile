@@ -61,12 +61,13 @@ check-env:
 # Sync
 # ============================================
 
-# Generate Cursor rules from .agent/commands
-gen-cursor-rules:
-	@./scripts/gen_cursor_rules_from_commands.py
+# Generate Cursor rules from .agent/commands (pending - needs redesign)
+#gen-cursor-rules:
+#	@./scripts/gen_cursor_rules_from_commands.py
 
-# Full sync: generate cursor rules + sync agents to claude/cursor
-sync: gen-cursor-rules
+# Full sync: sync agents to claude/cursor
+#sync: gen-cursor-rules
+sync:
 	@./scripts/sync-agents.sh
 
 # Sync then show git status
