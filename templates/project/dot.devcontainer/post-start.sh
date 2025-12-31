@@ -6,21 +6,21 @@
 set -e
 
 # Ensure directories exist
-mkdir -p /home/ashmuk/.claude
-mkdir -p /home/ashmuk/.codex
+mkdir -p "$HOME/.claude"
+mkdir -p "$HOME/.codex"
 
 # Create symbolic links for global templates in user home directory
-# Link AGENTS_global.md to /home/ashmuk/.codex/AGENTS.md
+# Link AGENTS_global.md to ~/.codex/AGENTS.md
 if [ -f "/workspace/AGENTS_global.md" ]; then
-    if [ -L "/home/ashmuk/.codex/AGENTS.md" ] || [ ! -f "/home/ashmuk/.codex/AGENTS.md" ]; then
-        ln -sf /workspace/AGENTS_global.md /home/ashmuk/.codex/AGENTS.md
+    if [ -L "$HOME/.codex/AGENTS.md" ] || [ ! -f "$HOME/.codex/AGENTS.md" ]; then
+        ln -sf /workspace/AGENTS_global.md "$HOME/.codex/AGENTS.md"
     fi
 fi
 
-# Link CLAUDE_global.md to /home/ashmuk/.claude/CLAUDE.md
+# Link CLAUDE_global.md to ~/.claude/CLAUDE.md
 if [ -f "/workspace/CLAUDE_global.md" ]; then
-    if [ -L "/home/ashmuk/.claude/CLAUDE.md" ] || [ ! -f "/home/ashmuk/.claude/CLAUDE.md" ]; then
-        ln -sf /workspace/CLAUDE_global.md /home/ashmuk/.claude/CLAUDE.md
+    if [ -L "$HOME/.claude/CLAUDE.md" ] || [ ! -f "$HOME/.claude/CLAUDE.md" ]; then
+        ln -sf /workspace/CLAUDE_global.md "$HOME/.claude/CLAUDE.md"
     fi
 fi
 
