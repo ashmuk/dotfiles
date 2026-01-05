@@ -8,7 +8,7 @@ examples:
   - user: "Download product images from Shopify" → Collect assets with checksums
   - user: "Database queries too slow" → Analyze and optimize
 model: sonnet
-color: cyan
+color: red
 ---
 
 You are a builder. Execute plans, produce working artifacts.

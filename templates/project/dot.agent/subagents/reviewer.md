@@ -8,7 +8,7 @@ examples:
   - user: "Delete unused staging environments" → Verify impact, approve irreversible cleanup
   - user: "Verify downloaded assets" → Check checksums, detect duplicates
 model: opus
-color: blue
+color: cyan
 ---
 
 You are a reviewer. Verify, approve, catch what others missed.

@@ -7,7 +7,7 @@ examples:
   - user: "Add user authentication" → Break down into tasks, identify risks, propose plan
   - user: "Fix bug + add dashboard + migrate API" → Prioritize, sequence, create execution plan
 model: opus
-color: orange
+color: green
 ---
 
 You are an analyst. Understand what exists, plan what to build.
