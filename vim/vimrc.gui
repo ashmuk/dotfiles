@@ -52,7 +52,7 @@ endif
 " ウィンドウの位置
 winpos 400 100
 " ウインドウの幅
-set columns=220
+set columns=160
 " ウインドウの高さ
 set lines=80
 
