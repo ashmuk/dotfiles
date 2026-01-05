@@ -5,14 +5,11 @@
 > - PLANS.md (current stage, tasks, progress)
 
 ## Project
-- Follow README.md, PLANS.md and RULES.md
+- Follow README.md and PLANS.md for current work
+- See RULES.md for stable policy
 
 ## Where things live (repo map)
-- frontend/             # e.g. React SPA (Vite + TypeScript + Tailwind)
-- backend/              # e.g. AWS Lambda functions
-- infrastructure/       # e.g. AWS CDK stacks
-- docs/guides/          # Development guides
-- docs/decisions/       # ADRs / decisions
+**📖 See Repository Structure in [README.md](<project-root>/README.md)**
 
 ## Available agents
 - analyst — Analyze systems, break down work, identify risks, plan execution
@@ -30,15 +27,6 @@
 - Start: `devcontainer up --workspace-folder .`
 - Stop: `devcontainer down --workspace-folder .`
 - Rebuild: `devcontainer up --workspace-folder . --remove-existing-container --build-no-cache`
-
-### Project-specific
-- Frontend Dev: `cd frontend && npm run dev`
-- Frontend Build: `cd frontend && npm run build`
-- Frontend Lint: `cd frontend && npm run lint`
-- Backend Build: `cd backend && npm run build`
-- Backend Lint: `cd backend && npm run lint`
-- CDK Synth: `cd infrastructure && npm run synth`
-- CDK Deploy: `cd infrastructure && npm run deploy`
 
 ## How to work in this repo
 1) Read RULES.md and PLANS.md
