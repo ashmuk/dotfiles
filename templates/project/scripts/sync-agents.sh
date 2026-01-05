@@ -12,11 +12,18 @@ echo "[sync] root=${PROJECT_ROOT}"
 mkdir -p "${DST_CLAUDE}"
 
 # 1) Claude subagents -> .claude/agents
-# Copy all md files (flat) from .agent/subagents
+# Create symlinks (not copies) from .agent/subagents
 if [[ -d "${SRC_AGENT}/subagents" ]]; then
   echo "[sync] Claude: ${SRC_AGENT}/subagents -> ${DST_CLAUDE}"
   rm -f "${DST_CLAUDE}/"*.md 2>/dev/null || true
-  cp -f "${SRC_AGENT}/subagents/"*.md "${DST_CLAUDE}/" 2>/dev/null || true
+  for agent_file in "${SRC_AGENT}/subagents/"*.md; do
+    if [[ -f "$agent_file" ]]; then
+      agent_name="$(basename "$agent_file")"
+      # Create relative symlink
+      ln -sf "../../.agent/subagents/${agent_name}" "${DST_CLAUDE}/${agent_name}"
+      echo "[sync]   ${agent_name} -> ../../.agent/subagents/${agent_name}"
+    fi
+  done
 else
   echo "[sync] Claude: no ${SRC_AGENT}/subagents (skip)"
 fi
