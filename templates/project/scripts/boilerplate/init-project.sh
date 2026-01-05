@@ -381,9 +381,9 @@ setup_hooks() {
     fi
   fi
 
-  if [[ -x "./scripts/setup-git-hooks.sh" ]]; then
+  if [[ -x "./scripts/boilerplate/setup-git-hooks.sh" ]]; then
     print_step "Running setup-git-hooks.sh..."
-    ./scripts/setup-git-hooks.sh
+    ./scripts/boilerplate/setup-git-hooks.sh
   elif [[ -d ".githooks" ]]; then
     print_step "Configuring git to use .githooks/..."
     git config core.hooksPath .githooks

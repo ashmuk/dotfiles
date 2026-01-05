@@ -6,7 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SRC_RULES = ROOT / "RULES.md"
 SRC_AGENTS = ROOT / ".agent" / "subagents"
 DST = ROOT / ".cursor" / "rules" / "project"

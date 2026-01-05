@@ -388,17 +388,26 @@ else
   print_info ".env already exists, skipping"
 fi
 
-# Copy scripts directory
+# Copy scripts directory (boilerplate + structure)
 print_info "Copying scripts directory..."
 if [ -d "$SCRIPT_DIR/scripts" ]; then
   backup_if_exists "scripts"
-  mkdir -p scripts
-  cp -r "$SCRIPT_DIR/scripts/"* scripts/
-  # Set executable permissions on shell scripts
-  chmod +x scripts/*.sh 2>/dev/null || true
-  # Set executable permissions on Python scripts
-  chmod +x scripts/*.py 2>/dev/null || true
-  print_success "scripts/ directory copied (shell and Python scripts made executable)"
+  mkdir -p scripts/boilerplate
+
+  # Copy boilerplate scripts
+  if [ -d "$SCRIPT_DIR/scripts/boilerplate" ]; then
+    cp -r "$SCRIPT_DIR/scripts/boilerplate/"* scripts/boilerplate/
+    # Set executable permissions on boilerplate scripts
+    chmod +x scripts/boilerplate/*.sh 2>/dev/null || true
+    chmod +x scripts/boilerplate/*.py 2>/dev/null || true
+    print_success "Boilerplate scripts copied and made executable"
+  fi
+
+  # Copy README.md and .gitkeep if they exist
+  [ -f "$SCRIPT_DIR/scripts/README.md" ] && cp "$SCRIPT_DIR/scripts/README.md" scripts/
+  [ -f "$SCRIPT_DIR/scripts/.gitkeep" ] && cp "$SCRIPT_DIR/scripts/.gitkeep" scripts/
+
+  print_success "scripts/ directory structure created"
 else
   print_info "scripts/ directory not found, skipping"
 fi

@@ -199,7 +199,7 @@ The `main` branch is protected using **local git hooks** (free alternative):
 
 **Setup (Required for all developers)**:
 ```bash
-./scripts/setup-git-hooks.sh
+./scripts/boilerplate/setup-git-hooks.sh
 ```
 
 **Note**: GitHub branch protection requires GitHub Pro/Team/Enterprise for private repos. We use local git hooks as a free alternative. For detailed setup and comparison, see:

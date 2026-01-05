@@ -19,7 +19,7 @@ help:
 	@echo ""
 	@echo "Options:"
 	@echo "  VERBOSE=1 make init    # Show detailed command output and errors"
-	@echo "  ./scripts/init-project.sh --help  # Show all init options"
+	@echo "  ./scripts/boilerplate/init-project.sh --help  # Show all init options"
 
 # ============================================
 # Initialization
@@ -27,15 +27,15 @@ help:
 
 # Interactive wizard (default for new projects)
 init:
-	@./scripts/init-project.sh wizard
+	@./scripts/boilerplate/init-project.sh wizard
 
 # Non-interactive mode (for automation/CI)
 init-cli:
-	@./scripts/init-project.sh cli
+	@./scripts/boilerplate/init-project.sh cli
 
 # Set up git hooks only
 setup-hooks:
-	@./scripts/setup-git-hooks.sh
+	@./scripts/boilerplate/setup-git-hooks.sh
 
 # Verify environment is configured
 check-env:
@@ -67,11 +67,11 @@ check-env:
 
 # Generate Cursor rules (symlinks RULES.md and 4 agents to .cursor/rules/project/)
 gen-cursor-rules:
-	@./scripts/gen_cursor_rules.py
+	@./scripts/boilerplate/gen_cursor_rules.py
 
 # Full sync: sync agents to claude/cursor + generate cursor rules
 sync: gen-cursor-rules
-	@./scripts/sync-agents.sh
+	@./scripts/boilerplate/sync-agents.sh
 
 # Sync then show git status
 sync-check: sync
@@ -79,4 +79,4 @@ sync-check: sync
 
 # Sync Codex skills from .agent/skills to .codex/skills
 sync-codex-skills:
-	@./scripts/sync-codex-skills.sh
+	@./scripts/boilerplate/sync-codex-skills.sh
