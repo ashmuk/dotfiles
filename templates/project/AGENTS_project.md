@@ -8,9 +8,17 @@
 - Follow README.md, PLANS.md and RULES.md
 
 ## Where things live (repo map)
-- assets_legacy/        # legacy assets (read-only)
-- docs/analytics/       # reports (JSON/MD)
+- frontend/             # e.g. React SPA (Vite + TypeScript + Tailwind)
+- backend/              # e.g. AWS Lambda functions
+- infrastructure/       # e.g. AWS CDK stacks
+- docs/guides/          # Development guides
 - docs/decisions/       # ADRs / decisions
+
+## Available agents
+- analyst — Analyze systems, break down work, identify risks, plan execution
+- architect — Technology choices, trade-offs, ADR documentation
+- builder — Implement code, scripts, CI/CD, infrastructure, collect assets
+- reviewer — Code review, security, safety escalation, integrity verification
 
 ## Quick commands
 ### Agent/AI workflows
@@ -23,14 +31,18 @@
 - Stop: `devcontainer down --workspace-folder .`
 - Rebuild: `devcontainer up --workspace-folder . --remove-existing-container --build-no-cache`
 
-### Project-specific (add your own)
-- Setup: `...` (e.g., `npm install`, `pip install -r requirements.txt`)
-- Lint: `...` (e.g., `npm run lint`, `ruff check`)
-- Test: `...` (e.g., `npm test`, `pytest`)
-- Build: `...` (e.g., `npm run build`, `docker build`)
+### Project-specific
+- Frontend Dev: `cd frontend && npm run dev`
+- Frontend Build: `cd frontend && npm run build`
+- Frontend Lint: `cd frontend && npm run lint`
+- Backend Build: `cd backend && npm run build`
+- Backend Lint: `cd backend && npm run lint`
+- CDK Synth: `cd infrastructure && npm run synth`
+- CDK Deploy: `cd infrastructure && npm run deploy`
 
 ## How to work in this repo
 1) Read RULES.md and PLANS.md
-2) Propose a small plan aligned with PLANS stage
-3) Implement minimal changes
-4) Verify (lint/test) + update docs if needed
+2) Use analyst agent to understand situation and plan work
+3) Use architect agent for technology decisions (creates ADRs)
+4) Use builder agent to implement changes
+5) Use reviewer agent to verify before commit
