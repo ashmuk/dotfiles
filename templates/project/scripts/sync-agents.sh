@@ -22,7 +22,7 @@ else
 fi
 
 # 2) Cursor rules
-# Note: Cursor rules are generated directly to .cursor/rules by gen_cursor_rules_from_commands.py
+# Note: Cursor rules are generated directly to .cursor/rules by gen_cursor_rules.py
 # No sync needed from .agent/cursor/rules
 
 # 3) Skills validation

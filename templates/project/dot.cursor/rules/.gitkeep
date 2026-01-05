@@ -1,2 +1,2 @@
-# This directory is auto-populated by gen_cursor_rules_from_commands.py
-# Run: make sync-agents (or python scripts/gen_cursor_rules_from_commands.py)
+# This directory is auto-populated by gen_cursor_rules.py
+# Run: make sync (or python scripts/gen_cursor_rules.py)
