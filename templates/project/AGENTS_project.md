@@ -9,7 +9,7 @@
 - See RULES.md for stable policy
 
 ## Where things live (repo map)
-**📖 See Repository Structure in [README.md](<project-root>/README.md)**
+**📖 See Repository Structure in [README.md](./README.md)**
 
 ## Available agents
 - analyst — Analyze systems, break down work, identify risks, plan execution

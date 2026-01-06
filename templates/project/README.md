@@ -94,7 +94,7 @@ Finalized in Stage 4 via Architecture Decision Records (ADRs):
 │   ├── analytics/              # Stage 1: Analysis outputs (site structure, quality reports)
 │   ├── concept/                # Stage 3: Design system, brand guidelines, wireframes
 │   └── decisions/              # Stage 4: ADRs and architecture diagrams
-├── PLAN.md                     # Technology roadmap
+├── PLANS.md                    # Technology roadmap
 ├── README.md                   # This file
 └── CLAUDE.md                   # AI assistant guidelines
 ```
