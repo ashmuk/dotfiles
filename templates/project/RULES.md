@@ -1,5 +1,5 @@
 # RULES.md — Project Policy (Stable)
-This file is refered from AGENTS.md
+This file is referred from AGENTS.md
 
 ---
 description: "This rule provides standards how to behave for this project"
@@ -79,6 +79,6 @@ alwaysApply: true
 
 ---
 
-**📖 For detailed workflows, see [AGENTS.md](<project-root>/AGENTS.md)**
-**📋 For technology roadmap, see [PLAN.md](<project-root>/PLANS.md)**
-**🏗️ For architecture details, see [<project-root>/docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)**
+**📖 For detailed workflows, see [AGENTS.md](./AGENTS.md)**
+**📋 For technology roadmap, see [PLANS.md](./PLANS.md)**
+**🏗️ For architecture details, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)**
