@@ -19,6 +19,7 @@ set -euo pipefail
 #   AGENTS            Sync only AGENTS.md
 #   CLAUDE            Sync only CLAUDE.md
 #   RULES             Sync only RULES.md
+#   Makefile          Sync only Makefile
 #   agent             Sync only .agent/ directory
 #   boilerplate       Sync only scripts/boilerplate/ directory
 #   all               Sync all files (default)
@@ -629,6 +630,7 @@ sync_all_files() {
   local sync_agents=false
   local sync_claude=false
   local sync_rules=false
+  local sync_makefile=false
   local sync_agent_dir=false
   local sync_boilerplate_dir=false
 
@@ -638,6 +640,7 @@ sync_all_files() {
     sync_agents=true
     sync_claude=true
     sync_rules=true
+    sync_makefile=true
     sync_agent_dir=true
     sync_boilerplate_dir=true
   else
@@ -648,6 +651,7 @@ sync_all_files() {
         AGENTS) sync_agents=true ;;
         CLAUDE) sync_claude=true ;;
         RULES) sync_rules=true ;;
+        Makefile) sync_makefile=true ;;
         agent) sync_agent_dir=true ;;
         boilerplate) sync_boilerplate_dir=true ;;
         *) log WARN "Unknown file: ${file}" ;;
@@ -687,6 +691,10 @@ sync_all_files() {
 
   if [[ "${sync_rules}" == "true" ]]; then
     sync_tier2_file "${TEMPLATE_PROJECT}/RULES.md" "RULES.md" "RULES.md"
+  fi
+
+  if [[ "${sync_makefile}" == "true" ]]; then
+    sync_tier2_file "${TEMPLATE_PROJECT}/Makefile" "Makefile" "Makefile"
   fi
 
   echo ""
@@ -755,7 +763,7 @@ parse_args() {
         FORCE_MODE=true
         shift
         ;;
-      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|agent|boilerplate|all)
+      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|agent|boilerplate|all)
         SELECTED_FILES+=("$1")
         shift
         ;;
