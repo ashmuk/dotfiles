@@ -325,3 +325,12 @@ migration/analytics/google/
 
 # Legacy assets (too large for git)
 migration/assets_legacy/
+
+# Allow infrastructure source folders
+\!infrastructure/lib/
+\!infrastructure/bin/
+
+# Template sync files
+.template-backups/
+.template-sync.log
+.template-sync-metadata

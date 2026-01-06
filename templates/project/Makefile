@@ -1,4 +1,4 @@
-.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills
+.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills sync-upstream sync-upstream-check sync-upstream-status sync-upstream-dry-run
 
 # ============================================
 # Help
@@ -12,14 +12,20 @@ help:
 	@echo "  make setup-hooks       # Set up git hooks only"
 	@echo "  make check-env         # Verify environment configuration"
 	@echo ""
-	@echo "Sync:"
+	@echo "Sync (Local):"
 	@echo "  make sync              # Generate + sync .agent -> .claude/.cursor"
 	@echo "  make sync-check        # Sync then show git status"
 	@echo "  make sync-codex-skills # Sync Codex skills from .agent to .codex/skills"
 	@echo ""
+	@echo "Sync (Upstream Template):"
+	@echo "  make sync-upstream           # Sync from dotfiles template"
+	@echo "  make sync-upstream-check     # Check for template differences"
+	@echo "  make sync-upstream-status    # Show sync status"
+	@echo "  make sync-upstream-dry-run   # Preview template sync"
+	@echo ""
 	@echo "Options:"
 	@echo "  VERBOSE=1 make init    # Show detailed command output and errors"
-	@echo "  ./scripts/boilerplate/init-project.sh --help  # Show all init options"
+	@echo "  ./scripts/init-project.sh --help  # Show all init options"
 
 # ============================================
 # Initialization
@@ -65,12 +71,13 @@ check-env:
 # Sync
 # ============================================
 
-# Generate Cursor rules (symlinks RULES.md and 4 agents to .cursor/rules/project/)
-gen-cursor-rules:
-	@./scripts/boilerplate/gen_cursor_rules.py
+# Generate Cursor rules from .agent/commands (pending - needs redesign)
+#gen-cursor-rules:
+#	@./scripts/boilerplate/gen_cursor_rules_from_commands.py
 
-# Full sync: sync agents to claude/cursor + generate cursor rules
-sync: gen-cursor-rules
+# Full sync: sync agents to claude/cursor
+#sync: gen-cursor-rules
+sync:
 	@./scripts/boilerplate/sync-agents.sh
 
 # Sync then show git status
@@ -80,3 +87,23 @@ sync-check: sync
 # Sync Codex skills from .agent/skills to .codex/skills
 sync-codex-skills:
 	@./scripts/boilerplate/sync-codex-skills.sh
+
+# ============================================
+# Upstream Template Sync
+# ============================================
+
+# Sync from upstream dotfiles template
+sync-upstream:
+	@./scripts/boilerplate/sync-upstream.sh
+
+# Check for template differences
+sync-upstream-check:
+	@./scripts/boilerplate/sync-upstream.sh --check
+
+# Show sync status
+sync-upstream-status:
+	@./scripts/boilerplate/sync-upstream.sh --status
+
+# Preview template sync (dry-run)
+sync-upstream-dry-run:
+	@./scripts/boilerplate/sync-upstream.sh --dry-run
