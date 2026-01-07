@@ -226,7 +226,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-vscode install-global-templates ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-btop install-vscode install-global-templates ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -262,6 +262,13 @@ install-claude: validate ## Install Claude configuration
 	@chmod +x $(DOTFILES_DIR)/config/claude/setup_claude.sh
 	@$(DOTFILES_DIR)/config/claude/setup_claude.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) Claude configuration installed"
+
+.PHONY: install-btop
+install-btop: validate ## Install btop configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing btop configuration..."
+	@chmod +x $(DOTFILES_DIR)/config/btop/setup_btop.sh
+	@$(DOTFILES_DIR)/config/btop/setup_btop.sh
+	@echo "$(GREEN)[SUCCESS]$(NC) btop configuration installed"
 
 .PHONY: install-vscode
 install-vscode: validate ## Install VS Code configuration
@@ -705,7 +712,7 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 	@echo ""
 	@echo "Checking for required directories..."
-	@for dir in shell vim git config/tmux config/claude config/vscode; do \
+	@for dir in shell vim git config/tmux config/claude config/btop config/vscode; do \
 		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
 			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
 			exit 1; \
@@ -715,7 +722,7 @@ validate: ## Validate configuration files and dependencies
 	done
 	@echo ""
 	@echo "Checking setup scripts..."
-	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh config/claude/setup_claude.sh; do \
+	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh config/claude/setup_claude.sh config/btop/setup_btop.sh; do \
 		if [ ! -x "$(DOTFILES_DIR)/$$script" ]; then \
 			echo "$(YELLOW)[WARNING]$(NC) $$script is not executable"; \
 			chmod +x "$(DOTFILES_DIR)/$$script"; \
