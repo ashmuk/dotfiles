@@ -46,6 +46,12 @@ create_symlinks() {
     ln -sf "$DOTFILES_DIR/shell/profile/zprofile" "$HOME/.zprofile"
     ln -sf "$DOTFILES_DIR/shell/profile/zlogout" "$HOME/.zlogout"
 
+    # Create symlink to p10k configuration
+    if [[ -f "$DOTFILES_DIR/shell/dot.p10k.zsh" ]]; then
+        print_status "Creating p10k configuration symlink..."
+        ln -sf "$DOTFILES_DIR/shell/dot.p10k.zsh" "$HOME/.p10k.zsh"
+    fi
+
     print_success "Symbolic links created in home directory"
 }
 
@@ -58,7 +64,7 @@ backup_existing_files() {
         return 1
     fi
 
-    local files=(.bashrc .zshrc .bash_logout .bash_profile .zprofile .zlogout)
+    local files=(.bashrc .zshrc .bash_logout .bash_profile .zprofile .zlogout .p10k.zsh)
     for file in "${files[@]}"; do
         backup_file "$HOME/$file" "$backup_dir" "$file"
     done
@@ -153,6 +159,9 @@ main() {
     print_status "  - $HOME/.bash_profile"
     print_status "  - $HOME/.zprofile"
     print_status "  - $HOME/.zlogout"
+    if [[ -L "$HOME/.p10k.zsh" ]]; then
+        print_status "  - $HOME/.p10k.zsh (powerlevel10k config)"
+    fi
     print_status ""
 
     return 0

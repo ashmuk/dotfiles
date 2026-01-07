@@ -840,6 +840,13 @@ fi
 # Zsh-specific Settings
 # =============================================================================
 
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # History setting
 export HISTFILE=~/.zsh_history
 
@@ -992,5 +999,32 @@ unsetopt PUSHD_MINUS
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=("$HOME/.docker/completions" "${fpath[@]}")
 # Don't call compinit here, as it is already called prior.
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# Auto-detect powerlevel10k installation path
+if [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
+  # Use HOMEBREW_PREFIX if set by Homebrew
+  _p10k_path="${HOMEBREW_PREFIX}/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif [[ -f /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  # Apple Silicon Mac
+  _p10k_path="/opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif [[ -f /usr/local/share/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  # Intel Mac or Linux with Homebrew in /usr/local
+  _p10k_path="/usr/local/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif [[ -f /home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  # Linux with Homebrew in standard location
+  _p10k_path="/home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif [[ -f "$HOME/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+  # Linux with Homebrew in home directory
+  _p10k_path="$HOME/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+fi
+
+# Source p10k theme if found
+if [[ -n "${_p10k_path:-}" ]] && [[ -f "$_p10k_path" ]]; then
+  source "$_p10k_path"
+  # Source p10k config if exists
+  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+fi
+unset _p10k_path
 
 # End of Docker CLI completions

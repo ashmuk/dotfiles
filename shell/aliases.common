@@ -11,6 +11,11 @@
 # Standard alias
 # =============================================================================
 alias ..='cd ..'
+alias lla='ls -Flah'
+alias lt='ls -Flht'
+alias lta='ls -Flhta'
+alias ltr='ls -Flhtr'
+alias ltra='ls -Flhtra'
 alias du='du -h'
 alias dus='du -sh'
 # Note: dubydir alias depends on $du_command variable
