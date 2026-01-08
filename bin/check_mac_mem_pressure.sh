@@ -116,7 +116,7 @@ _health_line() {
     color="${GREEN}"
   fi
 
-  echo -e "Health: ${color}${status}${NC} | Free=${free_g}GB | Compressed=${comp_g}GB | SwapUsed=${swap_g}GB"
+  echo -e "Health: ${color}${status}${NC} | Free=${free_g}GB | Comp=${comp_g}/>6GB | Swap=${swap_g}/>1GB"
 }
 
 clear
