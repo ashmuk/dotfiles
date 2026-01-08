@@ -75,9 +75,10 @@ alias tpane="tmux list-panes -aF '#S:#I.#P #{pane_title} #{pane_current_command}
 alias td='tmux new-session -s ${default_tmux_session}\; \
   split-window -h -p 60 \; \
   split-window -t 0.0 -v -p 60\; \
-  split-window -t 0.2 -v -p 24\; \
-  split-window -t 0.0 -v -p 40\; \
+  split-window -t 0.2 -v -p 8\; \
+  split-window -t 0.0 -v -p 45\; \
   send-keys -t 0.0 "ctop" C-m \; \
+  send-keys -t 0.1 "while true; do ~/dotfiles/bin/check_mac_mem_pressure.sh; sleep 10; done" C-m \; \
   send-keys -t 0.2 "btop" C-m \; \
   send-keys -t 0.4 "while true; do clear; dfc; sleep 5; done" C-m \; \
   select-pane -t 0.3'
