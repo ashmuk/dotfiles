@@ -64,10 +64,10 @@ npx astro check    # TypeScript validation (if using Astro)
 ### Upstream Template Sync
 Sync boilerplate from upstream template repository:
 ```bash
-make sync-upstream           # Sync from dotfiles template
-make sync-upstream-check     # Check for template differences
-make sync-upstream-status    # Show sync status
-make sync-upstream-dry-run   # Preview template sync
+make fetch-from-upstream           # Sync from dotfiles template
+make fetch-from-upstream-check     # Check for template differences
+make fetch-from-upstream-status    # Show sync status
+make fetch-from-upstream-dry-run   # Preview template sync
 ```
 
 ## Architecture Overview

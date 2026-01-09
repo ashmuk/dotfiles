@@ -4,7 +4,7 @@ set -euo pipefail
 # ============================================================================
 # Template Sync Script - Fetch updates from upstream dotfiles template
 # ============================================================================
-# Usage: sync-upstream.sh [OPTIONS] [FILES...]
+# Usage: fetch-from-upstream.sh [OPTIONS] [FILES...]
 #
 # Options:
 #   --check           Check for differences without syncing
@@ -712,7 +712,7 @@ sync_all_files() {
 show_status() {
   if [[ ! -f "${SYNC_METADATA}" ]]; then
     log INFO "No sync history found"
-    log INFO "Run 'make sync-upstream' to sync from template"
+    log INFO "Run 'make fetch-from-upstream' to fetch from template"
     return 0
   fi
 

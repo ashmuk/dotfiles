@@ -1,4 +1,4 @@
-.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills sync-upstream sync-upstream-check sync-upstream-status sync-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
+.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
 
 # ============================================
 # Help
@@ -18,10 +18,10 @@ help:
 	@echo "  make sync-codex-skills # Sync Codex skills from .agent to .codex/skills"
 	@echo ""
 	@echo "Sync (Upstream Template):"
-	@echo "  make sync-upstream           # Sync from dotfiles template"
-	@echo "  make sync-upstream-check     # Check for template differences"
-	@echo "  make sync-upstream-status    # Show sync status"
-	@echo "  make sync-upstream-dry-run   # Preview template sync"
+	@echo "  make fetch-from-upstream           # Sync from dotfiles template"
+	@echo "  make fetch-from-upstream-check     # Check for template differences"
+	@echo "  make fetch-from-upstream-status    # Show sync status"
+	@echo "  make fetch-from-upstream-dry-run   # Preview template sync"
 	@echo ""
 	@echo "Push to Upstream Template:"
 	@echo "  make push-to-upstream           # Push local changes to dotfiles template"
@@ -99,20 +99,20 @@ sync-codex-skills:
 # ============================================
 
 # Sync from upstream dotfiles template
-sync-upstream:
-	@./scripts/boilerplate/sync-upstream.sh
+fetch-from-upstream:
+	@./scripts/boilerplate/fetch-from-upstream.sh
 
 # Check for template differences
-sync-upstream-check:
-	@./scripts/boilerplate/sync-upstream.sh --check
+fetch-from-upstream-check:
+	@./scripts/boilerplate/fetch-from-upstream.sh --check
 
 # Show sync status
-sync-upstream-status:
-	@./scripts/boilerplate/sync-upstream.sh --status
+fetch-from-upstream-status:
+	@./scripts/boilerplate/fetch-from-upstream.sh --status
 
 # Preview template sync (dry-run)
-sync-upstream-dry-run:
-	@./scripts/boilerplate/sync-upstream.sh --dry-run
+fetch-from-upstream-dry-run:
+	@./scripts/boilerplate/fetch-from-upstream.sh --dry-run
 
 # ============================================
 # Push to Upstream Template
