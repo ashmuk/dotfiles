@@ -21,6 +21,7 @@ set -euo pipefail
 #   CLAUDE            Push only CLAUDE.md -> CLAUDE_project.md
 #   RULES             Push only RULES.md
 #   Makefile          Push only Makefile
+#   gitignore         Push only .gitignore -> dot.gitignore
 #   agent             Push only .agent/ -> dot.agent/
 #   boilerplate       Push only scripts/boilerplate/
 #   all               Push all files (default)
@@ -713,6 +714,7 @@ push_all_files() {
   local push_claude=false
   local push_rules=false
   local push_makefile=false
+  local push_gitignore=false
   local push_agent_dir=false
   local push_boilerplate_dir=false
 
@@ -723,6 +725,7 @@ push_all_files() {
     push_claude=true
     push_rules=true
     push_makefile=true
+    push_gitignore=true
     push_agent_dir=true
     push_boilerplate_dir=true
   else
@@ -734,6 +737,7 @@ push_all_files() {
         CLAUDE) push_claude=true ;;
         RULES) push_rules=true ;;
         Makefile) push_makefile=true ;;
+        gitignore) push_gitignore=true ;;
         agent) push_agent_dir=true ;;
         boilerplate) push_boilerplate_dir=true ;;
         *) log WARN "Unknown file: ${file}" ;;
@@ -783,6 +787,10 @@ push_all_files() {
     push_tier2_file "Makefile" "${TEMPLATE_PROJECT}/Makefile" "Makefile"
   fi
 
+  if [[ "${push_gitignore}" == "true" ]]; then
+    push_tier2_file ".gitignore" "${TEMPLATE_PROJECT}/dot.gitignore" ".gitignore -> dot.gitignore"
+  fi
+
   echo ""
   log OK "Push complete"
 }
@@ -808,6 +816,7 @@ show_status() {
   check_file_status "CLAUDE.md" "${TEMPLATE_PROJECT}/CLAUDE_project.md"
   check_file_status "RULES.md" "${TEMPLATE_PROJECT}/RULES.md"
   check_file_status "Makefile" "${TEMPLATE_PROJECT}/Makefile"
+  check_file_status ".gitignore" "${TEMPLATE_PROJECT}/dot.gitignore"
 
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
@@ -890,7 +899,7 @@ parse_args() {
         FORCE_MODE=true
         shift
         ;;
-      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|agent|boilerplate|all)
+      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|gitignore|agent|boilerplate|all)
         SELECTED_FILES+=("$1")
         shift
         ;;

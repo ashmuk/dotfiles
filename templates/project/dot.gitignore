@@ -334,3 +334,5 @@ migration/assets_legacy/
 .template-backups/
 .template-sync.log
 .template-sync-metadata
+.push-backups/
+.template-push.log
