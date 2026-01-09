@@ -1,4 +1,4 @@
-.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills sync-upstream sync-upstream-check sync-upstream-status sync-upstream-dry-run
+.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills sync-upstream sync-upstream-check sync-upstream-status sync-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
 
 # ============================================
 # Help
@@ -22,6 +22,12 @@ help:
 	@echo "  make sync-upstream-check     # Check for template differences"
 	@echo "  make sync-upstream-status    # Show sync status"
 	@echo "  make sync-upstream-dry-run   # Preview template sync"
+	@echo ""
+	@echo "Push to Upstream Template:"
+	@echo "  make push-to-upstream           # Push local changes to dotfiles template"
+	@echo "  make push-to-upstream-check     # Show what would be pushed (dry-run)"
+	@echo "  make push-to-upstream-status    # Compare local vs upstream"
+	@echo "  make push-to-upstream-dry-run   # Preview push without changes"
 	@echo ""
 	@echo "Options:"
 	@echo "  VERBOSE=1 make init    # Show detailed command output and errors"
@@ -107,3 +113,23 @@ sync-upstream-status:
 # Preview template sync (dry-run)
 sync-upstream-dry-run:
 	@./scripts/boilerplate/sync-upstream.sh --dry-run
+
+# ============================================
+# Push to Upstream Template
+# ============================================
+
+# Push local changes to dotfiles template
+push-to-upstream:
+	@./scripts/boilerplate/push-to-upstream.sh
+
+# Show what would be pushed (dry-run)
+push-to-upstream-check:
+	@./scripts/boilerplate/push-to-upstream.sh --check
+
+# Compare local vs upstream
+push-to-upstream-status:
+	@./scripts/boilerplate/push-to-upstream.sh --status
+
+# Preview push without changes
+push-to-upstream-dry-run:
+	@./scripts/boilerplate/push-to-upstream.sh --dry-run

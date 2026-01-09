@@ -28,6 +28,25 @@
 - Stop: `devcontainer down --workspace-folder .`
 - Rebuild: `devcontainer up --workspace-folder . --remove-existing-container --build-no-cache`
 
+> **Note**: `claude-hard` alias (dangerous mode) is only available inside DevContainer
+
+### Slash Commands (Claude Code)
+Available slash commands for common workflows:
+
+**Git workflows:**
+- `/commit` — Stage changes and create conventional commit
+- `/push` — Push changes with safety checks
+- `/pr.create` — Create pull request with generated description
+
+**DevContainer lifecycle:**
+- `/devcontainer.up` — Start development environment
+- `/devcontainer.down` — Stop development environment
+- `/devcontainer.rebuild` — Rebuild environment from scratch
+
+**Naming convention:** Dot notation for namespaces (e.g., `namespace.action`)
+**Structure:** Flat files in `.claude/commands/*.md` (like agents, not nested like skills)
+**Source of truth:** `.agent/commands/` → synced to `.claude/commands/` via `make sync`
+
 ## How to work in this repo
 1) Read RULES.md and PLANS.md
 2) Use analyst agent to understand situation and plan work

@@ -1,11 +1,6 @@
 ---
 name: architect
 description: Solutions architect for strategic decisions and ADR documentation. Use for technology choices, trade-off analysis, system design, or migration strategies.
-examples:
-  - user: "Add caching layer to application" → Evaluate options, document decision as ADR
-  - user: "Migrate from monolith to microservices" → Design strategy, create rollout plan
-  - user: "We chose PostgreSQL over MongoDB" → Document rationale in formal ADR
-  - user: "Building new API service" → Define architecture, evaluate technologies
 model: opus
 color: purple
 ---

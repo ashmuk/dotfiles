@@ -1,14 +1,156 @@
-# CLAUDE.md — Claude Code Notes (Repo)
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > For the main repo guide see AGENTS.md. For stable policy see RULES.md.
 
-## Claude-specific
-- Prefer using DevContainer if available.
-- "claude-hard" (dangerous mode) requires explicit approval before any destructive action.
-- When writing decisions, create an ADR in docs/decisions/ (see RULES.md).
+## Quick Reference
 
-## Pointers
-- Project overview: README.md
-- Repo entry: AGENTS.md
-- Stable rules: RULES.md
-- Current plan: PLANS.md
+### Essential Commands
+```bash
+# Project setup
+make init              # Interactive setup wizard (first time)
+make setup-hooks       # Set up git hooks for branch protection
+make help              # Show all available make commands
+
+# Development workflow
+make sync              # Sync .agent/ → .claude/.cursor/ configurations
+make sync-check        # Sync then show git diff status
+make check-env         # Verify .env configuration
+
+# DevContainer (preferred environment)
+devcontainer up --workspace-folder .
+devcontainer down --workspace-folder .
+
+# Git workflow
+git checkout develop                    # Work from develop branch
+git checkout -b feature/your-feature    # Create feature branch
+# ... make changes ...
+git commit -m "feat(scope): description"
+git push -u origin feature/your-feature
+# Create PR via GitHub UI
+```
+
+### Slash Commands (Claude Code)
+Use these commands for common workflows:
+
+**Workflow Skills** (coordinate multi-step tasks):
+- `/define` — Understand context and define requirements (uses Explore agents)
+- `/design` — Create architecture, designs, and implementation plans (uses Plan agents)
+- `/implement` — Build software and artifacts (uses general-purpose agents)
+- `/review` — Review project progress and validate implementations
+
+**Git Workflows**:
+- `/commit` — Stage changes and create conventional commit with generated message
+- `/push` — Push changes to remote with safety checks
+- `/pr.create` — Create pull request with auto-generated title and description
+
+**DevContainer Lifecycle**:
+- `/devcontainer.up` — Start development environment
+- `/devcontainer.down` — Stop and clean up development environment
+- `/devcontainer.rebuild` — Rebuild environment from scratch
+
+### Frontend Development (Stage 5+)
+**Note**: Frontend implementation begins in Stage 5. Directory structure will be:
+```bash
+cd frontend/
+npm install        # First time only
+npm run dev        # Dev server (typically port 4321 for Astro)
+npm run build      # Production build
+npm run preview    # Preview production build
+npx astro check    # TypeScript validation (if using Astro)
+```
+
+### Upstream Template Sync
+Sync boilerplate from upstream template repository:
+```bash
+make sync-upstream           # Sync from dotfiles template
+make sync-upstream-check     # Check for template differences
+make sync-upstream-status    # Show sync status
+make sync-upstream-dry-run   # Preview template sync
+```
+
+## Architecture Overview
+
+### Multi-AI Coordination System
+This repo uses a **centralized `.agent/` directory** as the source of truth:
+- `.agent/` → source files (commands, subagents, skills)
+- `make sync` generates configs for:
+  - `.claude/` (Claude Code) — commands, subagents, skills
+  - `.cursor/rules/` (Cursor IDE) — workspace rules
+  - `.codex/skills/` (Codex AI) — via `make sync-codex-skills`
+
+**Important**: Always run `make sync` after modifying `.agent/` files to propagate changes.
+
+### Agent-Based Workflow
+This project uses specialized subagents (defined in `.claude/agents/`) for different responsibilities:
+
+- **analyst** — System analysis, planning, risk identification
+  - Use for: Breaking down complex tasks, analyzing existing systems, identifying risks
+
+- **architect** — Technology decisions, trade-offs, ADR creation
+  - Use for: Choosing tech stack, designing architecture, creating ADRs
+
+- **builder** — Implementation (code, scripts, CI/CD, infrastructure)
+  - Use for: Writing code, creating scripts, setting up infrastructure
+
+- **reviewer** — Code review, security validation, integrity checks
+  - Use for: Validating implementations, security audits, final checks before merge
+
+**Coordination**: Use workflow skills (`/define`, `/design`, `/implement`, `/review`) to automatically coordinate these agents for multi-step tasks.
+
+### Stage-Based Development
+Project follows a structured roadmap in PLANS.md:
+- **Stage 1**: Analysis (current) — Read-only analysis, no deployment
+- **Stage 2**: Asset collection
+- **Stage 3-4**: Architecture & tech stack (via ADRs)
+- **Stage 5**: Implementation & AWS deployment
+- **Stage 6+**: Enhancement
+
+Always check PLANS.md for current stage constraints.
+
+## Claude-Specific Guidelines
+
+### Safety & Approvals
+- **DevContainer**: Prefer using it when available (`devcontainer up`)
+- **Dangerous operations**: `claude-hard` alias requires explicit user approval before:
+  - Merging to `main` branch
+  - Force push, hard reset, rebase on shared branches
+  - Infrastructure changes (AWS deployments, DNS)
+  - Deleting production data
+
+### Decision Documentation
+When making architectural or technical decisions:
+1. Create an ADR in `docs/decisions/ADR-YYYYMMDD-<slug>.md`
+2. Use the template from `.agent/skills/adr.md`
+3. Include: Context, Options (pros/cons), Decision, Consequences, Rollback plan
+
+Example: Choosing between authentication methods, selecting a database, CI/CD pipeline design.
+
+### Branch & Merge Workflow
+- **Automated** (no approval needed):
+  - Creating PRs (feature → develop)
+  - Running CI/CD checks
+  - Merging to `develop` (when user says "proceed")
+
+- **Require approval** (always ask first):
+  - ⚠️ Merging to `main` (production deployment)
+  - ⚠️ Force operations on shared branches
+  - ⚠️ Infrastructure changes
+
+## Key Constraints
+
+1. **assets_legacy/** is read-only — never modify original downloaded assets
+2. **No production deployment** until Stage 5 — respect PLANS.md roadmap
+3. **Commit secrets forbidden** — never commit `.env`, `config.json`, API keys
+4. **Follow existing patterns** — read code before modifying (especially in frontend/)
+5. **Git Flow branching** — `main` (prod) ← `develop` (integration) ← `feature/*`
+
+## Project Context Pointers
+
+- **Project overview**: README.md
+- **Repo entry point**: AGENTS.md
+- **Stable rules**: RULES.md
+- **Current stage & tasks**: PLANS.md
+- **Tech stack & statistics**: README.md (Tech Stack section)
+- **ADR template**: .agent/skills/adr.md

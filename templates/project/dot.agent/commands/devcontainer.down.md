@@ -1,3 +1,7 @@
+---
+description: Command - Stop and clean up the DevContainer environment for this repository.
+---
+
 # Command: devcontainer.down
 
 ## Purpose

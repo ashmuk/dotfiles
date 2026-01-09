@@ -1,3 +1,6 @@
+---
+description: Command - Start the development environment using DevContainer for this repository.
+---
 # Command: devcontainer.up
 
 ## Purpose

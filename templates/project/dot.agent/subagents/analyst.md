@@ -1,11 +1,6 @@
 ---
 name: analyst
 description: Analyst for understanding systems and planning work. Use to analyze existing systems, break down tasks, identify risks, discover assets, or create execution plans.
-examples:
-  - user: "Analyze legacy dashboard for React rebuild" → Structural inventory, components, design patterns
-  - user: "Document WordPress site pages and navigation" → Page inventory, hierarchy, content structure
-  - user: "Add user authentication" → Break down into tasks, identify risks, propose plan
-  - user: "Fix bug + add dashboard + migrate API" → Prioritize, sequence, create execution plan
 model: opus
 color: green
 ---

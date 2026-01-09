@@ -1,12 +1,6 @@
 ---
 name: builder
 description: Implementation specialist for executing plans. Use for writing code, creating tests, scripts, CI/CD pipelines, infrastructure, collecting assets, or operational documentation.
-examples:
-  - user: "Implement user auth service per architecture" → Write code, tests, verify
-  - user: "Set up GitHub Actions for Node.js" → Create CI/CD workflow
-  - user: "Create deployment script" → Write automation with safety checks
-  - user: "Download product images from Shopify" → Collect assets with checksums
-  - user: "Database queries too slow" → Analyze and optimize
 model: sonnet
 color: red
 ---

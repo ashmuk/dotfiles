@@ -1,12 +1,6 @@
 ---
 name: reviewer
 description: Independent reviewer and safety gate. Use for code review, security analysis, pre-commit verification, destructive action approval, or integrity verification.
-examples:
-  - after: "Implemented JWT auth" → Review for security, best practices
-  - after: "Refactored connection pooling" → Check side effects, backward compatibility
-  - user: "Run database migration on production" → Validate rollback, approve destructive action
-  - user: "Delete unused staging environments" → Verify impact, approve irreversible cleanup
-  - user: "Verify downloaded assets" → Check checksums, detect duplicates
 model: opus
 color: cyan
 ---

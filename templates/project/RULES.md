@@ -29,47 +29,28 @@ alwaysApply: true
 - Documentation-first: update docs when behavior changes
 - Prefer smallest diff that achieves the goal
 
-## Git / PR
-**Commit format**: `type(scope): description`
-```
-- feat(stage1): ...
-- fix(scraper): ...
-- docs: ...
-```
-
+## Git Flow
 **Branches**: `main` (prod) ← `develop` (integration) ← `feature/*`
-- Prefer short-lived feature branches
+**Commits**: Conventional format (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
+**Tags**: `v{X}.{yy}` (X = stage, yy = patch)
 
-**DevContainer**: `claude-hard` = dangerous mode alias
+## Approval Gates
 
-**PR checklist**
+| Action | Approval |
+|--------|----------|
+| Create PRs, run CI/CD | Automated |
+| Merge to `develop` | Automated (when user says "proceed") |
+| **Merge to `main`** | **Require approval** (production) |
+| Force push/reset/rebase | **Require approval** |
+| Delete production data | **Require approval** |
+| Infrastructure changes | **Require approval** |
+
+## PR Checklist
 - [ ] Scope is minimal and clear
 - [ ] Tests/lint run (or explain why not)
 - [ ] Docs updated if needed
 - [ ] No secrets / no large binaries
 - [ ] Decision captured as ADR when relevant
-
-### Merge Workflow & Approval Gates
-**Automated (No approval needed):**
-- ✅ Create PRs (feature → develop)
-- ✅ Run CI/CD checks
-- ✅ Merge to `develop` (when explicitly asked to "proceed")
-- ✅ Create release PRs (develop → main)
-
-**Require Explicit Approval:**
-- ⚠️ **Merge to `main`** - Always ask first (production deployment)
-- ⚠️ **Force operations** - push --force, reset --hard, rebase on shared branches
-- ⚠️ **Delete production data** - S3 objects, CloudFront invalidations, DB records
-- ⚠️ **Infrastructure changes** - CloudFormation/CDK deployments, DNS changes
-
-**Example Workflow:**
-```bash
-# 1. Create feature PR → develop (automated)
-# 2. Merge to develop (automated if user said "proceed")
-# 3. Create release PR → main (automated)
-# 4. ⚠️ STOP and ask: "PR #X ready to merge to main. Deploy to production?"
-# 5. After approval: merge to main
-```
 
 ## Definition of Done
 - The change works

@@ -1,8 +1,13 @@
+---
+
+description: Command - Rebuild the DevContainer environment from scratch using the current DevContainer configuration.
+
+---
+
 # Command: devcontainer.rebuild
 
 ## Purpose
-Rebuild the DevContainer environment from scratch using the current
-DevContainer configuration.
+Rebuild the DevContainer environment from scratch using the current DevContainer configuration.
 
 Use this command when:
 - `.devcontainer/devcontainer.json` is modified
