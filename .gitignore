@@ -310,3 +310,6 @@ junit.xml
 
 # Backup directory
 backup/
+
+# Template sync artifacts (runtime backups from push-to-upstream.sh)
+templates/.push-backups/

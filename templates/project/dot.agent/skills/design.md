@@ -1,8 +1,6 @@
 ---
-
 name: design
 description: Skill - Create system architecture, designs, task breakdowns and plans, co-working with ClaudeCode built-in Plan agent(s)
-
 ---
 
 # SKILL - Design architecture, system, tasks and plans

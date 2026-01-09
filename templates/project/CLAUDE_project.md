@@ -14,8 +14,9 @@ make setup-hooks       # Set up git hooks for branch protection
 make help              # Show all available make commands
 
 # Development workflow
-make sync              # Sync .agent/ → .claude/.cursor/ configurations
-make sync-check        # Sync then show git diff status
+make sync              # Sync .agent/ → .claude, .cursor, .codex
+make sync-check        # Sync then show git status
+make sync-verify       # Sync then verify all targets
 make check-env         # Verify .env configuration
 
 # DevContainer (preferred environment)
@@ -75,10 +76,20 @@ make fetch-from-upstream-dry-run   # Preview template sync
 ### Multi-AI Coordination System
 This repo uses a **centralized `.agent/` directory** as the source of truth:
 - `.agent/` → source files (commands, subagents, skills)
-- `make sync` generates configs for:
-  - `.claude/` (Claude Code) — commands, subagents, skills
-  - `.cursor/rules/` (Cursor IDE) — workspace rules
-  - `.codex/skills/` (Codex AI) — via `make sync-codex-skills`
+- `make sync` generates configs for all three AI tools:
+
+| Source | Claude Code | Cursor IDE | Codex |
+|--------|-------------|------------|-------|
+| `subagents/` | `.claude/agents/` (symlinks) | `.cursor/rules/agents/` (symlinks) | `.codex/AGENTS.override.md` (generated) |
+| `skills/` | `.claude/skills/<name>/SKILL.md` | `.cursor/rules/skills/<name>/RULE.md` | `.codex/skills/<name>/SKILL.md` |
+| `commands/` | `.claude/commands/` (symlinks) | *(not supported)* | *(not supported)* |
+
+**Individual sync targets** (for debugging):
+```bash
+make sync-claude       # Sync to Claude Code only
+make sync-cursor       # Sync to Cursor IDE only
+make sync-codex        # Sync to OpenAI Codex only
+```
 
 **Important**: Always run `make sync` after modifying `.agent/` files to propagate changes.
 

@@ -1,8 +1,6 @@
 ---
-
 name: implement
 description: Skill - Implement softwares and relevant artifacts, co-working with ClaudeCode built-in general-purpose agent(s)
-
 ---
 
 # SKILL - Implement softwares

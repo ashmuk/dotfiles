@@ -1,3 +1,8 @@
+---
+name: adr
+description: Skill - Create Architecture Decision Records (ADRs) for documenting important technical decisions
+---
+
 # Skill — ADR (Architecture Decision Record)
 
 ## Purpose

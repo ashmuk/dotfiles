@@ -1,4 +1,4 @@
-.PHONY: help init init-cli setup-hooks check-env sync gen-cursor-rules sync-check sync-codex-skills fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
+.PHONY: help init init-cli setup-hooks check-env sync sync-check sync-verify sync-claude sync-cursor sync-codex fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
 
 # ============================================
 # Help
@@ -13,9 +13,12 @@ help:
 	@echo "  make check-env         # Verify environment configuration"
 	@echo ""
 	@echo "Sync (Local):"
-	@echo "  make sync              # Generate + sync .agent -> .claude/.cursor"
+	@echo "  make sync              # Sync .agent -> .claude, .cursor, .codex"
 	@echo "  make sync-check        # Sync then show git status"
-	@echo "  make sync-codex-skills # Sync Codex skills from .agent to .codex/skills"
+	@echo "  make sync-verify       # Sync then verify all targets"
+	@echo "  make sync-claude       # Sync to Claude Code only"
+	@echo "  make sync-cursor       # Sync to Cursor IDE only"
+	@echo "  make sync-codex        # Sync to OpenAI Codex only"
 	@echo ""
 	@echo "Sync (Upstream Template):"
 	@echo "  make fetch-from-upstream           # Sync from dotfiles template"
@@ -77,21 +80,38 @@ check-env:
 # Sync
 # ============================================
 
-# Generate Cursor rules from .agent/commands (pending - needs redesign)
-#gen-cursor-rules:
-#	@./scripts/boilerplate/gen_cursor_rules_from_commands.py
-
-# Full sync: sync agents to claude/cursor
-#sync: gen-cursor-rules
+# Full sync: .agent -> .claude, .cursor, .codex
 sync:
 	@./scripts/boilerplate/sync-agents.sh
+	@./scripts/boilerplate/sync-cursor-rules.sh
+	@./scripts/boilerplate/sync-codex-skills.sh
 
 # Sync then show git status
 sync-check: sync
 	@git status --porcelain
 
-# Sync Codex skills from .agent/skills to .codex/skills
-sync-codex-skills:
+# Sync then verify all targets
+sync-verify: sync
+	@echo ""
+	@echo "=== Sync Verification ==="
+	@echo "Claude Code:"
+	@echo "  Agents:   $$(ls .claude/agents/*.md 2>/dev/null | wc -l | tr -d ' ') files"
+	@echo "  Skills:   $$(ls -d .claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') dirs"
+	@echo "  Commands: $$(ls .claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') files"
+	@echo "Cursor IDE:"
+	@echo "  Rules:    $$(find .cursor/rules -name 'RULE.md' 2>/dev/null | wc -l | tr -d ' ') files"
+	@echo "Codex:"
+	@echo "  Skills:   $$(ls -d .codex/skills/*/ 2>/dev/null | wc -l | tr -d ' ') dirs"
+	@echo "  Override: $$(test -f .codex/AGENTS.override.md && echo 'exists' || echo 'MISSING')"
+
+# Individual tool syncs (for debugging)
+sync-claude:
+	@./scripts/boilerplate/sync-agents.sh
+
+sync-cursor:
+	@./scripts/boilerplate/sync-cursor-rules.sh
+
+sync-codex:
 	@./scripts/boilerplate/sync-codex-skills.sh
 
 # ============================================

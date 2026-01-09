@@ -471,8 +471,11 @@ sync_agent_directory() {
       cp -R "${upstream_dir}" "${local_dir}"
       log OK "${label}: synced from upstream"
 
-      # Run local sync to propagate changes
-      if [[ -f "${PROJECT_ROOT}/scripts/boilerplate/sync-agents.sh" ]]; then
+      # Run local sync to propagate changes to Claude, Cursor, and Codex
+      if [[ -f "${PROJECT_ROOT}/Makefile" ]]; then
+        log INFO "Running 'make sync' to propagate .agent/ changes to all tools..."
+        make -C "${PROJECT_ROOT}" sync
+      elif [[ -f "${PROJECT_ROOT}/scripts/boilerplate/sync-agents.sh" ]]; then
         log INFO "Running local sync to propagate .agent/ changes..."
         "${PROJECT_ROOT}/scripts/boilerplate/sync-agents.sh"
       fi

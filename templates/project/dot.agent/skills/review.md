@@ -1,8 +1,6 @@
 ---
-
 name: review
 description: Skill - Review all relevant aspects of project progress, co-working with ClaudeCode built-in agent(s) which are relevant
-
 ---
 
 # SKILL - Review project progress
