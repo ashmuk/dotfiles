@@ -4,7 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > For the main repo guide see AGENTS.md. For stable policy see RULES.md.
 
+## Project Context
+**See README.md** for project-specific information:
+- Tech stack and dependencies
+- Build instructions
+- Module structure and conventions
+- Development guide
+etc.
+
 ## Quick Reference
+
+### Project Character
+This project supports two characters: Toolbox or Stage-Based.
+See PROJECT.yaml (./PROJECT.yaml) for which character this project follows.
 
 ### Essential Commands
 ```bash
@@ -98,11 +110,6 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
   - Use for: Validating implementations, security audits, final checks before merge
 
 **Coordination**: Use workflow skills (`/define`, `/design`, `/implement`, `/review`) to automatically coordinate these agents for multi-step tasks.
-
-### Project Character
-This project supports two characters: Toolbox or Stage-Based.
-See PROJECT.yaml (./PROJECT.yaml) for which character this project follows.
-
 
 ## Claude-Specific Guidelines
 
