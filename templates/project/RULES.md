@@ -29,6 +29,25 @@ alwaysApply: true
 - Documentation-first: update docs when behavior changes
 - Prefer smallest diff that achieves the goal
 
+## Project Character
+
+This project supports two characters. Check `PROJECT.yaml` for current mode:
+
+### Staged Projects (`character: staged` or no PROJECT.yaml)
+- Follow sequential workflow: `/define` → `/design` → `/implement` → `/review`
+- No production deployment until `staged.deployment_gate` stage
+- Update `PLANS.md` when stage transitions occur
+- Respect stage constraints (e.g., "read-only analysis" in Stage 1)
+
+### Toolbox Projects (`character: toolbox`)
+- Ship independently per component
+- Workflow scales to task size:
+  - Small (1 file, <50 LOC): `/implement` directly
+  - Medium (2-5 files): `/design` → `/implement`
+  - Large (cross-cutting): Full workflow
+- Update `BACKLOG.md` on completion
+- No stage gates - discuss impact before major changes
+
 ## Git Flow
 **Branches**: `main` (prod) ← `develop` (integration) ← `feature/*`
 **Commits**: Conventional format (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)

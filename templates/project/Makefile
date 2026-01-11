@@ -1,10 +1,15 @@
-.PHONY: help init init-cli setup-hooks check-env sync sync-check sync-verify sync-claude sync-cursor sync-codex fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run
+.PHONY: help init init-cli setup-hooks check-env sync sync-check sync-verify sync-claude sync-cursor sync-codex fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run _check-starters init-staged init-toolbox show-character
 
 # ============================================
 # Help
 # ============================================
 help:
 	@echo "Project Management Commands"
+	@echo ""
+	@echo "Project Character:"
+	@echo "  make init-toolbox      # Initialize as toolbox (ad-hoc) project"
+	@echo "  make init-staged       # Initialize as staged development project"
+	@echo "  make show-character    # Show current project character"
 	@echo ""
 	@echo "Initialization:"
 	@echo "  make init              # Interactive setup wizard (recommended for new projects)"
@@ -74,6 +79,81 @@ check-env:
 	else \
 		echo "✗ .env file not found"; \
 		echo "  Run: cp .env.example .env"; \
+	fi
+
+# ============================================
+# Project Character
+# ============================================
+
+# Check if starters exist (need fetch-from-upstream first)
+_check-starters:
+	@if [ ! -d .agent/starters ]; then \
+		echo "Error: .agent/starters/ not found."; \
+		echo "Run 'make fetch-from-upstream' first to get starter templates."; \
+		exit 1; \
+	fi
+
+# Initialize as staged development project
+init-staged: _check-starters
+	@if [ -f PROJECT.yaml ]; then \
+		echo "PROJECT.yaml already exists. Remove it first to reinitialize."; \
+		exit 1; \
+	fi
+	@cp .agent/starters/PROJECT.staged.yaml PROJECT.yaml
+	@if [ -f PLANS.md ]; then \
+		printf "PLANS.md exists. Overwrite? [y/N]: "; \
+		read answer; \
+		case "$$answer" in \
+			[yY]*) \
+				echo "Backing up existing PLANS.md -> PLANS.md.bak"; \
+				mv PLANS.md PLANS.md.bak; \
+				cp .agent/starters/PLANS.md PLANS.md; \
+				;; \
+			*) \
+				echo "Keeping existing PLANS.md"; \
+				;; \
+		esac; \
+	else \
+		cp .agent/starters/PLANS.md PLANS.md; \
+	fi
+	@mkdir -p docs/decisions
+	@echo "[OK] Initialized as STAGED project"
+	@echo "  - Edit PROJECT.yaml to set current_stage"
+	@echo "  - Edit PLANS.md to define roadmap"
+
+# Initialize as toolbox/ad-hoc project
+init-toolbox: _check-starters
+	@if [ -f PROJECT.yaml ]; then \
+		echo "PROJECT.yaml already exists. Remove it first to reinitialize."; \
+		exit 1; \
+	fi
+	@cp .agent/starters/PROJECT.toolbox.yaml PROJECT.yaml
+	@if [ -f BACKLOG.md ]; then \
+		printf "BACKLOG.md exists. Overwrite? [y/N]: "; \
+		read answer; \
+		case "$$answer" in \
+			[yY]*) \
+				echo "Backing up existing BACKLOG.md -> BACKLOG.md.bak"; \
+				mv BACKLOG.md BACKLOG.md.bak; \
+				cp .agent/starters/BACKLOG.md BACKLOG.md; \
+				;; \
+			*) \
+				echo "Keeping existing BACKLOG.md"; \
+				;; \
+		esac; \
+	else \
+		cp .agent/starters/BACKLOG.md BACKLOG.md; \
+	fi
+	@mkdir -p docs/decisions
+	@echo "[OK] Initialized as TOOLBOX project"
+	@echo "  - Add tasks to BACKLOG.md"
+
+# Show current project character
+show-character:
+	@if [ -f PROJECT.yaml ]; then \
+		grep "^character:" PROJECT.yaml; \
+	else \
+		echo "character: staged (default - no PROJECT.yaml)"; \
 	fi
 
 # ============================================

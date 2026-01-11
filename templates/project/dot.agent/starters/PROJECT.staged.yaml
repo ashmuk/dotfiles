@@ -1,0 +1,14 @@
+version: 1
+character: staged
+
+staged:
+  current_stage: 1
+  deployment_gate: 5
+  roadmap_file: PLANS.md
+
+# Staged projects follow linear progression:
+# Stage 1: Analysis (read-only)
+# Stage 2: Asset collection
+# Stage 3-4: Architecture & tech stack (ADRs)
+# Stage 5: Implementation & deployment
+# Stage 6+: Enhancement

@@ -1,0 +1,12 @@
+version: 1
+character: toolbox
+
+toolbox:
+  backlog_file: BACKLOG.md
+  shipping: continuous
+
+# Toolbox projects are ad-hoc:
+# - Multiple independent tools/plugins
+# - Business-driven iterations
+# - Each component can ship independently
+# - Workflow scales to task size
