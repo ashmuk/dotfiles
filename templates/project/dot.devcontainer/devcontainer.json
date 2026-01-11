@@ -55,6 +55,11 @@
             "path": "zsh"
           }
         },
+        // Terminal font (requires nerd font installed on host)
+        "terminal.integrated.fontFamily": "'HackGen Console NF', 'MesloLGS NF', 'Hack Nerd Font', monospace",
+        "terminal.integrated.fontSize": 14,
+        // Port forwarding - reduce noise from auto-detected ports
+        "remote.autoForwardPortsSource": "output",
         // Java settings
         "java.configuration.updateBuildConfiguration": "automatic",
         "java.compile.nullAnalysis.mode": "automatic"

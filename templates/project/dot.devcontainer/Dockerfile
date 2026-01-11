@@ -117,7 +117,7 @@ ENV VISUAL=nano
 # Switch to non-root user for remaining setup
 USER ${USERNAME}
 
-# Install zsh with plugins (git only - fzf is already installed via apt)
+# Install zsh with Oh My Zsh (theme set separately)
 # Note: fzf from apt package works directly, no Oh My Zsh plugin needed
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
  -p git \
@@ -125,6 +125,9 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
  -a "[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh || true" \
  -a "[ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh || true" \
  -x
+
+# Set Powerlevel10k theme (zsh-in-docker already clones it)
+RUN sed -i 's/ZSH_THEME=".*"/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc
 
 # Set zsh as default shell
 ENV SHELL=/bin/zsh
@@ -136,6 +139,10 @@ RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 USER root
 RUN mkdir -p /workspace /home/${USERNAME}/.claude && \
  chown -R ${USERNAME}:${USERNAME} /workspace /home/${USERNAME}/.claude
+
+# Copy Powerlevel10k configuration
+COPY dot.p10k.zsh /home/${USERNAME}/.p10k.zsh
+RUN chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.p10k.zsh
 
 # Copy and set up firewall script (optional security feature)
 COPY init-firewall.sh /usr/local/bin/init-firewall.sh
@@ -156,3 +163,6 @@ RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home
 
 # Enable vi mode
 RUN echo "bindkey -v" >> "/home/${USERNAME}/.zshrc"
+
+# Source Powerlevel10k configuration
+RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> "/home/${USERNAME}/.zshrc"
