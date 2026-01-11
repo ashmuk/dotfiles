@@ -148,9 +148,8 @@ USER ${USERNAME}
 
 WORKDIR /workspace
 
-# Create claude settings for user level
-RUN ln -sf ${WORKDIR}/dot.claude/statusline.sh /home/${USERNAME}/.claude/statusline.sh
-RUN ln -sf ${WORKDIR}/dot.claude/settings.json /home/${USERNAME}/.claude/settings.json
+# Note: Claude config symlinks are created in post-start.sh
+# (not here) because ~/.claude is a volume mount that overwrites Dockerfile changes
 
 # Alias for dangerous mode
 RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"

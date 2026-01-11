@@ -24,6 +24,7 @@ set -euo pipefail
 #   agent             Sync only .agent/ directory
 #   devcontainer      Sync only .devcontainer/ directory
 #   boilerplate       Sync only scripts/boilerplate/ directory
+#   claude-config     Sync only Claude config files (statusline.sh)
 #   all               Sync all files (default)
 # ============================================================================
 
@@ -714,6 +715,90 @@ sync_devcontainer_directory() {
   esac
 }
 
+sync_claude_config() {
+  # Sync Claude config files to .claude/ directory
+  # Sources:
+  #   - statusline.sh from ~/dotfiles/config/claude/
+  #   - settings.json from ~/dotfiles/templates/project/dot.claude/
+  local dotfiles_config="${TEMPLATE_ROOT}/../config/claude"
+  local template_claude="${TEMPLATE_PROJECT}/dot.claude"
+  local local_dir="${PROJECT_ROOT}/.claude"
+
+  mkdir -p "${local_dir}"
+
+  # Sync statusline.sh from config/claude/
+  local statusline_src="${dotfiles_config}/statusline.sh"
+  local statusline_dst="${local_dir}/statusline.sh"
+  if [[ -f "${statusline_src}" ]]; then
+    sync_claude_config_file "${statusline_src}" "${statusline_dst}" ".claude/statusline.sh" "executable"
+  else
+    log WARN ".claude/statusline.sh: source not found at ${statusline_src}"
+  fi
+
+  # Sync settings.json from templates/project/dot.claude/
+  local settings_src="${template_claude}/settings.json"
+  local settings_dst="${local_dir}/settings.json"
+  if [[ -f "${settings_src}" ]]; then
+    sync_claude_config_file "${settings_src}" "${settings_dst}" ".claude/settings.json"
+  else
+    log WARN ".claude/settings.json: source not found at ${settings_src}"
+  fi
+}
+
+sync_claude_config_file() {
+  local upstream_file="$1"
+  local local_file="$2"
+  local label="$3"
+  local file_type="${4:-}"  # "executable" or empty
+
+  # Check if files differ
+  if ! files_differ "${upstream_file}" "${local_file}"; then
+    log OK "${label}: unchanged"
+    return 0
+  fi
+
+  # Files differ - handle based on mode
+  case "${MODE}" in
+    check)
+      log WARN "${label}: differs from upstream"
+      return 0
+      ;;
+    dry-run)
+      log INFO "${label}: would be updated"
+      return 0
+      ;;
+    status)
+      return 0
+      ;;
+    sync)
+      echo ""
+      log INFO "${label}: differs from upstream"
+      show_diff "${upstream_file}" "${local_file}" "${label}"
+
+      while true; do
+        prompt_user "Apply changes to ${label}?" "y/n/d/s"
+        local result=$?
+        case ${result} in
+          0)  # Yes
+            create_backup "${label}"
+            cp -f "${upstream_file}" "${local_file}"
+            [[ "${file_type}" == "executable" ]] && chmod +x "${local_file}"
+            log OK "${label}: synced from upstream"
+            break
+            ;;
+          2)  # Diff
+            show_diff "${upstream_file}" "${local_file}" "${label}"
+            ;;
+          *)  # No or Skip
+            log INFO "${label}: skipped by user"
+            break
+            ;;
+        esac
+      done
+      ;;
+  esac
+}
+
 # ============================================================================
 # Main Sync Logic
 # ============================================================================
@@ -735,6 +820,7 @@ sync_all_files() {
   local sync_agent_dir=false
   local sync_boilerplate_dir=false
   local sync_devcontainer_dir=false
+  local sync_claude_config=false
 
   if [[ ${#SELECTED_FILES[@]} -eq 0 ]] || [[ " ${SELECTED_FILES[*]} " =~ " all " ]]; then
     sync_agents_global=true
@@ -747,6 +833,7 @@ sync_all_files() {
     sync_agent_dir=true
     sync_boilerplate_dir=true
     sync_devcontainer_dir=true
+    sync_claude_config=true
   else
     for file in "${SELECTED_FILES[@]}"; do
       case "${file}" in
@@ -760,6 +847,7 @@ sync_all_files() {
         agent) sync_agent_dir=true ;;
         boilerplate) sync_boilerplate_dir=true ;;
         devcontainer) sync_devcontainer_dir=true ;;
+        claude-config) sync_claude_config=true ;;
         *) log WARN "Unknown file: ${file}" ;;
       esac
     done
@@ -809,6 +897,10 @@ sync_all_files() {
 
   if [[ "${sync_devcontainer_dir}" == "true" ]]; then
     sync_devcontainer_directory
+  fi
+
+  if [[ "${sync_claude_config}" == "true" ]]; then
+    sync_claude_config
   fi
 
   echo ""
@@ -877,7 +969,7 @@ parse_args() {
         FORCE_MODE=true
         shift
         ;;
-      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|gitignore|agent|boilerplate|devcontainer|all)
+      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|gitignore|agent|boilerplate|devcontainer|claude-config|all)
         SELECTED_FILES+=("$1")
         shift
         ;;

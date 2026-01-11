@@ -24,3 +24,13 @@ if [ -f "/workspace/CLAUDE_global.md" ]; then
     fi
 fi
 
+# Link Claude Code config files from workspace/.claude/ to ~/.claude/
+# These must be created here (not Dockerfile) because ~/.claude is a volume mount
+if [ -f "/workspace/.claude/statusline.sh" ]; then
+    ln -sf /workspace/.claude/statusline.sh "$HOME/.claude/statusline.sh"
+fi
+
+if [ -f "/workspace/.claude/settings.json" ]; then
+    ln -sf /workspace/.claude/settings.json "$HOME/.claude/settings.json"
+fi
+
