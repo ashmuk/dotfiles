@@ -82,3 +82,4 @@ This project supports two characters. Check `PROJECT.yaml` for current mode:
 **📖 For detailed workflows, see [AGENTS.md](./AGENTS.md)**
 **📋 For technology roadmap, see [PLANS.md](./PLANS.md)**
 **🏗️ For architecture details, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)**
+**📖 For project character, see [PROJECT.yaml](./PROJECT.yaml)**

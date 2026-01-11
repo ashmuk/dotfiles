@@ -51,17 +51,6 @@ Use these commands for common workflows:
 - `/devcontainer.down` — Stop and clean up development environment
 - `/devcontainer.rebuild` — Rebuild environment from scratch
 
-### Frontend Development (Stage 5+)
-**Note**: Frontend implementation begins in Stage 5. Directory structure will be:
-```bash
-cd frontend/
-npm install        # First time only
-npm run dev        # Dev server (typically port 4321 for Astro)
-npm run build      # Production build
-npm run preview    # Preview production build
-npx astro check    # TypeScript validation (if using Astro)
-```
-
 ### Upstream Template Sync
 Sync boilerplate from upstream template repository:
 ```bash
@@ -110,15 +99,10 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 
 **Coordination**: Use workflow skills (`/define`, `/design`, `/implement`, `/review`) to automatically coordinate these agents for multi-step tasks.
 
-### Stage-Based Development
-Project follows a structured roadmap in PLANS.md:
-- **Stage 1**: Analysis (current) — Read-only analysis, no deployment
-- **Stage 2**: Asset collection
-- **Stage 3-4**: Architecture & tech stack (via ADRs)
-- **Stage 5**: Implementation & AWS deployment
-- **Stage 6+**: Enhancement
+### Project Character
+This project supports two characters: Toolbox or Stage-Based.
+See PROJECT.yaml (./PROJECT.yaml) for which character this project follows.
 
-Always check PLANS.md for current stage constraints.
 
 ## Claude-Specific Guidelines
 
@@ -151,17 +135,16 @@ Example: Choosing between authentication methods, selecting a database, CI/CD pi
 
 ## Key Constraints
 
-1. **assets_legacy/** is read-only — never modify original downloaded assets
-2. **No production deployment** until Stage 5 — respect PLANS.md roadmap
-3. **Commit secrets forbidden** — never commit `.env`, `config.json`, API keys
-4. **Follow existing patterns** — read code before modifying (especially in frontend/)
-5. **Git Flow branching** — `main` (prod) ← `develop` (integration) ← `feature/*`
+1. **Commit secrets forbidden** — never commit `.env`, `config.json`, API keys
+2. **Follow existing patterns** — read code before modifying.
+3. **Stable Policy** — read RULES.md (./RULES.md)
+4. **Git Flow branching** — `main` (prod) ← `develop` (integration) ← `feature/*`
 
 ## Project Context Pointers
 
 - **Project overview**: README.md
+- **Project character**: PROJECT.yaml
 - **Repo entry point**: AGENTS.md
 - **Stable rules**: RULES.md
-- **Current stage & tasks**: PLANS.md
 - **Tech stack & statistics**: README.md (Tech Stack section)
 - **ADR template**: .agent/skills/adr.md

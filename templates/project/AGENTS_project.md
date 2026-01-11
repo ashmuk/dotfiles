@@ -2,10 +2,11 @@
 
 > This file is intentionally short. Detailed rules and current plans live in:
 > - RULES.md (stable policy)
-> - PLANS.md (current stage, tasks, progress)
+> - PLANS.md, if present (current stage, tasks, progress)
+> - BACKLOG.md, if present
 
 ## Project
-- Follow README.md and PLANS.md for current work
+- Follow README.md and {PLANS.md, BACKLOG.md} for current work
 - See RULES.md for stable policy
 
 ## Where things live (repo map)
@@ -48,7 +49,7 @@ Available slash commands for common workflows:
 **Source of truth:** `.agent/commands/` → synced to `.claude/commands/` via `make sync`
 
 ## How to work in this repo
-1) Read RULES.md and PLANS.md
+1) Read RULES.md and {PLANS.md, BACKLOG.md}
 2) Use analyst agent to understand situation and plan work
 3) Use architect agent for technology decisions (creates ADRs)
 4) Use builder agent to implement changes
