@@ -69,7 +69,7 @@ log() {
 }
 
 show_help() {
-  sed -n '3,23p' "$0" | sed 's/^# \?//'
+  sed -n '4,27p' "$0" | sed 's/^# \?//'
   exit 0
 }
 
@@ -287,24 +287,23 @@ sync_tier1_file() {
         log INFO "${label}: differs from upstream"
         show_diff "${upstream_path}" "${local_path}" "${label}"
 
-        if prompt_user "Apply changes to ${label}?" "y/n/d"; then
+        while true; do
+          prompt_user "Apply changes to ${label}?" "y/n/d"
           local result=$?
-          if [[ ${result} -eq 2 ]]; then
-            # Show diff again
-            show_diff "${upstream_path}" "${local_path}" "${label}"
-            if prompt_user "Apply changes to ${label}?" "y/n"; then
-              return 1  # User said no
-            fi
-          elif [[ ${result} -ne 0 ]]; then
-            log INFO "${label}: skipped by user"
-            update_metadata "${local_file}" "${upstream_path}" "skipped"
-            return 0
-          fi
-        else
-          log INFO "${label}: skipped by user"
-          update_metadata "${local_file}" "${upstream_path}" "skipped"
-          return 0
-        fi
+          case ${result} in
+            0)  # Yes - proceed to apply changes
+              break
+              ;;
+            2)  # Diff - show diff again and re-prompt
+              show_diff "${upstream_path}" "${local_path}" "${label}"
+              ;;
+            *)  # No or Skip
+              log INFO "${label}: skipped by user"
+              update_metadata "${local_file}" "${upstream_path}" "skipped"
+              return 0
+              ;;
+          esac
+        done
       fi
 
       # Apply changes
@@ -369,33 +368,27 @@ sync_tier2_file() {
 
       show_diff "${upstream_path}" "${local_path}" "${label}"
 
-      local prompt_opts="y/n/d/s"
       while true; do
-        if prompt_user "Apply changes to ${label}?" "${prompt_opts}"; then
-          local result=$?
-          case ${result} in
-            0)  # Yes
-              create_backup "${local_file}"
-              mkdir -p "$(dirname "${local_path}")"
-              cp -f "${upstream_path}" "${local_path}"
-              log OK "${label}: synced from upstream"
-              update_metadata "${local_file}" "${upstream_path}" "synced"
-              break
-              ;;
-            2)  # Diff
-              show_diff "${upstream_path}" "${local_path}" "${label}"
-              ;;
-            *)  # No or Skip
-              log INFO "${label}: skipped by user"
-              update_metadata "${local_file}" "${upstream_path}" "skipped"
-              break
-              ;;
-          esac
-        else
-          log INFO "${label}: skipped by user"
-          update_metadata "${local_file}" "${upstream_path}" "skipped"
-          break
-        fi
+        prompt_user "Apply changes to ${label}?" "y/n/d/s"
+        local result=$?
+        case ${result} in
+          0)  # Yes
+            create_backup "${local_file}"
+            mkdir -p "$(dirname "${local_path}")"
+            cp -f "${upstream_path}" "${local_path}"
+            log OK "${label}: synced from upstream"
+            update_metadata "${local_file}" "${upstream_path}" "synced"
+            break
+            ;;
+          2)  # Diff
+            show_diff "${upstream_path}" "${local_path}" "${label}"
+            ;;
+          *)  # No or Skip
+            log INFO "${label}: skipped by user"
+            update_metadata "${local_file}" "${upstream_path}" "skipped"
+            break
+            ;;
+        esac
       done
       ;;
   esac
@@ -611,7 +604,7 @@ sync_boilerplate_directory() {
       cp -R "${upstream_dir}" "${local_dir}"
 
       # Ensure scripts are executable
-      chmod +x "${local_dir}"/*.sh "${local_dir}"/*.py 2>/dev/null || true
+      chmod +x "${local_dir}"/*.sh 2>/dev/null || true
 
       log OK "${label}: synced from upstream"
       ;;
