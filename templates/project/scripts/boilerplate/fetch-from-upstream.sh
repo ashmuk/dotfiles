@@ -22,6 +22,7 @@ set -euo pipefail
 #   Makefile          Sync only Makefile
 #   gitignore         Sync only .gitignore
 #   agent             Sync only .agent/ directory
+#   devcontainer      Sync only .devcontainer/ directory
 #   boilerplate       Sync only scripts/boilerplate/ directory
 #   all               Sync all files (default)
 # ============================================================================
@@ -611,6 +612,108 @@ sync_boilerplate_directory() {
   esac
 }
 
+sync_devcontainer_directory() {
+  local upstream_dir="${TEMPLATE_PROJECT}/dot.devcontainer"
+  local local_dir="${PROJECT_ROOT}/.devcontainer"
+  local label=".devcontainer/"
+
+  # Check if upstream directory exists
+  if [[ ! -d "${upstream_dir}" ]]; then
+    log WARN "${label}: upstream directory not found"
+    return 0
+  fi
+
+  # Directory comparison (same pattern as boilerplate)
+  local dirs_differ=false
+  if [[ ! -d "${local_dir}" ]]; then
+    dirs_differ=true
+  else
+    if ! diff -qr \
+      -x ".DS_Store" \
+      -x ".AppleDouble" \
+      -x ".LSOverride" \
+      -x "Thumbs.db" \
+      -x "Desktop.ini" \
+      -x ".git" \
+      "${upstream_dir}" "${local_dir}" &>/dev/null; then
+      dirs_differ=true
+    fi
+  fi
+
+  if [[ "${dirs_differ}" == "false" ]]; then
+    log OK "${label}: unchanged"
+    return 0
+  fi
+
+  # Check for local modifications
+  local has_mods=false
+  if git -C "${PROJECT_ROOT}" ls-files --error-unmatch ".devcontainer" &>/dev/null; then
+    if ! git -C "${PROJECT_ROOT}" diff --quiet HEAD -- ".devcontainer" 2>/dev/null; then
+      has_mods=true
+    fi
+  fi
+
+  # Mode handling (Tier 2 - always interactive in sync mode)
+  case "${MODE}" in
+    check)
+      if [[ "${has_mods}" == "true" ]]; then
+        log WARN "${label}: differs from upstream (has local modifications)"
+      else
+        log WARN "${label}: differs from upstream"
+      fi
+      return 0
+      ;;
+    dry-run)
+      if [[ "${has_mods}" == "true" ]]; then
+        log INFO "${label}: would prompt (has local modifications)"
+      else
+        log INFO "${label}: would be updated"
+      fi
+      return 0
+      ;;
+    status)
+      return 0
+      ;;
+    sync)
+      echo ""
+      if [[ "${has_mods}" == "true" ]]; then
+        log WARN "${label}: differs from upstream and has local modifications"
+      else
+        log INFO "${label}: differs from upstream"
+      fi
+
+      preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+
+      echo -e "${YELLOW}Warning:${NC} .devcontainer/ directory will be completely replaced"
+      echo "Current .devcontainer/ will be backed up to .template-backups/"
+      echo ""
+
+      while true; do
+        prompt_user "Replace .devcontainer/ directory?" "y/n/d/s"
+        local result=$?
+        case ${result} in
+          0)  # Yes
+            create_backup_dir ".devcontainer"
+            rm -rf "${local_dir}"
+            cp -R "${upstream_dir}" "${local_dir}"
+            # Ensure scripts are executable
+            find "${local_dir}" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+            log OK "${label}: synced from upstream"
+            break
+            ;;
+          2)  # Diff
+            preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+            ;;
+          *)  # No or Skip
+            log INFO "${label}: skipped by user"
+            break
+            ;;
+        esac
+      done
+      ;;
+  esac
+}
+
 # ============================================================================
 # Main Sync Logic
 # ============================================================================
@@ -631,6 +734,7 @@ sync_all_files() {
   local sync_gitignore=false
   local sync_agent_dir=false
   local sync_boilerplate_dir=false
+  local sync_devcontainer_dir=false
 
   if [[ ${#SELECTED_FILES[@]} -eq 0 ]] || [[ " ${SELECTED_FILES[*]} " =~ " all " ]]; then
     sync_agents_global=true
@@ -642,6 +746,7 @@ sync_all_files() {
     sync_gitignore=true
     sync_agent_dir=true
     sync_boilerplate_dir=true
+    sync_devcontainer_dir=true
   else
     for file in "${SELECTED_FILES[@]}"; do
       case "${file}" in
@@ -654,6 +759,7 @@ sync_all_files() {
         gitignore) sync_gitignore=true ;;
         agent) sync_agent_dir=true ;;
         boilerplate) sync_boilerplate_dir=true ;;
+        devcontainer) sync_devcontainer_dir=true ;;
         *) log WARN "Unknown file: ${file}" ;;
       esac
     done
@@ -699,6 +805,10 @@ sync_all_files() {
 
   if [[ "${sync_gitignore}" == "true" ]]; then
     sync_tier2_file "${TEMPLATE_PROJECT}/dot.gitignore" ".gitignore" ".gitignore"
+  fi
+
+  if [[ "${sync_devcontainer_dir}" == "true" ]]; then
+    sync_devcontainer_directory
   fi
 
   echo ""
@@ -767,7 +877,7 @@ parse_args() {
         FORCE_MODE=true
         shift
         ;;
-      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|gitignore|agent|boilerplate|all)
+      AGENTS_global|CLAUDE_global|AGENTS|CLAUDE|RULES|Makefile|gitignore|agent|boilerplate|devcontainer|all)
         SELECTED_FILES+=("$1")
         shift
         ;;

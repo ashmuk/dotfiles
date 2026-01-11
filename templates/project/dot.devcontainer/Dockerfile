@@ -9,28 +9,39 @@ ENV TZ=${TZ}
 ARG CLAUDE_CODE_VERSION=latest
 ARG GIT_DELTA_VERSION=0.18.2
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
+ARG YQ_VERSION=v4.44.1
 
-# Install development tools including security tools (iptables, ipset)
-# Also includes Playwright system dependencies for web scraping
+# =============================================================================
+# Multi-Runtime Base Image
+# =============================================================================
+# This image includes Python, Node.js, and Java to support multiple project types
+# without requiring rebuilds. Project-specific packages are installed via
+# post-create.sh based on requirements.yaml profile configuration.
+# =============================================================================
+
+# Install core development tools and all runtime dependencies
 RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
  && apt-get install -y --no-install-recommends \
-      tmux python3 python3-venv python3-pip ruby-full vim iputils-ping \
-      less procps fzf zsh man-db unzip gnupg2 \
-      iptables ipset iproute2 dnsutils aggregate nano \
-      libglib2.0-0t64 libnspr4 libnss3 libdbus-1-3 \
-      libatk1.0-0t64 libatspi2.0-0t64 libx11-6 libxcomposite1 \
-      libxdamage1 libxext6 libxfixes3 libxrandr2 libgbm1 \
-      libxcb1 libxkbcommon0 libasound2t64 libpango-1.0-0 \
+      # Core CLI tools
+      tmux vim nano less procps fzf zsh man-db unzip gnupg2 wget curl \
+      # Python runtime
+      python3 python3-venv python3-pip \
+      # Java runtime (OpenJDK 21)
+      openjdk-21-jdk maven gradle \
+      # Security/network tools (for firewall feature)
+      iptables ipset iproute2 dnsutils aggregate iputils-ping \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install tmuxinator
-RUN gem install tmuxinator
-
-# Install Node.js and devcontainer CLI
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Install Node.js LTS and devcontainer CLI
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
  && npm install -g @devcontainers/cli \
  && rm -rf /var/lib/apt/lists/*
+
+# Install yq for YAML parsing (used by parse-requirements.sh)
+RUN ARCH=$(dpkg --print-architecture) && \
+ wget -qO /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" && \
+ chmod +x /usr/local/bin/yq
 
 # Install act (GitHub Actions runner) - Multi-arch compatible
 RUN ARCH=$(dpkg --print-architecture) \
@@ -84,6 +95,21 @@ ENV DEVCONTAINER=true
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH=$PATH:/usr/local/share/npm-global/bin
 
+# Set Java environment dynamically based on architecture
+# Creates /etc/profile.d/java.sh for shell sessions
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "arm64" ]; then \
+        JAVA_PATH="/usr/lib/jvm/java-21-openjdk-arm64"; \
+    else \
+        JAVA_PATH="/usr/lib/jvm/java-21-openjdk-amd64"; \
+    fi && \
+    echo "export JAVA_HOME=$JAVA_PATH" > /etc/profile.d/java.sh && \
+    echo "export PATH=\$PATH:\$JAVA_HOME/bin" >> /etc/profile.d/java.sh && \
+    chmod +x /etc/profile.d/java.sh && \
+    ln -sf "$JAVA_PATH" /usr/lib/jvm/default-java
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+ENV PATH=$PATH:$JAVA_HOME/bin
+
 # Set default editor
 ENV EDITOR=nano
 ENV VISUAL=nano
@@ -126,9 +152,8 @@ WORKDIR /workspace
 RUN ln -sf ${WORKDIR}/dot.claude/statusline.sh /home/${USERNAME}/.claude/statusline.sh
 RUN ln -sf ${WORKDIR}/dot.claude/settings.json /home/${USERNAME}/.claude/settings.json
 
-# Alias
+# Alias for dangerous mode
 RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"
 
 # Enable vi mode
 RUN echo "bindkey -v" >> "/home/${USERNAME}/.zshrc"
-

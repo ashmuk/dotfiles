@@ -96,8 +96,6 @@ replace_devcontainer_names() {
   if [ -f "$devcontainer_dir/devcontainer.json" ]; then
     if command -v sed >/dev/null 2>&1; then
       if [[ "$OSTYPE" == darwin* ]]; then
-        # Replace container name (Project Dev -> ${project_name} Dev)
-        sed -i '' "s|\"name\": \"Project Dev\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
         # Replace service name (devcontainer -> ${docker_name}_dev)
         sed -i '' "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
         # Replace volume names (project- -> ${docker_name}-)
@@ -105,7 +103,6 @@ replace_devcontainer_names() {
         sed -i '' "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
       else
         # Linux sed
-        sed -i "s|\"name\": \"Project Dev\"|\"name\": \"${project_name} Dev\"|g" "$devcontainer_dir/devcontainer.json"
         sed -i "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
         sed -i "s|project-bashhistory-|${docker_name}-bashhistory-|g" "$devcontainer_dir/devcontainer.json"
         sed -i "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
@@ -253,7 +250,7 @@ print_info "Copying dot.devcontainer/ → .devcontainer/..."
 backup_if_exists ".devcontainer"
 mkdir -p .devcontainer
 cp -r "$SCRIPT_DIR/dot.devcontainer/"* .devcontainer/
-chmod +x .devcontainer/*.sh 2>/dev/null || true
+find .devcontainer -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 # Replace devcontainer names with project-specific names
 replace_devcontainer_names ".devcontainer" "$PROJECT_NAME"
 print_success ".devcontainer/ copied (names customized for $PROJECT_NAME)"

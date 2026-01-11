@@ -1,5 +1,5 @@
 {
-  "name": "Project Dev",
+  "name": "${localWorkspaceFolderBasename} Dev",
   "dockerComposeFile": "compose.yml",
   "service": "devcontainer",
   "workspaceFolder": "/workspace",
@@ -7,21 +7,37 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        // Universal - Container & DevOps
         "ms-vscode-remote.remote-containers",
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
         "redhat.vscode-yaml",
-        "ms-python.python",
-        "charliermarsh.ruff",
         "timonwong.shellcheck",
+        "ms-vscode.makefile-tools",
+
+        // Universal - Documentation
         "yzhang.markdown-all-in-one",
         "bierner.markdown-mermaid",
+
+        // Universal - Git
         "eamodio.gitlens",
-        "ms-vscode.makefile-tools",
+
+        // Universal - AI
         "anthropic.claude-code",
         "openai.chatgpt",
+
+        // Python (all profiles except java-plugin)
+        "ms-python.python",
+        "charliermarsh.ruff",
+
+        // JavaScript/TypeScript (web and fullstack profiles)
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+
+        // Java (java-plugin and fullstack profiles)
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-maven",
+        "vscjava.vscode-gradle"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -38,7 +54,10 @@
           "zsh": {
             "path": "zsh"
           }
-        }
+        },
+        // Java settings
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.compile.nullAnalysis.mode": "automatic"
       }
     }
   },
@@ -57,6 +76,6 @@
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
   "postCreateCommand": "bash /workspace/.devcontainer/post-create.sh",
-  "postStartCommand": "grep -q '/home/developer/.venv/bin/activate' /home/developer/.bashrc || echo 'source /home/developer/.venv/bin/activate' >> /home/developer/.bashrc; sudo /usr/local/bin/init-firewall.sh || true; bash /workspace/.devcontainer/post-start.sh",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh || true; bash /workspace/.devcontainer/post-start.sh",
   "waitFor": "postStartCommand"
 }
