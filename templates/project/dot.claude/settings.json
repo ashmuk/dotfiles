@@ -1,8 +1,1 @@
-{
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
-  "includeCoAuthoredBy": true,
-  "outputStyle": "Explanatory"
-}
+../../../config/claude/settings.json
