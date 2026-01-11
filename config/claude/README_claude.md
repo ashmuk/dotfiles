@@ -110,10 +110,81 @@ shellcheck *.sh
 ```
 
 ### Status Line Integration
-The setup creates a custom statusline script showing:
-- 📁 Current project name
-- 🌳 Git branch and status (● clean, ● dirty)
-- 🖥️ Platform indicator (🍎 macOS, 🐧 Linux, 🪟 Windows)
+The setup creates a polished statusline script with emoji icons, budget tracking, and ccusage integration.
+
+**Reference:** Based on [note.com/y__u777](https://note.com/y__u777/n/n841c3da533b8) and `config/claude/sample_statusline.webp`
+
+**Balanced Format (Default):**
+```
+🤖 Opus 4.5 [MAX5] | 💰 $10.30/$100 (10%) | 📊 33.9k/88.0k (39%) | ⏰ 10:00AM (4h 2m) [ID:11] | 📁 dotfiles | 🌿 main
+```
+
+**Format Components:**
+| Component | Example | Description |
+|-----------|---------|-------------|
+| Model + Plan | `🤖 Opus 4.5 [MAX5]` | Model name with plan tier |
+| Cost | `💰 $10.30/$100 (10%)` | Block cost / limit (percentage) |
+| Tokens | `📊 33.9k/88.0k (39%)` | Token usage / limit (percentage) |
+| Reset Time | `⏰ 10:00AM (4h 2m)` | Block reset time (remaining) |
+| Session ID | `[ID:11]` | Short session identifier |
+| Directory | `📁 dotfiles` | Current project directory |
+| Branch | `🌿 main` | Git branch name |
+
+**Available Formats:**
+
+| Format | Lines | Best For |
+|--------|-------|----------|
+| `balanced` (default) | 1 | Standard terminal sessions |
+| `compact` | 1 | tmux status bars, narrow terminals |
+| `minimal` | 1 | Focus mode, distraction-free |
+| `rich` | 10+ | Debugging, session summaries |
+
+**Icons Reference:**
+
+| Element | Emoji | ASCII Fallback | Description |
+|---------|-------|----------------|-------------|
+| Model | 🤖 | `[AI]` | Claude model indicator |
+| Cost | 💰 | `$` | Cost/budget tracking |
+| Tokens | 📊 | `#` | Token usage |
+| Time | ⏰ | `@` | Reset time/remaining |
+| Directory | 📁 | `Dir:` | Project folder |
+| Branch | 🌿 | `Branch:` | Git branch |
+| Warning | ⚠️ | `!` | 80-94% usage warning |
+| Critical | 🔴 | `!!` | 95%+ usage critical |
+
+**Warning Indicators:**
+| Usage % | Indicator | Meaning |
+|---------|-----------|---------|
+| 0-79% | (none) | Normal usage |
+| 80-94% | ⚠️ | Approaching limit |
+| 95%+ | 🔴 | Critical - near limit |
+
+**Plan Limits:**
+
+| Plan | Cost Limit | Token Limit |
+|------|------------|-------------|
+| `pro` | $20 | 45,000 |
+| `max5` | $100 | 88,000 |
+| `max20` | $200 | 175,000 |
+
+**Environment Variables:**
+
+| Variable | Values | Default | Description |
+|----------|--------|---------|-------------|
+| `CLAUDE_STATUSLINE_FORMAT` | compact/balanced/minimal/rich | balanced | Output format |
+| `CLAUDE_STATUSLINE_PLAN` | pro/max5/max20 | max5 | Plan tier for limits |
+| `CLAUDE_STATUSLINE_ASCII` | 0/1 | 0 | Force ASCII mode (no emoji) |
+| `CLAUDE_STATUSLINE_ENHANCED` | 0/1 | 1 | Enable ccusage integration |
+| `CLAUDE_STATUSLINE_DEBUG` | 0/1 | 0 | Enable debug logging |
+
+**Data Sources:**
+- **Session data**: Real-time from Claude Code stdin JSON
+- **Block data**: `ccusage blocks --active --json` (1-minute cache)
+- **Plan limits**: Configurable via `CLAUDE_STATUSLINE_PLAN`
+
+**Dependencies:**
+- `jq` - JSON parsing (required)
+- `npx` + `ccusage` - Block/token data (optional, graceful fallback)
 
 ## Configuration Files
 
@@ -224,9 +295,37 @@ If the status line isn't working:
    chmod +x ~/.claude/statusline.sh
    ```
 
-2. **Test the script**:
+2. **Test the script with sample input**:
    ```bash
-   ~/.claude/statusline.sh
+   echo '{"model":{"display_name":"test"}}' | ~/.claude/statusline.sh
+   ```
+
+3. **Test different formats**:
+   ```bash
+   echo '{}' | CLAUDE_STATUSLINE_FORMAT=compact ~/.claude/statusline.sh
+   echo '{}' | CLAUDE_STATUSLINE_FORMAT=minimal ~/.claude/statusline.sh
+   echo '{}' | CLAUDE_STATUSLINE_FORMAT=rich ~/.claude/statusline.sh
+   ```
+
+4. **Test ASCII fallback** (if Nerd Fonts not rendering):
+   ```bash
+   echo '{}' | CLAUDE_STATUSLINE_ASCII=1 ~/.claude/statusline.sh
+   ```
+
+5. **Enable debug mode for troubleshooting**:
+   ```bash
+   echo '{}' | CLAUDE_STATUSLINE_DEBUG=1 ~/.claude/statusline.sh 2>&1
+   ```
+
+6. **Check ccusage blocks** (for real-time cost/token data):
+   ```bash
+   npx ccusage@latest blocks --active --json
+   ```
+
+7. **Test different plan tiers**:
+   ```bash
+   echo '{}' | CLAUDE_STATUSLINE_PLAN=pro ~/.claude/statusline.sh
+   echo '{}' | CLAUDE_STATUSLINE_PLAN=max20 ~/.claude/statusline.sh
    ```
 
 ### Configuration Validation
