@@ -1,1 +1,1 @@
-../../../templates/project/RULES.md
+../../../RULES.md
