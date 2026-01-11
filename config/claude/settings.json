@@ -113,5 +113,6 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-  "outputStyle": "Explanatory"
+  "outputStyle": "Explanatory",
+  "model": "opus"
 }
