@@ -753,6 +753,15 @@ validate: ## Validate configuration files and dependencies
 	fi
 	@echo "$(GREEN)[SUCCESS]$(NC) Validation completed successfully"
 
+# Template sync for dotfiles repo itself
+.PHONY: sync-from-template
+sync-from-template: ## Sync dotfiles symlinks from templates/project/
+	@./scripts/sync-from-template.sh
+
+.PHONY: sync-from-template-check
+sync-from-template-check: ## Check dotfiles symlinks (no changes)
+	@./scripts/sync-from-template.sh --check
+
 .PHONY: test
 test: validate test-syntax test-shellcheck test-compat ## Run all tests (syntax, shellcheck, compatibility)
 

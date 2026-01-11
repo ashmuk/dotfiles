@@ -70,6 +70,34 @@ EOF
 chmod +x "$PRE_PUSH_HOOK"
 echo "${GREEN}[SUCCESS]${NC} Pre-push hook installed at $PRE_PUSH_HOOK"
 
+# Install post-checkout hook (for recreating hardlinks after clone/checkout)
+POST_CHECKOUT_HOOK="$HOOKS_DIR/post-checkout"
+cat > "$POST_CHECKOUT_HOOK" << 'EOF'
+#!/bin/sh
+#
+# Post-checkout hook to sync template files after checkout
+# This recreates hardlinks that don't survive git clone
+#
+
+# Only run on branch checkout (not file checkout)
+# $3 is 1 for branch checkout, 0 for file checkout
+if [ "$3" != "1" ]; then
+    exit 0
+fi
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+SYNC_SCRIPT="$REPO_ROOT/scripts/sync-from-template.sh"
+
+# Only run if sync script exists (this is the dotfiles repo)
+if [ -x "$SYNC_SCRIPT" ]; then
+    echo "[POST-CHECKOUT] Syncing template files..."
+    "$SYNC_SCRIPT" --fix 2>/dev/null || true
+fi
+EOF
+
+chmod +x "$POST_CHECKOUT_HOOK"
+echo "${GREEN}[SUCCESS]${NC} Post-checkout hook installed at $POST_CHECKOUT_HOOK"
+
 # Show user what they can do
 echo ""
 echo "${BLUE}[INFO]${NC} Git hooks have been set up successfully!"
