@@ -96,6 +96,10 @@ if [[ "$OSTYPE" == darwin* ]]; then
   # shellcheck disable=SC1091  # Oh My Zsh script is external dependency
   source "$ZSH/oh-my-zsh.sh"
 
+  # Override Oh-My-Zsh's LSCOLORS with stable directory color
+  # (lowercase 'g' = cyan, avoids bold cyan -> white issue in some terminals)
+  export LSCOLORS="gxfxcxdxbxegedabagacad"
+
   # User configuration
 
   # export MANPATH="/usr/local/man:$MANPATH"
