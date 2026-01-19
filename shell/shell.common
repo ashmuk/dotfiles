@@ -35,6 +35,24 @@ export HISTFILESIZE=20000
 export EDITOR=vim
 export VISUAL=vim
 
+# Enable colorized ls
+if [[ "$OSTYPE" == darwin* ]]; then
+  # BSD ls (macOS)
+  export CLICOLOR=1
+  # Stable directory color across terminals (avoid bright cyan -> white)
+  export LSCOLORS="gxfxcxdxbxegedabagacad"
+elif [[ "$OSTYPE" == linux* ]]; then
+  # GNU ls (Linux) - uses LS_COLORS (with underscore, different format)
+  if command -v dircolors >/dev/null 2>&1; then
+    # Use system dircolors configuration (reads from ~/.dircolors or system default)
+    eval "$(dircolors -b)"
+  else
+    # Fallback: basic LS_COLORS if dircolors not available
+    # Format: di=directory, ln=symlink, so=socket, ex=executable, etc.
+    export LS_COLORS="di=01;34:ln=01;36:so=01;35:pi=01;33:ex=01;32:bd=01;34;46:cd=01;34;43:su=01;35:sg=01;35:tw=01;35:ow=01;35"
+  fi
+fi
+
 # Language settings
 # Set locale only if available to avoid warnings
 # Cache locale list to avoid running locale -a multiple times (performance optimization)
