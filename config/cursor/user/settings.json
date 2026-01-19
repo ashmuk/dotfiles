@@ -7,7 +7,7 @@
 
   "workbench.colorTheme": "Solarized Dark",
   "terminal.integrated.colorScheme": "Solarized Dark",
-
+  "terminal.integrated.fontFamily": "HackGen Console NF",
   "terminal.integrated.drawBoldTextInBrightColors": false,
   "terminal.integrated.gpuAcceleration": "off",
 
