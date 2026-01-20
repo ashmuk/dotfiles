@@ -1,67 +1,13 @@
 {
-  "_comment": "Claude Code MCP server configuration template. Merged into ~/.claude.json by setup script.",
+  "_comment": "Minimal global MCP config. Add project-specific servers via .mcp.json using 'mcp-enable' command.",
   "mcpServers": {
-    "strands": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "strands-agents-mcp-server"
-      ],
-      "env": {}
-    },
     "aws-knowledge": {
       "type": "http",
       "url": "https://knowledge-mcp.global.api.aws"
     },
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ],
-      "env": {}
-    },
-    "cdk-mcp-server": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "awslabs.cdk-mcp-server@latest"
-      ],
-      "env": {}
-    },
-    "chrome-devtools": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "chrome-devtools-mcp@latest"
-      ],
-      "env": {}
-    },
     "context7": {
       "type": "http",
       "url": "https://context7.liam.sh/mcp"
-    },
-    "github": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
-    "bedrock-agentcore-mcp-server": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "awslabs.amazon-bedrock-agentcore-mcp-server@latest"
-      ],
-      "env": {
-        "FASTMCP_LOG_LEVEL": "ERROR"
-      }
     }
   }
 }

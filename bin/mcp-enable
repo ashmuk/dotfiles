@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+#
+# mcp-enable - Enable MCP servers for current project
+#
+# Usage:
+#   mcp-enable --list              List available MCP servers
+#   mcp-enable --interactive       Interactive selection (requires fzf)
+#   mcp-enable <server>...         Enable specific servers
+#
+# Examples:
+#   mcp-enable github playwright   Enable GitHub and Playwright servers
+#   mcp-enable --list              Show all available servers
+#
+
+set -euo pipefail
+
+# Configuration
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+MCP_SERVERS_DIR="$DOTFILES/templates/project/dot.agent/mcp/servers"
+TARGET=".mcp.json"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+usage() {
+    cat <<EOF
+Usage: mcp-enable [OPTIONS] [server...]
+
+Enable MCP servers for the current project by adding them to .mcp.json
+
+Options:
+  --list, -l         List available MCP servers
+  --interactive, -i  Interactive selection using fzf
+  --help, -h         Show this help message
+
+Arguments:
+  server...          One or more server names to enable
+
+Examples:
+  mcp-enable --list              # List available servers
+  mcp-enable github              # Enable GitHub server
+  mcp-enable github playwright   # Enable multiple servers
+  mcp-enable -i                  # Interactive selection
+
+Available servers are located in:
+  $MCP_SERVERS_DIR
+EOF
+}
+
+list_servers() {
+    echo -e "${BLUE}Available MCP servers:${NC}"
+    echo
+    for f in "$MCP_SERVERS_DIR"/*.json; do
+        [[ -f "$f" ]] || continue
+        name=$(basename "$f" .json)
+        # Extract server key from JSON
+        server_key=$(jq -r 'keys[0]' "$f" 2>/dev/null || echo "$name")
+        echo -e "  ${GREEN}$name${NC} → $server_key"
+    done
+    echo
+    echo "Usage: mcp-enable <server>..."
+}
+
+interactive_select() {
+    if ! command -v fzf &>/dev/null; then
+        echo -e "${RED}Error: fzf is required for interactive mode${NC}"
+        echo "Install with: brew install fzf"
+        exit 1
+    fi
+
+    # Get available servers
+    servers=()
+    for f in "$MCP_SERVERS_DIR"/*.json; do
+        [[ -f "$f" ]] || continue
+        servers+=("$(basename "$f" .json)")
+    done
+
+    # Use fzf for multi-select
+    selected=$(printf '%s\n' "${servers[@]}" | fzf --multi --prompt="Select MCP servers: ")
+
+    if [[ -n "$selected" ]]; then
+        # shellcheck disable=SC2086
+        enable_servers $selected
+    else
+        echo "No servers selected"
+    fi
+}
+
+enable_servers() {
+    local servers=("$@")
+    local enabled=0
+    local failed=0
+
+    # Check if jq is available
+    if ! command -v jq &>/dev/null; then
+        echo -e "${RED}Error: jq is required${NC}"
+        echo "Install with: brew install jq"
+        exit 1
+    fi
+
+    # Initialize .mcp.json if not exists
+    if [[ ! -f "$TARGET" ]]; then
+        echo '{"mcpServers":{}}' > "$TARGET"
+        echo -e "${YELLOW}Created $TARGET${NC}"
+    fi
+
+    for server in "${servers[@]}"; do
+        src="$MCP_SERVERS_DIR/${server}.json"
+        if [[ -f "$src" ]]; then
+            # Merge server config into .mcp.json
+            tmp=$(mktemp)
+            if jq -s '.[0].mcpServers += .[1] | .[0]' "$TARGET" "$src" > "$tmp"; then
+                mv "$tmp" "$TARGET"
+                echo -e "  ${GREEN}✓${NC} Enabled: $server"
+                enabled=$((enabled + 1))
+            else
+                rm -f "$tmp"
+                echo -e "  ${RED}✗${NC} Failed to merge: $server"
+                failed=$((failed + 1))
+            fi
+        else
+            echo -e "  ${RED}✗${NC} Not found: $server"
+            echo "    Available: $(ls "$MCP_SERVERS_DIR"/*.json 2>/dev/null | xargs -n1 basename | sed 's/.json$//' | tr '\n' ' ')"
+            failed=$((failed + 1))
+        fi
+    done
+
+    echo
+    if ((enabled > 0)); then
+        echo -e "${GREEN}Enabled $enabled server(s)${NC} in $TARGET"
+        echo
+        echo "Current .mcp.json servers:"
+        jq -r '.mcpServers | keys[]' "$TARGET" 2>/dev/null | sed 's/^/  - /'
+    fi
+
+    if ((failed > 0)); then
+        exit 1
+    fi
+}
+
+# Main
+main() {
+    case "${1:-}" in
+        --list|-l)
+            list_servers
+            ;;
+        --interactive|-i)
+            interactive_select
+            ;;
+        --help|-h)
+            usage
+            ;;
+        "")
+            usage
+            exit 1
+            ;;
+        -*)
+            echo -e "${RED}Unknown option: $1${NC}"
+            usage
+            exit 1
+            ;;
+        *)
+            enable_servers "$@"
+            ;;
+    esac
+}
+
+main "$@"
