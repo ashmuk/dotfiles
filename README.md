@@ -19,6 +19,17 @@ make status
 make check-prereqs
 ```
 
+## 🖥️ Platform Support
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| macOS (Intel/ARM) | Full | Homebrew, BSD tool handling |
+| Linux (Debian/Ubuntu/Arch) | Full | GNU tools |
+| WSL1/WSL2 | Full | Path translation via wslpath |
+| Cygwin/MintTY | Good | Symlink fallback to copy |
+| MSYS2/Git Bash | Good | OSTYPE detection |
+| Windows Native | Good | Scoop + PowerShell |
+
 ## 🔧 CLI Tool Requirements
 
 This dotfiles system uses a comprehensive set of command-line tools across different categories:
@@ -138,6 +149,11 @@ dotfiles/
 ├── vimrc.generated         # Generated vim configuration (universal)
 ├── gvimrc.generated        # Generated GUI vim configuration (universal)
 ├── ideavimrc.generated     # Generated IdeaVim configuration (universal)
+├── lib/                    # Shared utilities
+│   └── common.sh           # Common shell functions for scripts
+├── docs/                   # Architecture documentation
+│   └── ARCHITECTURE.md     # System design and data flows
+├── templates/              # Project templates
 ├── shell/                  # Shell configuration directory
 │   ├── setup_shell.sh      # Shell installation script
 │   ├── shell.common        # Common shell settings (bash/zsh)
@@ -279,6 +295,27 @@ dotfiles/
 - **Content search**: Grep and ripgrep-based multibyte character detection
 - **Language-specific**: CJK and Extended Latin character detection
 - **Reduced false positives**: Improved regex patterns
+
+## 🤖 AI Development Integration
+
+This dotfiles repository includes **project templates** with AI coding assistant support.
+
+### For New Projects (via templates/)
+
+Projects created from `templates/project/` include full AI tool integration:
+
+| Tool | Config Location | Sync Command |
+|------|-----------------|--------------|
+| Claude Code | `.claude/` | `make sync-claude` |
+| Cursor IDE | `.cursor/` | `make sync-cursor` |
+| Codex | `.codex/` | `make sync-codex` |
+
+Source of truth: `.agent/` directory. Run `make sync` to propagate changes.
+
+### For This Dotfiles Repo
+
+AI tool configs (`.claude/`, `.cursor/`) in this dotfiles repo are managed directly without the sync system.
+See [templates/README.md](templates/README.md) for creating new AI-integrated projects.
 
 ## 🔧 Customization
 
@@ -569,6 +606,8 @@ See [Windows-First Documentation](windows/README-WindowsFirst.md) for detailed s
 
 ## 📚 Documentation
 
+- [Architecture](docs/ARCHITECTURE.md) - System design and data flows
+- [Requirements](REQUIREMENTS.md) - Tool dependencies
 - [Shell Configuration](shell/README_shell.md) - Detailed shell setup documentation
 - [Shell Profile Reference](shell/profile/README_profile.md) - Comprehensive shell profiles
 - [Command Reference](shell/README_command.md) - Available shell commands and aliases
