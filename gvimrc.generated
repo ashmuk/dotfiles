@@ -3,17 +3,23 @@
 
 set nocompatible
 
+" Detect dotfiles directory dynamically from this file's location
+let s:dotfiles_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
 " 共通設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.common'))
-  source ~/dotfiles/vim/vimrc.common
+let s:vimrc_common = s:dotfiles_dir . '/vim/vimrc.common'
+if filereadable(s:vimrc_common)
+  execute 'source ' . s:vimrc_common
 endif
 
 " GUI版専用設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.gui'))
-  source ~/dotfiles/vim/vimrc.gui
+let s:vimrc_gui = s:dotfiles_dir . '/vim/vimrc.gui'
+if filereadable(s:vimrc_gui)
+  execute 'source ' . s:vimrc_gui
 endif
 
 " 共通キーマップを読み込み
-if filereadable(expand('~/dotfiles/vim/mappings.common'))
-  source ~/dotfiles/vim/mappings.common
+let s:mappings_common = s:dotfiles_dir . '/vim/mappings.common'
+if filereadable(s:mappings_common)
+  execute 'source ' . s:mappings_common
 endif
