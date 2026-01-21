@@ -23,7 +23,7 @@
     editor = vim
     # Pager
     pager = less -R
-    # Excludes file
+    # Excludes file (uses ~/.gitignore which is symlinked by setup)
     excludesfile = ~/.gitignore
 
 # =============================================================================
@@ -42,8 +42,8 @@
     prompt = false
 
 [difftool "vimdiff"]
-    # Vimdiff command
-    cmd = mvim -d -f "$LOCAL" "$REMOTE"
+    # Vimdiff command (uses vim; for macOS gvim, set git config difftool.vimdiff.cmd "mvim -d -f ...")
+    cmd = vim -d "$LOCAL" "$REMOTE"
 
 # =============================================================================
 # Merge Settings
@@ -59,8 +59,8 @@
     prompt = false
 
 [mergetool "vimdiff"]
-    # Vimdiff merge command
-    cmd = mvim -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+    # Vimdiff merge command (uses vim; for macOS gvim, set git config mergetool.vimdiff.cmd "mvim -d ...")
+    cmd = vim -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
 
 # =============================================================================
 # Branch Settings
@@ -166,3 +166,13 @@
     what = show
     when = log --pretty=format:"%C(yellow)%h%C(reset) %C(blue)%ad%C(reset) %s" --date=short
     where = log --pretty=format:"%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %s" --date=short
+# =============================================================================
+# User Configuration (set locally)
+# =============================================================================
+# Note: User-specific settings should be configured in your local ~/.gitconfig
+# or set via environment/command line:
+#   git config --global user.name "Your Name"
+#   git config --global user.email "your.email@example.com"
+
+[init]
+	defaultBranch = main

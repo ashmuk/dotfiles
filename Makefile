@@ -16,6 +16,7 @@ ifeq ($(shell test -t 1 && echo "yes" || echo "no"),yes)
     GREEN := \033[0;32m
     YELLOW := \033[1;33m
     BLUE := \033[0;34m
+    CYAN := \033[0;36m
     NC := \033[0m
 else
     # No color support
@@ -23,6 +24,7 @@ else
     GREEN :=
     YELLOW :=
     BLUE :=
+    CYAN :=
     NC :=
 endif
 
@@ -48,6 +50,9 @@ help: ## Show this help message
 check-prereqs: ## Check for required tools and suggest installation commands
 	@echo "$(BLUE)[INFO]$(NC) Checking prerequisites..."
 	@$(MAKE) -s _check_essential_tools
+	@$(MAKE) -s _check_bash_version
+	@$(MAKE) -s _check_git_version
+	@$(MAKE) -s _check_make_version
 	@$(MAKE) -s _check_core_tools
 	@$(MAKE) -s _check_modern_tools
 	@$(MAKE) -s _check_dev_tools
@@ -67,6 +72,45 @@ _check_essential_tools:
 		echo "$(RED)[ERROR]$(NC) Missing essential tools:$$missing_tools"; \
 		$(MAKE) -s _suggest_installation TOOLS="$$missing_tools"; \
 		exit 1; \
+	fi
+
+.PHONY: _check_bash_version
+_check_bash_version:
+	@echo "$(BLUE)[INFO]$(NC) Checking Bash version (4.0+ required for associative arrays)..."
+	@bash_major=$$(bash -c 'echo $${BASH_VERSINFO[0]}'); \
+	bash_minor=$$(bash -c 'echo $${BASH_VERSINFO[1]}'); \
+	if [ "$$bash_major" -lt 4 ] 2>/dev/null; then \
+		echo "$(RED)[ERROR]$(NC) Bash 4.0+ is required, found version $$bash_major.$$bash_minor"; \
+		echo "$(YELLOW)[INFO]$(NC) On macOS, install newer Bash: brew install bash"; \
+		echo "$(YELLOW)[INFO]$(NC) Then add /opt/homebrew/bin/bash to /etc/shells"; \
+		exit 1; \
+	else \
+		echo "$(GREEN)[SUCCESS]$(NC) Bash version $$bash_major.$$bash_minor detected"; \
+	fi
+
+.PHONY: _check_git_version
+_check_git_version:
+	@echo "$(BLUE)[INFO]$(NC) Checking Git version (2.23+ recommended for git restore)..."
+	@git_version=$$(git --version | sed -E 's/git version ([0-9]+)\.([0-9]+).*/\1.\2/'); \
+	git_major=$$(echo $$git_version | cut -d. -f1); \
+	git_minor=$$(echo $$git_version | cut -d. -f2); \
+	if [ "$$git_major" -lt 2 ] 2>/dev/null || ([ "$$git_major" -eq 2 ] && [ "$$git_minor" -lt 23 ]) 2>/dev/null; then \
+		echo "$(YELLOW)[WARNING]$(NC) Git 2.23+ recommended, found version $$git_version"; \
+		echo "$(YELLOW)[INFO]$(NC) Some features like 'git restore' may not be available"; \
+	else \
+		echo "$(GREEN)[SUCCESS]$(NC) Git version $$git_version detected"; \
+	fi
+
+.PHONY: _check_make_version
+_check_make_version:
+	@echo "$(BLUE)[INFO]$(NC) Checking Make version (3.81+ required)..."
+	@make_version=$$($(MAKE) --version | head -1 | sed -E 's/.*([0-9]+\.[0-9]+).*/\1/'); \
+	make_major=$$(echo $$make_version | cut -d. -f1); \
+	make_minor=$$(echo $$make_version | cut -d. -f2); \
+	if [ "$$make_major" -lt 3 ] 2>/dev/null || ([ "$$make_major" -eq 3 ] && [ "$$make_minor" -lt 81 ]) 2>/dev/null; then \
+		echo "$(YELLOW)[WARNING]$(NC) Make 3.81+ recommended, found version $$make_version"; \
+	else \
+		echo "$(GREEN)[SUCCESS]$(NC) Make version $$make_version detected"; \
 	fi
 
 .PHONY: _check_core_tools

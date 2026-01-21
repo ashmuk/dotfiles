@@ -4,8 +4,17 @@
 # macOS / Windows 対応
 #
 
-# dotfiles ディレクトリのパス
-DOTFILES_DIR="$HOME/dotfiles"
+set -e
+
+# Validate HOME environment variable
+if [[ -z "$HOME" ]]; then
+    echo -e "\033[31m[ERROR]\033[0m HOME environment variable is not set" >&2
+    exit 1
+fi
+
+# Get the directory where this script is located (dynamic detection)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 VIM_DIR="$DOTFILES_DIR/vim"
 
 # 色付きメッセージ用関数
@@ -46,7 +55,7 @@ backup_existing_files() {
     print_info "Backing up existing files..."
 
     local backup_dir
-    backup_dir="$HOME/dotfiles/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
+    backup_dir="$DOTFILES_DIR/backup/.vim_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
     # Backup vim configuration files (platform-aware)
@@ -125,14 +134,22 @@ create_platform_files() {
 
 set nocompatible
 
+" Detect dotfiles directory dynamically from this file's location
+" This works whether cloned to ~/dotfiles or any other location
+let s:dotfiles_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
 " 共通設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.common'))
-  source ~/dotfiles/vim/vimrc.common
+let s:vimrc_common = s:dotfiles_dir . '/vim/vimrc.common'
+if filereadable(s:vimrc_common)
+  execute 'source ' . s:vimrc_common
 endif
 
 " ターミナル版専用設定を読み込み
-if !has('gui_running') && filereadable(expand('~/dotfiles/vim/vimrc.terminal'))
-  source ~/dotfiles/vim/vimrc.terminal
+if !has('gui_running')
+  let s:vimrc_terminal = s:dotfiles_dir . '/vim/vimrc.terminal'
+  if filereadable(s:vimrc_terminal)
+    execute 'source ' . s:vimrc_terminal
+  endif
 endif
 
 " プラットフォーム固有設定
@@ -168,19 +185,25 @@ EOF
 
 set nocompatible
 
+" Detect dotfiles directory dynamically from this file's location
+let s:dotfiles_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
 " 共通設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.common'))
-  source ~/dotfiles/vim/vimrc.common
+let s:vimrc_common = s:dotfiles_dir . '/vim/vimrc.common'
+if filereadable(s:vimrc_common)
+  execute 'source ' . s:vimrc_common
 endif
 
 " GUI版専用設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.gui'))
-  source ~/dotfiles/vim/vimrc.gui
+let s:vimrc_gui = s:dotfiles_dir . '/vim/vimrc.gui'
+if filereadable(s:vimrc_gui)
+  execute 'source ' . s:vimrc_gui
 endif
 
 " 共通キーマップを読み込み
-if filereadable(expand('~/dotfiles/vim/mappings.common'))
-  source ~/dotfiles/vim/mappings.common
+let s:mappings_common = s:dotfiles_dir . '/vim/mappings.common'
+if filereadable(s:mappings_common)
+  execute 'source ' . s:mappings_common
 endif
 EOF
 
@@ -191,19 +214,25 @@ EOF
 
 set nocompatible
 
+" Detect dotfiles directory dynamically from this file's location
+let s:dotfiles_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
 " 共通設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.common'))
-  source ~/dotfiles/vim/vimrc.common
+let s:vimrc_common = s:dotfiles_dir . '/vim/vimrc.common'
+if filereadable(s:vimrc_common)
+  execute 'source ' . s:vimrc_common
 endif
 
 " IdeaVim専用設定を読み込み
-if filereadable(expand('~/dotfiles/vim/vimrc.idea'))
-  source ~/dotfiles/vim/vimrc.idea
+let s:vimrc_idea = s:dotfiles_dir . '/vim/vimrc.idea'
+if filereadable(s:vimrc_idea)
+  execute 'source ' . s:vimrc_idea
 endif
 
 " 共通キーマップを読み込み
-if filereadable(expand('~/dotfiles/vim/mappings.common'))
-  source ~/dotfiles/vim/mappings.common
+let s:mappings_common = s:dotfiles_dir . '/vim/mappings.common'
+if filereadable(s:mappings_common)
+  execute 'source ' . s:mappings_common
 endif
 EOF
 

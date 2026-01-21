@@ -243,6 +243,30 @@ logs/
 secrets/
 .secrets/
 
+# SSH keys
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+id_ecdsa
+id_ecdsa.*
+id_dsa
+id_dsa.*
+*.ppk
+
+# Java keystores
+*.keystore
+*.jks
+*.truststore
+
+# Credentials and tokens
+credentials.json
+token.json
+*.credentials
+.netrc
+.npmrc
+.pypirc
+
 # =============================================================================
 # Documentation and Generated Files
 # =============================================================================

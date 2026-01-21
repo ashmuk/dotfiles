@@ -6,6 +6,16 @@
 #
 ###############################################################################
 
+# =============================================================================
+# Environment Validation
+# =============================================================================
+
+# Validate that HOME environment variable is set
+if [[ -z "${HOME:-}" ]]; then
+    echo -e "\033[0;31m[ERROR]\033[0m HOME environment variable is not set" >&2
+    exit 1
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -112,7 +122,9 @@ validate_required_commands() {
 create_backup_dir() {
     local backup_type="$1"
     local backup_dir
-    backup_dir="$HOME/dotfiles/backup/.${backup_type}_backup_$(date +%Y%m%d_%H%M%S)"
+    # Use DOTFILES_DIR if set, otherwise fall back to $HOME/dotfiles
+    local base_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+    backup_dir="$base_dir/backup/.${backup_type}_backup_$(date +%Y%m%d_%H%M%S)"
 
     if ! mkdir -p "$backup_dir"; then
         print_error "Failed to create backup directory: $backup_dir"
@@ -315,12 +327,15 @@ generate_file_from_template() {
     cp "$template_file" "$temp_file"
 
     # Apply substitutions if provided
+    # Cross-platform sed: use temp file instead of -i flag (BSD vs GNU compatibility)
     if [[ -n "$substitutions" ]]; then
         local -n subs_ref="$substitutions"
         for key in "${!subs_ref[@]}"; do
-            sed -i.bak "s|{{$key}}|${subs_ref[$key]}|g" "$temp_file"
+            local sed_temp
+            sed_temp=$(mktemp)
+            sed "s|{{$key}}|${subs_ref[$key]}|g" "$temp_file" > "$sed_temp"
+            mv "$sed_temp" "$temp_file"
         done
-        rm -f "$temp_file.bak"
     fi
 
     mv "$temp_file" "$output_file"
@@ -398,7 +413,13 @@ cleanup_on_error() {
 }
 
 # Trap function for cleanup
+# Usage: setup_error_handling [temp_file1] [temp_file2] ...
+# Note: Pass temp file paths that should be cleaned up on error.
+#       Call with no arguments for basic error handling without cleanup.
 setup_error_handling() {
-    local temp_files=("$@")
-    trap 'cleanup_on_error ${temp_files[*]}' ERR
+    if [[ $# -gt 0 ]]; then
+        local temp_files=("$@")
+        trap 'cleanup_on_error ${temp_files[*]}' ERR
+    fi
+    # Basic error handling is already set via 'set -e' in calling scripts
 }

@@ -17,8 +17,8 @@ else
     exit 1
 fi
 
-# Set up error handling
-setup_error_handling "$@"
+# Set up error handling (no temp files to clean up)
+setup_error_handling
 
 print_status "Setting up shell configuration..."
 print_status "Dotfiles directory: $DOTFILES_DIR"

@@ -216,13 +216,13 @@ if [ -f "$DOTFILES_DIR/shell/aliases.shell" ]; then
 fi
 
 # =============================================================================
-# Commoon Functions
+# Common Functions
 # =============================================================================
 
 # Function to extract archives
 extract() {
-  if [[ -f $1 ]]; then
-    case $1 in
+  if [[ -f "$1" ]]; then
+    case "$1" in
       *.tar.bz2)   tar xjf "$1"     ;;
       *.tar.gz)    tar xzf "$1"     ;;
       *.bz2)       bunzip2 "$1"     ;;

@@ -3,6 +3,7 @@
 # This script sets up git configuration files in the user's home directory
 
 set -e
+set -o pipefail
 
 # Colors for output
 RED='\033[0;31m'
@@ -72,7 +73,7 @@ backup_existing_files() {
     print_status "Backing up existing files..."
 
     local backup_dir
-    backup_dir="$HOME/dotfiles/backup/.git_backup_$(date +%Y%m%d_%H%M%S)"
+    backup_dir="$DOTFILES_DIR/backup/.git_backup_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
 
     for file in .gitignore .gitconfig .gitattributes ; do
@@ -95,44 +96,6 @@ create_symlinks() {
     print_success "Symbolic links created in home directory"
 }
 
-# Create platform-specific files in dotfiles directory
-create_platform_files() {
-    print_status "Creating platform-dependent files in dotfiles root..."
-
-    # Create gitconfig.$PLATFORM
-    cat > "$DOTFILES_DIR/gitconfig.$PLATFORM" << 'EOF'
-# Git configuration for platform
-# This file is managed by dotfiles project
-
-# Include common git configuration
-[include]
-    path = ~/dotfiles/git/gitconfig.common
-
-# User-specific settings (override common settings if needed)
-# Add your personal settings here
-EOF
-
-    # Create gitignore.$PLATFORM
-    cat > "$DOTFILES_DIR/gitignore.$PLATFORM" << 'EOF'
-# Global gitignore for platform
-# This file is managed by dotfiles project
-
-# Include common gitignore patterns
-# Add your personal ignore patterns here
-EOF
-
-    # Create gitattributes.$PLATFORM
-    cat > "$DOTFILES_DIR/gitattributes.$PLATFORM" << 'EOF'
-# Global gitattributes for platform
-# This file is managed by dotfiles project
-
-# Include common gitattributes patterns
-# Add your personal attributes here
-EOF
-
-    print_success "Platform-dependent files created in dotfiles directory"
-}
-
 # Main execution
 main() {
     print_status "Starting git configuration setup..."
@@ -144,14 +107,9 @@ main() {
     fi
 
     backup_existing_files
-#    create_platform_files
-   create_symlinks
+    create_symlinks
 
     print_success "Git configuration setup completed!"
-#    print_status "Platform-specific files created:"
-#    print_status "  - $DOTFILES_DIR/gitconfig.$PLATFORM"
-#    print_status "  - $DOTFILES_DIR/gitignore.$PLATFORM"
-#    print_status "  - $DOTFILES_DIR/gitattributes.$PLATFORM"
     print_status ""
     print_status "Symlinks created in home directory:"
     print_status "  - $HOME/.gitconfig"

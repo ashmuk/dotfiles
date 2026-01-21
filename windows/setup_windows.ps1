@@ -229,17 +229,22 @@ function Setup-VimWindows {
 
     $backupDir = New-BackupDirectory "vim_windows"
 
-    # Vim configuration files
+    # Vim configuration files (use generated configs from vim/setup_vimrc.sh)
     $vimConfigs = @(
         @{
-            Source = Join-Path $DotfilesPath "vimrc.win"
+            Source = Join-Path $DotfilesPath "vimrc.generated"
             Target = "$env:USERPROFILE\_vimrc"
             Name = "Vim Config"
         },
         @{
-            Source = Join-Path $DotfilesPath "gvimrc.win"
+            Source = Join-Path $DotfilesPath "gvimrc.generated"
             Target = "$env:USERPROFILE\_gvimrc"
             Name = "GVim Config"
+        },
+        @{
+            Source = Join-Path $DotfilesPath "ideavimrc.generated"
+            Target = "$env:USERPROFILE\_ideavimrc"
+            Name = "IdeaVim Config"
         }
     )
 
