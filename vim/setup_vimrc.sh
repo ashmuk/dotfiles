@@ -17,7 +17,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 VIM_DIR="$DOTFILES_DIR/vim"
 
-# 色付きメッセージ用関数
+# Source common functions library for cross-platform utilities
+if [[ -f "$DOTFILES_DIR/lib/common.sh" ]]; then
+    # shellcheck disable=SC1091
+    source "$DOTFILES_DIR/lib/common.sh"
+fi
+
+# 色付きメッセージ用関数 (kept for backward compatibility if common.sh not found)
 print_info() {
     echo -e "\033[34m[INFO]\033[0m $1"
 }
@@ -103,20 +109,39 @@ PLATFORM=$(detect_platform)
 print_info "Detected platform: $PLATFORM"
 
 # シンボリックリンクの作成
+# Uses create_symlink_safe for Cygwin compatibility (falls back to copy if symlinks fail)
 create_symlinks() {
     print_info "Creating Symbolic links in home directory..."
 
+    # Check if create_symlink_safe is available (from lib/common.sh)
+    local use_safe_symlink=0
+    if command -v create_symlink_safe >/dev/null 2>&1 || type create_symlink_safe >/dev/null 2>&1; then
+        use_safe_symlink=1
+    fi
+
     # Windows では _vimrc, _gvimrc を使用
     if [[ "$PLATFORM" == "win" ]]; then
-        ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/_vimrc"
-        ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/_gvimrc"
-        ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/_ideavimrc"
+        if [[ $use_safe_symlink -eq 1 ]]; then
+            create_symlink_safe "$DOTFILES_DIR/vimrc.generated" "$HOME/_vimrc" "_vimrc"
+            create_symlink_safe "$DOTFILES_DIR/gvimrc.generated" "$HOME/_gvimrc" "_gvimrc"
+            create_symlink_safe "$DOTFILES_DIR/ideavimrc.generated" "$HOME/_ideavimrc" "_ideavimrc"
+        else
+            ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/_vimrc"
+            ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/_gvimrc"
+            ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/_ideavimrc"
+        fi
         print_info "Created Windows-style symlinks: _vimrc (consolidated), _gvimrc (consolidated), _ideavimrc (consolidated)"
     else
         # Unix/macOS/Linux では .vimrc, .gvimrc を使用
-        ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/.vimrc"
-        ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/.gvimrc"
-        ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/.ideavimrc"
+        if [[ $use_safe_symlink -eq 1 ]]; then
+            create_symlink_safe "$DOTFILES_DIR/vimrc.generated" "$HOME/.vimrc" ".vimrc"
+            create_symlink_safe "$DOTFILES_DIR/gvimrc.generated" "$HOME/.gvimrc" ".gvimrc"
+            create_symlink_safe "$DOTFILES_DIR/ideavimrc.generated" "$HOME/.ideavimrc" ".ideavimrc"
+        else
+            ln -sf "$DOTFILES_DIR/vimrc.generated" "$HOME/.vimrc"
+            ln -sf "$DOTFILES_DIR/gvimrc.generated" "$HOME/.gvimrc"
+            ln -sf "$DOTFILES_DIR/ideavimrc.generated" "$HOME/.ideavimrc"
+        fi
         print_info "Created Unix-style symlinks: .vimrc (consolidated), .gvimrc (consolidated), .ideavimrc (consolidated)"
     fi
 
@@ -315,9 +340,13 @@ create_vimfiles_symlink() {
         fi
     fi
 
-    # Create the symlink
+    # Create the symlink (use create_symlink_safe for Cygwin compatibility)
     print_info "Creating symlink: $vim_dir -> $DOTFILES_DIR/vim/vimfiles"
-    ln -sf "$DOTFILES_DIR/vim/vimfiles" "$vim_dir"
+    if command -v create_symlink_safe >/dev/null 2>&1 || type create_symlink_safe >/dev/null 2>&1; then
+        create_symlink_safe "$DOTFILES_DIR/vim/vimfiles" "$vim_dir" "$(basename "$vim_dir")"
+    else
+        ln -sf "$DOTFILES_DIR/vim/vimfiles" "$vim_dir"
+    fi
 
     print_success "Vim plugin directory symlink created"
 }

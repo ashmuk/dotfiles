@@ -202,6 +202,64 @@ scoop install shellcheck yq tree
 
 Follow the Ubuntu/Debian instructions above within your WSL distribution.
 
+### Cygwin (Windows)
+
+Cygwin provides a Unix-like environment on Windows. These dotfiles have specific support for Cygwin with MintTY terminal.
+
+#### Prerequisites
+
+```bash
+# Install via Cygwin Setup
+# Required packages:
+#   - git
+#   - bash (4.0+)
+#   - make
+#   - vim or gvim
+#   - zsh (optional)
+```
+
+#### Symlink Support
+
+Cygwin symlinks require one of the following:
+
+1. **Developer Mode** (Windows 10/11): Enable in Settings → Update & Security → For Developers
+2. **Administrator privileges**: Run Cygwin terminal as Administrator
+3. **Native symlinks**: Set `CYGWIN=winsymlinks:nativestrict` environment variable
+
+If symlinks are unavailable, the installer will automatically fall back to copying files (with a warning).
+
+#### Git Configuration
+
+The setup script automatically configures Cygwin-specific git settings:
+
+```bash
+# These are set automatically by git/setup_git.sh on Cygwin:
+git config --global core.ignorecase true   # NTFS is case-insensitive
+git config --global core.filemode false    # NTFS doesn't preserve Unix permissions
+```
+
+#### MintTY Terminal
+
+MintTY is the default terminal for Cygwin. The setup automatically:
+- Installs Solarized Dark color theme to `~/.minttyrc`
+- Sets up the color theme directory at `~/etc/mintty-colors-solarized/`
+
+To switch themes manually:
+```bash
+# Dark theme
+cp ~/dotfiles/etc/mintty-colors-solarized/.minttyrc.dark ~/.minttyrc
+
+# Light theme
+cp ~/dotfiles/etc/mintty-colors-solarized/.minttyrc.light ~/.minttyrc
+```
+
+#### Known Limitations
+
+1. **Line endings**: Files are stored with LF endings. Git `core.autocrlf=input` ensures proper handling.
+2. **Permissions**: `chmod +x` has no effect on NTFS; executable permissions are simulated.
+3. **Path formats**: Both `/c/` and `/cygdrive/c/` path formats are supported.
+4. **Case sensitivity**: NTFS is case-insensitive; avoid files differing only in case.
+
 ## Verification
 
 After installation, verify your environment:

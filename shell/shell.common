@@ -463,8 +463,10 @@ gvim() {
     msys*|cygwin*)
       # Try multiple common Vim installation paths for MSYS/Cygwin
       # Prioritize .msi installed ones (Program Files) over Scoop installations
+      # Support both /c/ (MSYS2 default) and /cygdrive/c/ (Cygwin default) path formats
       local win_gvim=""
       local vim_candidates=(
+        # Standard /c/ paths (MSYS2 style)
         "/c/Program Files/Vim/vim*/gvim.exe"
         "/c/Program Files (x86)/Vim/vim*/gvim.exe"
         "/c/Program Files/vim/gvim.exe"
@@ -472,6 +474,14 @@ gvim() {
         "/c/Users/*/scoop/apps/vim/*/gvim.exe"
         "/c/ProgramData/scoop/apps/vim/*/gvim.exe"
         "/c/scoop/apps/vim/*/gvim.exe"
+        # Cygwin-style /cygdrive/c/ paths (for older or default Cygwin installs)
+        "/cygdrive/c/Program Files/Vim/vim*/gvim.exe"
+        "/cygdrive/c/Program Files (x86)/Vim/vim*/gvim.exe"
+        "/cygdrive/c/Program Files/vim/gvim.exe"
+        "/cygdrive/c/vim/gvim.exe"
+        "/cygdrive/c/Users/*/scoop/apps/vim/*/gvim.exe"
+        "/cygdrive/c/ProgramData/scoop/apps/vim/*/gvim.exe"
+        "/cygdrive/c/scoop/apps/vim/*/gvim.exe"
       )
 
       # Find the first existing gvim.exe
@@ -552,13 +562,16 @@ wholink() {
 
   # Get the real path of the target
   local realpathstr
-  if command -v realpath >/dev/null 2>&1; then
+  if [[ "$OSTYPE" == cygwin* ]] && command -v cygpath >/dev/null 2>&1; then
+    # On Cygwin, use cygpath for reliable path resolution
+    realpathstr="$(cygpath -a "$target" 2>/dev/null || echo "$target")"
+  elif command -v realpath >/dev/null 2>&1; then
     realpathstr="$(realpath "$target")"
   elif command -v readlink >/dev/null 2>&1; then
     # Fallback for systems without realpath
     realpathstr="$(readlink -f "$target" 2>/dev/null || echo "$target")"
   else
-    echo "Error: Neither realpath nor readlink found" >&2
+    echo "Error: Neither realpath, readlink, nor cygpath found" >&2
     return 1
   fi
 
@@ -573,9 +586,13 @@ wholink() {
     return 1
   fi
 
-  # Determine which readlink to use
+  # Determine which readlink to use for resolving symlink targets
+  # On Cygwin, cygpath -a provides reliable path resolution
   local readlink_cmd="readlink"
-  if command -v greadlink >/dev/null 2>&1; then
+  if [[ "$OSTYPE" == cygwin* ]] && command -v cygpath >/dev/null 2>&1; then
+    # cygpath -a returns absolute path, -f follows symlinks
+    readlink_cmd="cygpath -a"
+  elif command -v greadlink >/dev/null 2>&1; then
     readlink_cmd="greadlink"
   elif command -v /usr/local/bin/readlink >/dev/null 2>&1; then
     readlink_cmd="/usr/local/bin/readlink"

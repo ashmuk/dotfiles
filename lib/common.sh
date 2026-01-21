@@ -182,6 +182,172 @@ backup_directory() {
 }
 
 # =============================================================================
+# Platform Utility Functions
+# =============================================================================
+
+# Resolve absolute path (cross-platform, with Cygwin support)
+# Usage: resolve_path <path>
+# Uses cygpath on Cygwin, realpath if available, or readlink -f as fallback
+resolve_path() {
+    local path="$1"
+
+    if [[ -z "$path" ]]; then
+        echo ""
+        return 1
+    fi
+
+    # On Cygwin, use cygpath for proper path resolution
+    if [[ "$OSTYPE" == cygwin* ]] && command -v cygpath >/dev/null 2>&1; then
+        cygpath -a "$path" 2>/dev/null || echo "$path"
+    elif command -v realpath >/dev/null 2>&1; then
+        realpath "$path" 2>/dev/null || echo "$path"
+    elif command -v readlink >/dev/null 2>&1; then
+        # readlink -f may not be available on all systems (e.g., BSD/macOS without coreutils)
+        readlink -f "$path" 2>/dev/null || echo "$path"
+    else
+        # Fallback: return the path as-is
+        echo "$path"
+    fi
+}
+
+# Cross-platform sed in-place editing
+# Usage: sed_inplace <sed_expression> <file>
+# Handles differences between BSD sed (macOS) and GNU sed (Linux)
+sed_inplace() {
+    local expression="$1"
+    local file="$2"
+
+    if [[ -z "$expression" ]] || [[ -z "$file" ]]; then
+        print_error "sed_inplace requires expression and file arguments"
+        return 1
+    fi
+
+    if [[ ! -f "$file" ]]; then
+        print_error "File not found: $file"
+        return 1
+    fi
+
+    if [[ "$OSTYPE" == darwin* ]]; then
+        # BSD sed requires an argument to -i (empty string for no backup)
+        sed -i '' "$expression" "$file"
+    else
+        # GNU sed (Linux, Cygwin, MSYS2)
+        sed -i "$expression" "$file"
+    fi
+}
+
+# Test if symlinks are supported in the current environment
+# Returns 0 if symlinks work, 1 otherwise
+# On Cygwin/Windows, symlinks require admin privileges or Developer Mode
+test_symlink_support() {
+    local test_dir="${TMPDIR:-/tmp}"
+    local test_link="$test_dir/.symlink_test_$$"
+    local test_target="$test_dir/.symlink_target_$$"
+
+    # Create a test target
+    echo "test" > "$test_target" 2>/dev/null || return 1
+
+    # Try to create a symlink
+    if ln -s "$test_target" "$test_link" 2>/dev/null; then
+        rm -f "$test_link" "$test_target" 2>/dev/null
+        return 0
+    else
+        rm -f "$test_target" 2>/dev/null
+        return 1
+    fi
+}
+
+# Create symlink with fallback to copy for Cygwin/Windows without admin privileges
+# Usage: create_symlink_safe <source> <target> [name] [backup_dir]
+# If symlinks fail (common on Cygwin without admin), falls back to copying the file
+create_symlink_safe() {
+    local source="$1"
+    local target="$2"
+    local name="${3:-$(basename "$target")}"
+    local backup_dir="$4"
+
+    # Validate source exists
+    if [[ ! -e "$source" ]]; then
+        print_error "Source file does not exist: $source"
+        return 1
+    fi
+
+    # Handle existing target
+    if [[ -L "$target" ]]; then
+        local current_target
+        current_target=$(readlink "$target" 2>/dev/null || echo "")
+        if [[ "$current_target" == "$source" ]]; then
+            print_status "$name symlink already correct"
+            return 0
+        fi
+        print_warning "$name already exists as symlink, removing..."
+        rm "$target"
+    elif [[ -f "$target" ]] || [[ -d "$target" ]]; then
+        if [[ -n "$backup_dir" ]]; then
+            if [[ -f "$target" ]]; then
+                backup_file "$target" "$backup_dir" "$(basename "$target")" || return 1
+            else
+                backup_directory "$target" "$backup_dir" "$(basename "$target")" || return 1
+            fi
+        else
+            print_warning "$name already exists, creating backup..."
+            local backup_name
+            backup_name="${target}.backup.$(date +%Y%m%d_%H%M%S)"
+            mv "$target" "$backup_name" || {
+                print_error "Failed to backup existing $name"
+                return 1
+            }
+        fi
+    fi
+
+    # Create target directory if needed
+    local target_dir
+    target_dir=$(dirname "$target")
+    if [[ ! -d "$target_dir" ]]; then
+        mkdir -p "$target_dir" || {
+            print_error "Failed to create target directory: $target_dir"
+            return 1
+        }
+    fi
+
+    # On Cygwin/MSYS, test if symlinks work
+    if [[ "$OSTYPE" == cygwin* ]] || [[ "$OSTYPE" == msys* ]]; then
+        if test_symlink_support; then
+            # Symlinks work, use them
+            if ln -s "$source" "$target" 2>/dev/null; then
+                print_success "$name symlink created: $target -> $source"
+                return 0
+            fi
+        fi
+
+        # Symlinks don't work or failed, fall back to copy
+        print_warning "Symlinks unavailable (admin/Developer Mode required), copying instead..."
+        if [[ -d "$source" ]]; then
+            cp -r "$source" "$target" || {
+                print_error "Failed to copy directory: $source -> $target"
+                return 1
+            }
+        else
+            cp -f "$source" "$target" || {
+                print_error "Failed to copy file: $source -> $target"
+                return 1
+            }
+        fi
+        print_success "$name copied (symlink fallback): $target <- $source"
+        return 0
+    fi
+
+    # Non-Windows: use regular symlink
+    if ! ln -s "$source" "$target"; then
+        print_error "Failed to create symlink: $target -> $source"
+        return 1
+    fi
+
+    print_success "$name symlink created: $target -> $source"
+    return 0
+}
+
+# =============================================================================
 # Symlink Functions
 # =============================================================================
 

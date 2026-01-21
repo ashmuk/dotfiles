@@ -36,23 +36,68 @@ create_symlinks() {
     print_status "Creating symbolic links in home directory..."
 
     # Create symlinks to platform-specific generated files
-    ln -sf "$DOTFILES_DIR/bashrc.generated" "$HOME/.bashrc"
-    ln -sf "$DOTFILES_DIR/zshrc.generated" "$HOME/.zshrc"
+    # Use create_symlink_safe for Cygwin compatibility (falls back to copy if symlinks fail)
+    create_symlink_safe "$DOTFILES_DIR/bashrc.generated" "$HOME/.bashrc" ".bashrc"
+    create_symlink_safe "$DOTFILES_DIR/zshrc.generated" "$HOME/.zshrc" ".zshrc"
 
     # Create symlinks to profile files
     print_status "Creating profile file symlinks..."
-    ln -sf "$DOTFILES_DIR/shell/profile/bash_logout" "$HOME/.bash_logout"
-    ln -sf "$DOTFILES_DIR/shell/profile/bash_profile" "$HOME/.bash_profile"
-    ln -sf "$DOTFILES_DIR/shell/profile/zprofile" "$HOME/.zprofile"
-    ln -sf "$DOTFILES_DIR/shell/profile/zlogout" "$HOME/.zlogout"
+    create_symlink_safe "$DOTFILES_DIR/shell/profile/bash_logout" "$HOME/.bash_logout" ".bash_logout"
+    create_symlink_safe "$DOTFILES_DIR/shell/profile/bash_profile" "$HOME/.bash_profile" ".bash_profile"
+    create_symlink_safe "$DOTFILES_DIR/shell/profile/zprofile" "$HOME/.zprofile" ".zprofile"
+    create_symlink_safe "$DOTFILES_DIR/shell/profile/zlogout" "$HOME/.zlogout" ".zlogout"
 
     # Create symlink to p10k configuration
     if [[ -f "$DOTFILES_DIR/shell/dot.p10k.zsh" ]]; then
         print_status "Creating p10k configuration symlink..."
-        ln -sf "$DOTFILES_DIR/shell/dot.p10k.zsh" "$HOME/.p10k.zsh"
+        create_symlink_safe "$DOTFILES_DIR/shell/dot.p10k.zsh" "$HOME/.p10k.zsh" ".p10k.zsh"
     fi
 
     print_success "Symbolic links created in home directory"
+}
+
+# Setup MintTY colors for Cygwin
+# Installs Solarized Dark theme for MintTY terminal
+setup_mintty_colors() {
+    # Only run on Cygwin with MintTY
+    if [[ "$OSTYPE" != cygwin* ]]; then
+        return 0
+    fi
+
+    print_status "Setting up MintTY colors..."
+
+    local mintty_colors_dir="$DOTFILES_DIR/etc/mintty-colors-solarized"
+    local minttyrc_source="$mintty_colors_dir/.minttyrc.dark"
+    local minttyrc_target="$HOME/.minttyrc"
+
+    # Check if the color theme source exists
+    if [[ ! -f "$minttyrc_source" ]]; then
+        print_warning "MintTY color theme not found: $minttyrc_source"
+        return 0
+    fi
+
+    # Backup existing .minttyrc if it exists and is different
+    if [[ -f "$minttyrc_target" ]]; then
+        if ! diff -q "$minttyrc_source" "$minttyrc_target" >/dev/null 2>&1; then
+            local backup_name
+            backup_name="${minttyrc_target}.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$minttyrc_target" "$backup_name"
+            print_status "Backed up existing .minttyrc to $backup_name"
+        fi
+    fi
+
+    # Copy the color theme (MintTY reads .minttyrc, not a symlink target)
+    cp "$minttyrc_source" "$minttyrc_target"
+    print_success "MintTY Solarized Dark theme installed to $minttyrc_target"
+
+    # Also set up the etc directory for shell sourcing
+    local etc_target="$HOME/etc/mintty-colors-solarized"
+    if [[ ! -d "$etc_target" ]]; then
+        mkdir -p "$HOME/etc"
+        create_symlink_safe "$mintty_colors_dir" "$etc_target" "mintty-colors-solarized"
+    fi
+
+    print_success "MintTY color configuration complete"
 }
 
 # 既存ファイルのバックアップ
@@ -149,6 +194,9 @@ main() {
         print_error "Failed to create symlinks"
         return 1
     fi
+
+    # Setup MintTY colors on Cygwin
+    setup_mintty_colors
 
     print_success "Shell configuration setup completed!"
     print_status ""

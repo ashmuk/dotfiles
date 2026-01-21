@@ -5,66 +5,23 @@
 set -e
 set -o pipefail
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Function to create symlink with backup
-create_symlink() {
-    local source="$1"
-    local target="$2"
-    local name="$3"
-
-    if [[ -L "$target" ]]; then
-        print_warning "$name already exists as symlink, removing..."
-        rm "$target"
-    elif [[ -f "$target" ]]; then
-        print_warning "$name already exists as file, creating backup..."
-        mv "$target" "${target}.backup.$(date +%Y%m%d_%H%M%S)"
-    fi
-
-    print_status "Creating symlink for $name..."
-    ln -s "$source" "$target"
-    print_success "$name symlink created"
-}
-
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Source common functions library for cross-platform utilities
+if [[ -f "$DOTFILES_DIR/lib/common.sh" ]]; then
+    # shellcheck disable=SC1091
+    source "$DOTFILES_DIR/lib/common.sh"
+else
+    echo "Error: Common functions library not found at $DOTFILES_DIR/lib/common.sh" >&2
+    exit 1
+fi
+
 print_status "Setting up git configuration..."
 print_status "Dotfiles directory: $DOTFILES_DIR"
 
-# Detect platform
-detect_platform() {
-    case "$OSTYPE" in
-        darwin*)  echo "mac" ;;
-        linux*)   echo "linux" ;;
-        msys*|cygwin*) echo "win" ;;
-        *)        echo "unknown" ;;
-    esac
-}
-
+# Detect platform (using function from lib/common.sh)
 PLATFORM=$(detect_platform)
 print_status "Detected platform: $PLATFORM"
 
@@ -85,15 +42,46 @@ backup_existing_files() {
 }
 
 # Create symlinks in home directory
+# Uses create_symlink_safe for Cygwin compatibility (falls back to copy if symlinks fail)
 create_symlinks() {
     print_status "Creating symbolic links in home directory..."
 
     # Create symlinks to platform-specific files
-    ln -sf "$DOTFILES_DIR/git/gitconfig.common" "$HOME/.gitconfig"
-    ln -sf "$DOTFILES_DIR/git/gitignore.common" "$HOME/.gitignore"
-    ln -sf "$DOTFILES_DIR/git/gitattributes.common" "$HOME/.gitattributes"
+    create_symlink_safe "$DOTFILES_DIR/git/gitconfig.common" "$HOME/.gitconfig" ".gitconfig"
+    create_symlink_safe "$DOTFILES_DIR/git/gitignore.common" "$HOME/.gitignore" ".gitignore"
+    create_symlink_safe "$DOTFILES_DIR/git/gitattributes.common" "$HOME/.gitattributes" ".gitattributes"
 
     print_success "Symbolic links created in home directory"
+}
+
+# Configure Cygwin-specific git settings
+# NTFS is case-insensitive and doesn't preserve Unix permissions
+configure_cygwin_git() {
+    if [[ "$OSTYPE" != cygwin* ]]; then
+        return 0
+    fi
+
+    print_status "Configuring Cygwin-specific git settings..."
+
+    # NTFS is case-insensitive; ignorecase=true prevents checkout failures
+    # and merge conflicts caused by case-only filename differences
+    git config --global core.ignorecase true
+    print_status "  Set core.ignorecase = true (NTFS is case-insensitive)"
+
+    # NTFS doesn't preserve Unix file permissions; filemode=false prevents
+    # spurious diffs due to permission changes
+    git config --global core.filemode false
+    print_status "  Set core.filemode = false (NTFS doesn't preserve Unix permissions)"
+
+    # Ensure proper line ending handling
+    # autocrlf=input is already set in gitconfig.common, but verify it
+    local current_autocrlf
+    current_autocrlf=$(git config --global core.autocrlf 2>/dev/null || echo "")
+    if [[ "$current_autocrlf" != "input" ]]; then
+        print_status "  Note: Consider setting core.autocrlf = input for Cygwin"
+    fi
+
+    print_success "Cygwin-specific git settings configured"
 }
 
 # Main execution
@@ -108,6 +96,7 @@ main() {
 
     backup_existing_files
     create_symlinks
+    configure_cygwin_git
 
     print_success "Git configuration setup completed!"
     print_status ""

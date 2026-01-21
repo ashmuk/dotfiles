@@ -71,9 +71,11 @@ ZSH_VER="${ZSH_VERSION%.*}"
 # Git branch name function
 # Performance optimization: cache git branch with 2-second timeout to avoid slow git calls on every prompt
 git_branch() {
-  local branch cache_file="/tmp/zsh_git_branch_$$"
+  # Use TMPDIR for temp files (handles Cygwin /tmp permission quirks)
+  local _tmpdir="${TMPDIR:-/tmp}"
+  local branch cache_file="$_tmpdir/zsh_git_branch_$$"
   local cache_age current_dir_hash
-  
+
   # Use directory hash for per-directory caching (portable hash generation)
   if command -v md5sum >/dev/null 2>&1; then
     current_dir_hash=$(echo "$PWD" | md5sum 2>/dev/null | cut -d' ' -f1)
@@ -83,7 +85,7 @@ git_branch() {
     # Fallback: use process ID if no hash command available
     current_dir_hash="$$"
   fi
-  cache_file="/tmp/zsh_git_branch_${current_dir_hash:-$$}"
+  cache_file="$_tmpdir/zsh_git_branch_${current_dir_hash:-$$}"
   
   # Check cache (if exists and < 2 seconds old)
   if [[ -f "$cache_file" ]]; then
