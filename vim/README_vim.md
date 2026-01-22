@@ -382,14 +382,6 @@ make clean
 - [IdeaVim Plugin](https://plugins.jetbrains.com/plugin/164-ideavim)
 - [Solarized Color Scheme](https://ethanschoonover.com/solarized/)
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test in different environments
-5. Submit a pull request
-
 ## 📄 License
 
 This configuration is part of the dotfiles project and is available under the [MIT License](../LICENSE).

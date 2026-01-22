@@ -225,14 +225,6 @@ make clean
 - [Git Ignore](https://git-scm.com/docs/gitignore)
 - [Git Aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases)
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with different file types
-5. Submit a pull request
-
 ## 📄 License
 
 This configuration is part of the dotfiles project and is available under the [MIT License](../LICENSE).

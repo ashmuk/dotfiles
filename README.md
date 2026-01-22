@@ -548,15 +548,14 @@ make test-compat      # Cross-platform compatibility only
 make status
 ```
 
-### Getting Help
+### Self-Help Resources
 
 1. Check the validation output: `make validate`
 2. Review the troubleshooting section above
-3. Check existing [GitHub Issues](https://github.com/your-username/dotfiles/issues)
-4. Create a new issue with:
-   - OS and shell version
-   - Output of `make validate`
-   - Specific error messages
+3. Run `make test` to identify configuration issues
+4. Check the documentation files in `docs/` directory
+
+**Note**: This is a personal project without dedicated support. The troubleshooting guide and documentation should help resolve most issues.
 
 ## 🪟 Windows Support
 
@@ -616,13 +615,18 @@ See [Windows-First Documentation](windows/README-WindowsFirst.md) for detailed s
 - [Windows-First Workflow](windows/README-WindowsFirst.md) - Windows-first installation guide
 - [Project Analysis](notes/) - Technical analysis and implementation reports
 
-## 🤝 Contributing
+## 📝 About This Project
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with `make validate` and `make test`
-5. Submit a pull request
+This is a **personal dotfiles repository** primarily maintained for my own use. While the code is open source under MIT license, I have limited time for community engagement.
+
+**Using this project:**
+- Feel free to fork and adapt for your own needs
+- No support or issue tracking is provided
+- Pull requests are unlikely to be reviewed
+
+**If you find this useful:**
+- Star the repo if it helped you
+- Fork and customize for your own setup
 
 ## 📄 License
 
