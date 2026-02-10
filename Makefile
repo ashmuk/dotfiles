@@ -270,7 +270,7 @@ _suggest_installation:
 	echo ""
 
 .PHONY: install
-install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-btop install-vscode install-global-templates ## Install all dotfiles
+install: check-prereqs install-shell install-vim install-git install-tmux install-claude install-btop install-ghostty install-vscode install-global-templates ## Install all dotfiles
 
 .PHONY: install-shell
 install-shell: validate ## Install shell configuration
@@ -313,6 +313,13 @@ install-btop: validate ## Install btop configuration
 	@chmod +x $(DOTFILES_DIR)/config/btop/setup_btop.sh
 	@$(DOTFILES_DIR)/config/btop/setup_btop.sh
 	@echo "$(GREEN)[SUCCESS]$(NC) btop configuration installed"
+
+.PHONY: install-ghostty
+install-ghostty: validate ## Install Ghostty configuration
+	@echo "$(BLUE)[INFO]$(NC) Installing Ghostty configuration..."
+	@chmod +x $(DOTFILES_DIR)/config/ghostty/setup_ghostty.sh
+	@$(DOTFILES_DIR)/config/ghostty/setup_ghostty.sh
+	@echo "$(GREEN)[SUCCESS]$(NC) Ghostty configuration installed"
 
 .PHONY: install-vscode
 install-vscode: validate ## Install VS Code configuration
@@ -587,6 +594,9 @@ clean: ## Remove installed dotfiles (with confirmation)
 	@echo "$(BLUE)[INFO]$(NC) Removing Claude configuration..."
 	@rm -f $(HOME_DIR)/.claude/settings.json $(HOME_DIR)/.claude/settings.local.json $(HOME_DIR)/.claude/statusline.sh
 	@if [ -d $(HOME_DIR)/.claude ] && [ -z "$$(ls -A $(HOME_DIR)/.claude)" ]; then rmdir $(HOME_DIR)/.claude; fi
+	@echo "$(BLUE)[INFO]$(NC) Removing Ghostty configuration..."
+	@rm -f $(HOME_DIR)/.config/ghostty/config
+	@if [ -d $(HOME_DIR)/.config/ghostty ] && [ -z "$$(ls -A $(HOME_DIR)/.config/ghostty)" ]; then rmdir $(HOME_DIR)/.config/ghostty; fi
 	@echo "$(BLUE)[INFO]$(NC) Removing VS Code configuration..."
 	@rm -f $(HOME_DIR)/.vscode/settings.json
 	@if [ -d $(HOME_DIR)/.vscode ] && [ -z "$$(ls -A $(HOME_DIR)/.vscode)" ]; then rmdir $(HOME_DIR)/.vscode; fi
@@ -724,6 +734,16 @@ status: validate ## Show status of installed dotfiles
 		echo "    $(RED)✗$(NC) .claude/statusline.sh (not found)"; \
 	fi
 	@echo ""
+	@echo "Ghostty Configuration:"
+	@echo "  Home directory:"
+	@if [ -L $(HOME_DIR)/.config/ghostty/config ]; then \
+		echo "    $(GREEN)✓$(NC) .config/ghostty/config (symlink)"; \
+	elif [ -f $(HOME_DIR)/.config/ghostty/config ]; then \
+		echo "    $(YELLOW)⚠$(NC) .config/ghostty/config (file)"; \
+	else \
+		echo "    $(RED)✗$(NC) .config/ghostty/config (not found)"; \
+	fi
+	@echo ""
 	@echo "VS Code Configuration:"
 	@echo "  Home directory:"
 	@if [ -L $(HOME_DIR)/.vscode/settings.json ]; then \
@@ -756,7 +776,7 @@ validate: ## Validate configuration files and dependencies
 	@echo "$(GREEN)[SUCCESS]$(NC) Shell configuration syntax is valid"
 	@echo ""
 	@echo "Checking for required directories..."
-	@for dir in shell vim git config/tmux config/claude config/btop config/vscode; do \
+	@for dir in shell vim git config/tmux config/claude config/btop config/ghostty config/vscode; do \
 		if [ ! -d "$(DOTFILES_DIR)/$$dir" ]; then \
 			echo "$(RED)[ERROR]$(NC) Required directory missing: $$dir"; \
 			exit 1; \
@@ -766,7 +786,7 @@ validate: ## Validate configuration files and dependencies
 	done
 	@echo ""
 	@echo "Checking setup scripts..."
-	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh config/claude/setup_claude.sh config/btop/setup_btop.sh; do \
+	@for script in shell/setup_shell.sh vim/setup_vimrc.sh git/setup_git.sh config/tmux/setup_tmux.sh config/claude/setup_claude.sh config/btop/setup_btop.sh config/ghostty/setup_ghostty.sh; do \
 		if [ ! -x "$(DOTFILES_DIR)/$$script" ]; then \
 			echo "$(YELLOW)[WARNING]$(NC) $$script is not executable"; \
 			chmod +x "$(DOTFILES_DIR)/$$script"; \
