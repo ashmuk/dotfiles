@@ -1,5 +1,12 @@
 font-family = HackGen Console NF
-font-size = 13
+font-size = 14
+#theme = Firewatch
+#theme = Mirage
+theme = Treehouse
+#theme = Matrix
+#theme = Gruvbox Material Light
+#theme = TokyoNight Moon
+#theme = iTerm2 Solarized Dark
 cursor-style = block
 window-padding-x = 6
 window-padding-y = 6
