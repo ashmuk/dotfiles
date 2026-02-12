@@ -107,5 +107,6 @@
     "**/__pycache__": true
   },
   "diffEditor.ignoreTrimWhitespace": false,
-  "terminal.integrated.minimumContrastRatio": 1
+  "terminal.integrated.minimumContrastRatio": 1,
+  "editor.accessibilitySupport": "on"
 }
