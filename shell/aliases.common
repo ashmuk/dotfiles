@@ -37,7 +37,7 @@ alias ds='dirs -v'
 # =============================================================================
 # Claude Code aliases
 # =============================================================================
-alias claude-teams='CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --teammate-mode tmux'
+alias claude-teams='tmux new-session -s claude-agents "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --teammate-mode tmux"'
 
 # =============================================================================
 # tmux Aliases
