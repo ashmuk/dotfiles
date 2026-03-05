@@ -11,17 +11,17 @@ Understand context and define requirements for this project, co-working with Cla
 ## When to use
 - Use this skill when end-user asks for 'requirements' definition
 - Manually invoke when ClaudeCode built-in Explore agent(s) are needed for requirements analysis
-- Coordinate with analyst agent policies during requirements gathering
+- Coordinate with my-analyst agent policies during requirements gathering
 
 ## Policy
-ClaudeCode built-in Explore agent(s) respects analyst agent's policies
+ClaudeCode built-in Explore agent(s) respects my-analyst agent's policies
 
 ## Workflow
-1. Explore agent(s) is co-working with analyst agent and respecting its policies
+1. Explore agent(s) is co-working with my-analyst agent and respecting its policies
 2. Read Vision.md (if exists), or input from end-user
 3. Analyze the context and start search and investigation (invoke Explore or relevant agents in your needs)
 4. Define requirements for what to achieve
-5. Apply reviewer agent policy for validation of what was investigated
+5. Apply my-reviewer agent policy for validation of what was investigated
 6. Finalize outcome by this feedback loop
 7. Preserve all outcome in REQUIREMENTS.md
-8. Next: Invoke cc-design skill with built-in Plan agent(s) following reviewer validation
+8. Next: Invoke cc-design skill with built-in Plan agent(s) following my-reviewer validation

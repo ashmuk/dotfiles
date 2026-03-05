@@ -45,9 +45,9 @@
 | 2 | NEW | `skills/cc-test.md` | Test strategy ownership |
 | 3 | ENRICH | `skills/cc-review.md` | Added "Next: remediate or accept" |
 | 4 | ENRICH | `skills/cc-implement.md` | Added refactor/simplify triggers |
-| 5 | ENRICH | `subagents/reviewer.md` | code-simplifier + infra maintenance |
-| 6 | ENRICH | `subagents/builder.md` | toolsmith + infra implementation |
-| 7 | ENRICH | `subagents/architect.md` | infra design scope |
+| 5 | ENRICH | `subagents/my-reviewer.md` | code-simplifier + infra maintenance |
+| 6 | ENRICH | `subagents/my-builder.md` | toolsmith + infra implementation |
+| 7 | ENRICH | `subagents/my-architect.md` | infra design scope |
 | 8 | UPDATE | `CLAUDE.md` | Registered new skills |
 
 All paths relative to `templates/project/dot.agent/`.
@@ -66,9 +66,9 @@ cc-define -> cc-design -> cc-test -> cc-implement -> cc-review --+--> [accept]
 ### Infrastructure Scope Clarification
 | Concern | Agent Owner |
 |---------|-------------|
-| Infrastructure Design | **Architect** (service selection, network, IAM, monitoring) |
-| Infrastructure Implementation | **Builder** (Terraform/CDK, CI/CD, deployment scripts) |
-| Infrastructure Maintenance | **Reviewer** (drift detection, patches, compliance) |
+| Infrastructure Design | **my-architect** (service selection, network, IAM, monitoring) |
+| Infrastructure Implementation | **my-builder** (Terraform/CDK, CI/CD, deployment scripts) |
+| Infrastructure Maintenance | **my-reviewer** (drift detection, patches, compliance) |
 
 ### Token Impact (estimated)
 
@@ -79,8 +79,8 @@ cc-define -> cc-design -> cc-test -> cc-implement -> cc-review --+--> [accept]
 | `skills/cc-test.md` *(new)* | 0 | 357 | +357 |
 | `skills/cc-review.md` | 189 | 236 | +47 |
 | `skills/cc-implement.md` | 205 | 220 | +15 |
-| `subagents/builder.md` | 590 | 653 | +63 |
-| `subagents/reviewer.md` | 604 | 722 | +118 |
+| `subagents/my-builder.md` | 590 | 653 | +63 |
+| `subagents/my-reviewer.md` | 604 | 722 | +118 |
 | `RULES.md` | 574 | 582 | +8 |
 | **Total** | **2,791** | **3,960** | **+1,169** |
 
@@ -111,15 +111,15 @@ cc-define -> cc-design -> cc-test -> cc-implement -> cc-review --+--> [accept]
 
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
 |-------|--------------|---------------------|---------------|------------|
-| `/cc-define` | analyst | Explore | reviewer | — |
-| `/cc-design` | architect | Plan | reviewer | — |
-| `/cc-test` | analyst | — | reviewer | implement (builder) |
-| `/cc-implement` | builder | general-purpose | reviewer | — |
-| `/cc-review` | reviewer | — | (self) | — |
-| `/cc-remediate` | builder | — | reviewer | architect (systemic) |
+| `/cc-define` | my-analyst | Explore | my-reviewer | — |
+| `/cc-design` | my-architect | Plan | my-reviewer | — |
+| `/cc-test` | my-analyst | — | my-reviewer | implement (my-builder) |
+| `/cc-implement` | my-builder | general-purpose | my-reviewer | — |
+| `/cc-review` | my-reviewer | — | (self) | — |
+| `/cc-remediate` | my-builder | — | my-reviewer | my-architect (systemic) |
 | `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `cc-define(analyst) → cc-design(architect) → cc-test(analyst) → cc-implement(builder) → cc-review(reviewer) → cc-remediate(builder+reviewer)`
+**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect) → cc-test(my-analyst) → cc-implement(my-builder) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer)`
 
 ## References
 

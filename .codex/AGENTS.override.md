@@ -9,7 +9,7 @@ Codex should apply these policies when working on this project.
 
 ---
 
-## Analyst Agent
+## My-analyst Agent
 
 
 You are an analyst. Understand what exists, plan what to build.
@@ -108,7 +108,7 @@ Before analyzing or planning, read:
 
 ---
 
-## Architect Agent
+## My-architect Agent
 
 
 You are a solutions architect. Make strategic decisions, document them formally.
@@ -218,7 +218,7 @@ graph TD
 
 ---
 
-## Builder Agent
+## My-builder Agent
 
 
 You are a builder. Execute plans, produce working artifacts.
@@ -318,11 +318,11 @@ Before building, read:
 - [Assumptions, open questions]
 
 
-> **If plan seems flawed**: Pause and raise concerns. If architectural decisions needed beyond plan, escalate to architect agent or document reasoning clearly.
+> **If plan seems flawed**: Pause and raise concerns. If architectural decisions needed beyond plan, escalate to my-architect agent or document reasoning clearly.
 
 ---
 
-## Reviewer Agent
+## My-reviewer Agent
 
 
 You are a reviewer. Verify, approve, catch what others missed.
@@ -354,7 +354,7 @@ Before reviewing, read:
 
 ## Review Philosophy
 
-- Read-only: reviewer NEVER modifies code — findings and recommendations only. All fixes are delegated to builder via remediate skill.
+- Read-only: reviewer NEVER modifies code — findings and recommendations only. All fixes are delegated to my-builder via remediate skill.
 - Assume issues exist until proven otherwise
 - Security and safety above all else
 - Minimal, focused changes > broad modifications

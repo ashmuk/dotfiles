@@ -50,10 +50,10 @@ Use these commands for common workflows:
 **Workflow Skills** (coordinate multi-step tasks):
 - `/cc-define` — Understand context and define requirements (uses Explore agents)
 - `/cc-design` — Create architecture, designs, and implementation plans (uses Plan agents)
-- `/cc-test` — Create test strategy and coverage plans (uses analyst + reviewer agents)
+- `/cc-test` — Create test strategy and coverage plans (uses my-analyst + my-reviewer agents)
 - `/cc-implement` — Build software and artifacts (uses general-purpose agents)
 - `/cc-review` — Review project progress and validate implementations
-- `/cc-remediate` — Apply fixes from review findings and re-validate (uses builder + reviewer agents)
+- `/cc-remediate` — Apply fixes from review findings and re-validate (uses my-builder + my-reviewer agents)
 
 **Git Workflows**:
 - `/cc-commit` — Stage changes and create conventional commit with generated message
@@ -99,16 +99,16 @@ make sync-codex        # Sync to OpenAI Codex only
 ### Agent-Based Workflow
 This project uses specialized subagents (defined in `.claude/agents/`) for different responsibilities:
 
-- **analyst** — System analysis, planning, risk identification
+- **my-analyst** — System analysis, planning, risk identification
   - Use for: Breaking down complex tasks, analyzing existing systems, identifying risks
 
-- **architect** — Technology decisions, trade-offs, ADR creation
+- **my-architect** — Technology decisions, trade-offs, ADR creation
   - Use for: Choosing tech stack, designing architecture, creating ADRs
 
-- **builder** — Implementation (code, scripts, CI/CD, infrastructure)
+- **my-builder** — Implementation (code, scripts, CI/CD, infrastructure)
   - Use for: Writing code, creating scripts, setting up infrastructure
 
-- **reviewer** — Code review, security validation, integrity checks
+- **my-reviewer** — Code review, security validation, integrity checks
   - Use for: Validating implementations, security audits, final checks before merge
 
 **Coordination**: Use workflow skills (`/cc-define`, `/cc-design`, `/cc-test`, `/cc-implement`, `/cc-review`, `/cc-remediate`) to automatically coordinate these agents for multi-step tasks.

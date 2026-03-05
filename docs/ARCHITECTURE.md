@@ -279,10 +279,10 @@ In templated projects, the `.agent/` directory serves as the master configuratio
 ```
 .agent/ (SOURCE)                    Target Outputs
 ├── subagents/
-│   ├── analyst.md          ──►    .claude/agents/analyst.md (symlink)
-│   ├── architect.md        ──►    .cursor/rules/agents/architect.md (symlink)
-│   ├── builder.md          ──►    .codex/AGENTS.override.md (generated)
-│   └── reviewer.md
+│   ├── my-analyst.md       ──►    .claude/agents/my-analyst.md (symlink)
+│   ├── my-architect.md     ──►    .cursor/rules/agents/my-architect.md (symlink)
+│   ├── my-builder.md       ──►    .codex/AGENTS.override.md (generated)
+│   └── my-reviewer.md
 │
 ├── commands/
 │   ├── cc-commit.md        ──►    .claude/commands/cc-commit.md (symlink)
@@ -313,10 +313,10 @@ make sync-verify       # Sync + verification
 
 | Agent | Role | Use Cases |
 |-------|------|-----------|
-| **analyst** | System analysis | Task breakdown, risk identification, planning |
-| **architect** | Design decisions | Tech choices, trade-offs, ADR creation |
-| **builder** | Implementation | Code, scripts, infrastructure, CI/CD |
-| **reviewer** | Validation | Code review, security audits, pre-merge checks |
+| **my-analyst** | System analysis | Task breakdown, risk identification, planning |
+| **my-architect** | Design decisions | Tech choices, trade-offs, ADR creation |
+| **my-builder** | Implementation | Code, scripts, infrastructure, CI/CD |
+| **my-reviewer** | Validation | Code review, security audits, pre-merge checks |
 
 ### Workflow Skills
 
@@ -325,8 +325,8 @@ make sync-verify       # Sync + verification
 | `/cc-define` | Requirements gathering | Explore agents |
 | `/cc-design` | Architecture planning | Plan agents |
 | `/cc-implement` | Code generation | General-purpose agents |
-| `/cc-review` | Validation | Reviewer agents |
-| `/cc-adr` | Decision documentation | Architect agent |
+| `/cc-review` | Validation | my-reviewer agents |
+| `/cc-adr` | Decision documentation | my-architect agent |
 
 ---
 

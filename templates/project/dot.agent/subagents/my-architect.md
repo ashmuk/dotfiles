@@ -1,5 +1,5 @@
 ---
-name: architect
+name: my-architect
 description: Solutions architect for strategic decisions and ADR documentation. Use for technology choices, trade-off analysis, system design, or migration strategies.
 model: opus
 color: purple

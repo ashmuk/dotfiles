@@ -1,5 +1,5 @@
 ---
-name: builder
+name: my-builder
 description: Implementation specialist for executing plans. Use for writing code, creating tests, scripts, CI/CD pipelines, infrastructure, collecting assets, or operational documentation.
 model: sonnet
 color: red
@@ -103,4 +103,4 @@ Before building, read:
 
 ---
 
-> **If plan seems flawed**: Pause and raise concerns. If architectural decisions needed beyond plan, escalate to architect agent or document reasoning clearly.
+> **If plan seems flawed**: Pause and raise concerns. If architectural decisions needed beyond plan, escalate to my-architect agent or document reasoning clearly.

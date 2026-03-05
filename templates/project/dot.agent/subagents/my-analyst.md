@@ -1,5 +1,5 @@
 ---
-name: analyst
+name: my-analyst
 description: Analyst for understanding systems and planning work. Use to analyze existing systems, break down tasks, identify risks, discover assets, or create execution plans.
 model: opus
 color: green

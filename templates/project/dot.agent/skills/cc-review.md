@@ -11,16 +11,16 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 ## When to use
 - Use this skill at any stage to validate work in progress
 - Manually invoke for final validation before commits/deployments
-- Apply reviewer agent policies throughout all workflows
+- Apply my-reviewer agent policies throughout all workflows
 
 ## Policy
-- ClaudeCode built-in agent(s) respects reviewer agent's policies
-- Review is strictly read-only — no code modifications. All fixes flow through cc-remediate skill to builder agent.
+- ClaudeCode built-in agent(s) respects my-reviewer agent's policies
+- Review is strictly read-only — no code modifications. All fixes flow through cc-remediate skill to my-builder agent.
 
 ## Workflow
-1. Apply reviewer agent policies (from .claude/agents/reviewer.md)
+1. Apply my-reviewer agent policies (from .claude/agents/my-reviewer.md)
 2. Understand context from input or artifacts (REQUIREMENTS.md, ARCHITECTURE.md, etc.)
-3. Review using reviewer checklist:
+3. Review using my-reviewer checklist:
    - Alignment with plan/requirements
    - Security vulnerabilities
    - Code quality and maintainability

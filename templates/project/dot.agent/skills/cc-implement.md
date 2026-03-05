@@ -11,18 +11,18 @@ Implement softwares and relevant artifacts, co-working with ClaudeCode built-in 
 ## When to use
 - Use this skill when end-user asks for 'implementations', 'build', 'coding', 'deploy', 'refactor' or 'simplify' (in the context of code/artifacts, not strategy or plans)
 - Manually invoke after processing 'plans' (PLANS.md exists)
-- Coordinate with builder agent policies during implementation work
+- Coordinate with my-builder agent policies during implementation work
 
 ## Policy
-- ClaudeCode built-in general-purpose agent(s) respects builder agent's policies
+- ClaudeCode built-in general-purpose agent(s) respects my-builder agent's policies
 - When implementing tests from a test strategy, this MUST be a separate invocation from the feature implementation — never combine feature code and test code in the same implement session
 
 ## Workflow
-1. general-purpose agent(s) is co-working with builder agent and respect its policies
+1. general-purpose agent(s) is co-working with my-builder agent and respect its policies
 2. Read PLANS.md (if exists)
 3. Analyze the context and start implementations (invoke general-purpose or relevant agents in your needs)
 4. Implement using the model **Haiku** or **Sonnet**
-5. Apply reviewer agent policy for validation of what was implemented
+5. Apply my-reviewer agent policy for validation of what was implemented
 6. Finalize outcome by this feedback loop
 7. Preserve notable points in docs/IMPLEMENTATIONS.md
 8. Next: Invoke cc-review skill for final validation

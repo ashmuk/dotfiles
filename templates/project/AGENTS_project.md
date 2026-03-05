@@ -13,24 +13,24 @@
 **📖 See Repository Structure in [README.md](./README.md)**
 
 ## Available agents
-- analyst — Analyze systems, break down work, identify risks, plan execution
-- architect — Technology choices, trade-offs, ADR documentation
-- builder — Implement code, scripts, CI/CD, infrastructure, collect assets
-- reviewer — Code review, security, safety escalation, integrity verification
+- my-analyst — Analyze systems, break down work, identify risks, plan execution
+- my-architect — Technology choices, trade-offs, ADR documentation
+- my-builder — Implement code, scripts, CI/CD, infrastructure, collect assets
+- my-reviewer — Code review, security, safety escalation, integrity verification
 
 ## Agent-Skill Coverage Matrix
 
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
 |-------|--------------|---------------------|---------------|------------|
-| `/cc-define` | analyst | Explore | reviewer | — |
-| `/cc-design` | architect | Plan | reviewer | — |
-| `/cc-test` | analyst | — | reviewer | implement (builder) |
-| `/cc-implement` | builder | general-purpose | reviewer | — |
-| `/cc-review` | reviewer | — | (self) | — |
-| `/cc-remediate` | builder | — | reviewer | architect (systemic) |
+| `/cc-define` | my-analyst | Explore | my-reviewer | — |
+| `/cc-design` | my-architect | Plan | my-reviewer | — |
+| `/cc-test` | my-analyst | — | my-reviewer | implement (my-builder) |
+| `/cc-implement` | my-builder | general-purpose | my-reviewer | — |
+| `/cc-review` | my-reviewer | — | (self) | — |
+| `/cc-remediate` | my-builder | — | my-reviewer | my-architect (systemic) |
 | `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `cc-define(analyst) → cc-design(architect) → cc-test(analyst) → cc-implement(builder) → cc-review(reviewer) → cc-remediate(builder+reviewer)`
+**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect) → cc-test(my-analyst) → cc-implement(my-builder) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer)`
 
 ## Quick commands
 ### Agent/AI workflows
@@ -64,7 +64,7 @@ Available slash commands for common workflows:
 
 ## How to work in this repo
 1) Read RULES.md and {PLANS.md, BACKLOG.md}
-2) Use analyst agent to understand situation and plan work
-3) Use architect agent for technology decisions (creates ADRs)
-4) Use builder agent to implement changes
-5) Use reviewer agent to verify before commit
+2) Use my-analyst agent to understand situation and plan work
+3) Use my-architect agent for technology decisions (creates ADRs)
+4) Use my-builder agent to implement changes
+5) Use my-reviewer agent to verify before commit
