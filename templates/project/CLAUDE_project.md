@@ -50,8 +50,10 @@ Use these commands for common workflows:
 **Workflow Skills** (coordinate multi-step tasks):
 - `/define` — Understand context and define requirements (uses Explore agents)
 - `/design` — Create architecture, designs, and implementation plans (uses Plan agents)
+- `/test` — Create test strategy and coverage plans (uses analyst + reviewer agents)
 - `/implement` — Build software and artifacts (uses general-purpose agents)
 - `/review` — Review project progress and validate implementations
+- `/remediate` — Apply fixes from review findings and re-validate (uses builder + reviewer agents)
 
 **Git Workflows**:
 - `/commit` — Stage changes and create conventional commit with generated message
@@ -109,7 +111,7 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 - **reviewer** — Code review, security validation, integrity checks
   - Use for: Validating implementations, security audits, final checks before merge
 
-**Coordination**: Use workflow skills (`/define`, `/design`, `/implement`, `/review`) to automatically coordinate these agents for multi-step tasks.
+**Coordination**: Use workflow skills (`/define`, `/design`, `/test`, `/implement`, `/review`, `/remediate`) to automatically coordinate these agents for multi-step tasks.
 
 ## Claude-Specific Guidelines
 

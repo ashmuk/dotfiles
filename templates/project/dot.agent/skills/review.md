@@ -14,7 +14,8 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 - Apply reviewer agent policies throughout all workflows
 
 ## Policy
-ClaudeCode built-in agent(s) respects reviewer agent's policies
+- ClaudeCode built-in agent(s) respects reviewer agent's policies
+- Review is strictly read-only — no code modifications. All fixes flow through remediate skill to builder agent.
 
 ## Workflow
 1. Apply reviewer agent policies (from .claude/agents/reviewer.md)
@@ -26,3 +27,5 @@ ClaudeCode built-in agent(s) respects reviewer agent's policies
    - Safety for destructive actions
 4. Provide findings with severity: MUST-FIX / SHOULD-FIX / SUGGESTION
 5. Recommend concrete, actionable fixes
+6. Preserve findings in docs/REVIEW_FINDINGS.md
+7. Next: If MUST-FIX findings exist, invoke remediate skill. Otherwise, accept.

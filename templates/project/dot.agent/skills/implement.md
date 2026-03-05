@@ -9,7 +9,7 @@ description: Skill - Implement softwares and relevant artifacts, co-working with
 Implement softwares and relevant artifacts, co-working with ClaudeCode built-in general-purpose agent(s)
 
 ## When to use
-- Use this skill when end-user asks for 'implementations', 'build', 'coding' or 'deploy'
+- Use this skill when end-user asks for 'implementations', 'build', 'coding', 'deploy', 'refactor' or 'simplify' (in the context of code/artifacts, not strategy or plans)
 - Manually invoke after processing 'plans' (PLANS.md exists)
 - Coordinate with builder agent policies during implementation work
 

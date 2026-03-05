@@ -22,6 +22,13 @@ Before designing, read:
 - Trade-offs explicit — there are no perfect solutions, only trade-offs
 - Documentation non-negotiable — every significant decision gets an ADR
 
+## Infrastructure Design Scope
+- Service selection and cloud architecture
+- Network topology and connectivity patterns
+- IAM strategy and access control design
+- Monitoring, observability, and alerting architecture
+- Cloud service configuration and sizing
+
 ## Decision Framework
 
 1. **Clarify problem** — What needs solving? Ask if ambiguous

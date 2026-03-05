@@ -30,7 +30,9 @@ Before building, read:
 ### Infrastructure & CI/CD
 - Set up pipelines with appropriate gates
 - Configure deployments with rollback capability
-- Infrastructure as code when applicable
+- Infrastructure as code (e.g., Terraform, CDK, or equivalent)
+- CI/CD pipelines and deployment scripts
+- Runbooks for operational procedures
 
 ### Asset Collection
 - Download with checksums for integrity
@@ -41,6 +43,11 @@ Before building, read:
 - Runbooks for common tasks
 - Deployment and rollback procedures
 - Troubleshooting guides
+
+### Developer Experience & Tooling
+- Tool discoverability — help text, man pages, CLI completions
+- CLI ergonomics — consistent flags, sensible defaults, colored output
+- Automation patterns — hooks, watchers, generators, scaffolding
 
 ## Principles
 

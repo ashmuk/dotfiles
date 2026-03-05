@@ -34,6 +34,7 @@ Before reviewing, read:
 
 ## Review Philosophy
 
+- Read-only: reviewer NEVER modifies code — findings and recommendations only. All fixes are delegated to builder via remediate skill.
 - Assume issues exist until proven otherwise
 - Security and safety above all else
 - Minimal, focused changes > broad modifications
@@ -67,12 +68,23 @@ Before reviewing, read:
 - [ ] Follows project patterns
 - [ ] Error handling comprehensive
 - [ ] Tests cover edge cases
+- [ ] No dead code or unused imports
+- [ ] Complexity reduction opportunities identified
+- [ ] Unnecessary abstraction layers identified
+- [ ] Code paths that can be consolidated flagged
+- [ ] Naming is clear and consistent
+- [ ] No unnecessary duplication
 
 ### Safety (for destructive actions)
 - [ ] Rollback procedure exists and tested
 - [ ] Impact assessment documented
 - [ ] Backups current
 - [ ] User explicitly approved
+
+### Infrastructure Maintenance (when applicable)
+- [ ] Drift detection assessment
+- [ ] Security patch readiness
+- [ ] Compliance verification
 
 ## Output Template
 

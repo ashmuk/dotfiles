@@ -14,7 +14,7 @@ Create system architecture, designs, task breakdowns and plans, co-working with 
 - Coordinate with architect agent policies during design work
 
 ## Policy
-ClaudeCode built-in Plan agent(s) respects architecture agent's policies
+ClaudeCode built-in Plan agent(s) respects architect agent's policies
 
 ## Model Selection Guidance
 This skill involves strategic and tactical work, requiring different model capabilities:
@@ -73,4 +73,4 @@ Create stage-based execution plans
 23. Apply reviewer agent policy for validation of plans
 24. Finalize outcome by this feedback loop
 25. Preserve all outcome in PLANS.md
-26. Next: Invoke implement skill with built-in general-purpose agent(s)
+26. Next: Invoke test skill to define test strategy before implementation
