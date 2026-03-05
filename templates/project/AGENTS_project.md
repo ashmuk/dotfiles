@@ -18,6 +18,20 @@
 - builder — Implement code, scripts, CI/CD, infrastructure, collect assets
 - reviewer — Code review, security, safety escalation, integrity verification
 
+## Agent-Skill Coverage Matrix
+
+| Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
+|-------|--------------|---------------------|---------------|------------|
+| `/define` | analyst | Explore | reviewer | — |
+| `/design` | architect | Plan | reviewer | — |
+| `/test` | analyst | — | reviewer | implement (builder) |
+| `/implement` | builder | general-purpose | reviewer | — |
+| `/review` | reviewer | — | (self) | — |
+| `/remediate` | builder | — | reviewer | architect (systemic) |
+| `/adr` | (template) | — | — | — |
+
+**Workflow chain:** `define(analyst) → design(architect) → test(analyst) → implement(builder) → review(reviewer) → remediate(builder+reviewer)`
+
 ## Quick commands
 ### Agent/AI workflows
 - Sync: `make sync` (generate + sync .agent → .claude/.cursor)

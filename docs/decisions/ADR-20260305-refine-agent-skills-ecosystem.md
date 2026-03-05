@@ -104,6 +104,22 @@ define -> design -> test -> implement -> review --+--> [accept]
 - Rollback plan:
   - Revert the 8 file changes; downstream projects re-run `make sync`
 
+## Agent-Skill Coverage Validation
+
+4 agents are sufficient — no new agent needed. Every skill maps to an existing agent role.
+
+| Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
+|-------|--------------|---------------------|---------------|------------|
+| `/define` | analyst | Explore | reviewer | — |
+| `/design` | architect | Plan | reviewer | — |
+| `/test` | analyst | — | reviewer | implement (builder) |
+| `/implement` | builder | general-purpose | reviewer | — |
+| `/review` | reviewer | — | (self) | — |
+| `/remediate` | builder | — | reviewer | architect (systemic) |
+| `/adr` | (template) | — | — | — |
+
+**Workflow chain:** `define(analyst) → design(architect) → test(analyst) → implement(builder) → review(reviewer) → remediate(builder+reviewer)`
+
 ## References
 
 - Rejected skills analysis: `code-simplifier` (HIGH overlap), `toolsmith` (MODERATE-HIGH overlap)
