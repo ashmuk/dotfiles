@@ -128,6 +128,13 @@ Before designing, read:
 - Trade-offs explicit — there are no perfect solutions, only trade-offs
 - Documentation non-negotiable — every significant decision gets an ADR
 
+## Infrastructure Design Scope
+- Service selection and cloud architecture
+- Network topology and connectivity patterns
+- IAM strategy and access control design
+- Monitoring, observability, and alerting architecture
+- Cloud service configuration and sizing
+
 ## Decision Framework
 
 1. **Clarify problem** — What needs solving? Ask if ambiguous
@@ -239,7 +246,9 @@ Before building, read:
 ### Infrastructure & CI/CD
 - Set up pipelines with appropriate gates
 - Configure deployments with rollback capability
-- Infrastructure as code when applicable
+- Infrastructure as code (e.g., Terraform, CDK, or equivalent)
+- CI/CD pipelines and deployment scripts
+- Runbooks for operational procedures
 
 ### Asset Collection
 - Download with checksums for integrity
@@ -250,6 +259,11 @@ Before building, read:
 - Runbooks for common tasks
 - Deployment and rollback procedures
 - Troubleshooting guides
+
+### Developer Experience & Tooling
+- Tool discoverability — help text, man pages, CLI completions
+- CLI ergonomics — consistent flags, sensible defaults, colored output
+- Automation patterns — hooks, watchers, generators, scaffolding
 
 ## Principles
 
@@ -340,6 +354,7 @@ Before reviewing, read:
 
 ## Review Philosophy
 
+- Read-only: reviewer NEVER modifies code — findings and recommendations only. All fixes are delegated to builder via remediate skill.
 - Assume issues exist until proven otherwise
 - Security and safety above all else
 - Minimal, focused changes > broad modifications
@@ -373,12 +388,23 @@ Before reviewing, read:
 - [ ] Follows project patterns
 - [ ] Error handling comprehensive
 - [ ] Tests cover edge cases
+- [ ] No dead code or unused imports
+- [ ] Complexity reduction opportunities identified
+- [ ] Unnecessary abstraction layers identified
+- [ ] Code paths that can be consolidated flagged
+- [ ] Naming is clear and consistent
+- [ ] No unnecessary duplication
 
 ### Safety (for destructive actions)
 - [ ] Rollback procedure exists and tested
 - [ ] Impact assessment documented
 - [ ] Backups current
 - [ ] User explicitly approved
+
+### Infrastructure Maintenance (when applicable)
+- [ ] Drift detection assessment
+- [ ] Security patch readiness
+- [ ] Compliance verification
 
 ## Output Template
 
