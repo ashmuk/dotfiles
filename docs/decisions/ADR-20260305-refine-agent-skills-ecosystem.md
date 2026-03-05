@@ -101,6 +101,7 @@ define -> design -> test -> implement -> review --+--> [accept]
 - Mitigations:
   - Remediate skill escalates to architect if systemic issues found
   - Test skill policy explicitly states "never writes code"
+  - Test implementation is explicitly required to be a separate builder invocation from feature implementation (separation of concerns)
 - Rollback plan:
   - Revert the 8 file changes; downstream projects re-run `make sync`
 

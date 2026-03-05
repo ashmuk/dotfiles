@@ -14,7 +14,8 @@ Implement softwares and relevant artifacts, co-working with ClaudeCode built-in 
 - Coordinate with builder agent policies during implementation work
 
 ## Policy
-ClaudeCode built-in general-purpose agent(s) respects builder agent's policies
+- ClaudeCode built-in general-purpose agent(s) respects builder agent's policies
+- When implementing tests from a test strategy, this MUST be a separate invocation from the feature implementation — never combine feature code and test code in the same implement session
 
 ## Workflow
 1. general-purpose agent(s) is co-working with builder agent and respect its policies

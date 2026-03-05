@@ -16,6 +16,7 @@ Own test strategy — coverage gap analysis, test architecture, test plans, and 
 ## Policy
 - Test skill NEVER writes code — that is always delegated to builder via implement skill
 - Builder NEVER decides test strategy — that is always owned by this skill
+- Test implementation MUST be a separate builder invocation from feature implementation — the builder instance that writes tests must not be the same instance that wrote the feature code
 - Analyst agent drives strategic planning; reviewer agent validates coverage completeness
 
 ## Workflow
