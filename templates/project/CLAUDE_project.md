@@ -48,22 +48,22 @@ git push -u origin feature/your-feature
 Use these commands for common workflows:
 
 **Workflow Skills** (coordinate multi-step tasks):
-- `/define` — Understand context and define requirements (uses Explore agents)
-- `/design` — Create architecture, designs, and implementation plans (uses Plan agents)
-- `/test` — Create test strategy and coverage plans (uses analyst + reviewer agents)
-- `/implement` — Build software and artifacts (uses general-purpose agents)
-- `/review` — Review project progress and validate implementations
-- `/remediate` — Apply fixes from review findings and re-validate (uses builder + reviewer agents)
+- `/cc-define` — Understand context and define requirements (uses Explore agents)
+- `/cc-design` — Create architecture, designs, and implementation plans (uses Plan agents)
+- `/cc-test` — Create test strategy and coverage plans (uses analyst + reviewer agents)
+- `/cc-implement` — Build software and artifacts (uses general-purpose agents)
+- `/cc-review` — Review project progress and validate implementations
+- `/cc-remediate` — Apply fixes from review findings and re-validate (uses builder + reviewer agents)
 
 **Git Workflows**:
-- `/commit` — Stage changes and create conventional commit with generated message
-- `/push` — Push changes to remote with safety checks
-- `/pr.create` — Create pull request with auto-generated title and description
+- `/cc-commit` — Stage changes and create conventional commit with generated message
+- `/cc-push` — Push changes to remote with safety checks
+- `/cc-pr-create` — Create pull request with auto-generated title and description
 
 **DevContainer Lifecycle**:
-- `/devcontainer.up` — Start development environment
-- `/devcontainer.down` — Stop and clean up development environment
-- `/devcontainer.rebuild` — Rebuild environment from scratch
+- `/cc-devcontainer-up` — Start development environment
+- `/cc-devcontainer-down` — Stop and clean up development environment
+- `/cc-devcontainer-rebuild` — Rebuild environment from scratch
 
 ### Upstream Template Sync
 Sync boilerplate from upstream template repository:
@@ -111,7 +111,7 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 - **reviewer** — Code review, security validation, integrity checks
   - Use for: Validating implementations, security audits, final checks before merge
 
-**Coordination**: Use workflow skills (`/define`, `/design`, `/test`, `/implement`, `/review`, `/remediate`) to automatically coordinate these agents for multi-step tasks.
+**Coordination**: Use workflow skills (`/cc-define`, `/cc-design`, `/cc-test`, `/cc-implement`, `/cc-review`, `/cc-remediate`) to automatically coordinate these agents for multi-step tasks.
 
 ## Claude-Specific Guidelines
 
@@ -126,7 +126,7 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 ### Decision Documentation
 When making architectural or technical decisions:
 1. Create an ADR in `docs/decisions/ADR-YYYYMMDD-<slug>.md`
-2. Use the template from `.agent/skills/adr.md`
+2. Use the template from `.agent/skills/cc-adr.md`
 3. Include: Context, Options (pros/cons), Decision, Consequences, Rollback plan
 
 Example: Choosing between authentication methods, selecting a database, CI/CD pipeline design.
@@ -156,4 +156,4 @@ Example: Choosing between authentication methods, selecting a database, CI/CD pi
 - **Repo entry point**: AGENTS.md
 - **Stable rules**: RULES.md
 - **Tech stack & statistics**: README.md (Tech Stack section)
-- **ADR template**: .agent/skills/adr.md
+- **ADR template**: .agent/skills/cc-adr.md

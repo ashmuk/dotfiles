@@ -41,10 +41,10 @@
 
 | # | Action | File | Absorbs |
 |---|--------|------|---------|
-| 1 | NEW | `skills/remediate.md` | Closes review-to-fix feedback loop |
-| 2 | NEW | `skills/test.md` | Test strategy ownership |
-| 3 | ENRICH | `skills/review.md` | Added "Next: remediate or accept" |
-| 4 | ENRICH | `skills/implement.md` | Added refactor/simplify triggers |
+| 1 | NEW | `skills/cc-remediate.md` | Closes review-to-fix feedback loop |
+| 2 | NEW | `skills/cc-test.md` | Test strategy ownership |
+| 3 | ENRICH | `skills/cc-review.md` | Added "Next: remediate or accept" |
+| 4 | ENRICH | `skills/cc-implement.md` | Added refactor/simplify triggers |
 | 5 | ENRICH | `subagents/reviewer.md` | code-simplifier + infra maintenance |
 | 6 | ENRICH | `subagents/builder.md` | toolsmith + infra implementation |
 | 7 | ENRICH | `subagents/architect.md` | infra design scope |
@@ -54,13 +54,13 @@ All paths relative to `templates/project/dot.agent/`.
 
 ### Resulting SDLC Flow
 ```
-define -> design -> test -> implement -> review --+--> [accept]
-                                                  |
-                                                  v
-                                              remediate
-                                           (if MUST-FIX exists)
+cc-define -> cc-design -> cc-test -> cc-implement -> cc-review --+--> [accept]
+                                                                 |
+                                                                 v
+                                                           cc-remediate
+                                                        (if MUST-FIX exists)
 
-         adr <- (strategic decisions at any point)
+         cc-adr <- (strategic decisions at any point)
 ```
 
 ### Infrastructure Scope Clarification
@@ -74,11 +74,11 @@ define -> design -> test -> implement -> review --+--> [accept]
 
 | File | Before | After | Delta |
 |------|--------|-------|-------|
-| `skills/design.md` | 629 | 632 | +3 |
-| `skills/remediate.md` *(new)* | 0 | 558 | +558 |
-| `skills/test.md` *(new)* | 0 | 357 | +357 |
-| `skills/review.md` | 189 | 236 | +47 |
-| `skills/implement.md` | 205 | 220 | +15 |
+| `skills/cc-design.md` | 629 | 632 | +3 |
+| `skills/cc-remediate.md` *(new)* | 0 | 558 | +558 |
+| `skills/cc-test.md` *(new)* | 0 | 357 | +357 |
+| `skills/cc-review.md` | 189 | 236 | +47 |
+| `skills/cc-implement.md` | 205 | 220 | +15 |
 | `subagents/builder.md` | 590 | 653 | +63 |
 | `subagents/reviewer.md` | 604 | 722 | +118 |
 | `RULES.md` | 574 | 582 | +8 |
@@ -111,15 +111,15 @@ define -> design -> test -> implement -> review --+--> [accept]
 
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
 |-------|--------------|---------------------|---------------|------------|
-| `/define` | analyst | Explore | reviewer | — |
-| `/design` | architect | Plan | reviewer | — |
-| `/test` | analyst | — | reviewer | implement (builder) |
-| `/implement` | builder | general-purpose | reviewer | — |
-| `/review` | reviewer | — | (self) | — |
-| `/remediate` | builder | — | reviewer | architect (systemic) |
-| `/adr` | (template) | — | — | — |
+| `/cc-define` | analyst | Explore | reviewer | — |
+| `/cc-design` | architect | Plan | reviewer | — |
+| `/cc-test` | analyst | — | reviewer | implement (builder) |
+| `/cc-implement` | builder | general-purpose | reviewer | — |
+| `/cc-review` | reviewer | — | (self) | — |
+| `/cc-remediate` | builder | — | reviewer | architect (systemic) |
+| `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `define(analyst) → design(architect) → test(analyst) → implement(builder) → review(reviewer) → remediate(builder+reviewer)`
+**Workflow chain:** `cc-define(analyst) → cc-design(architect) → cc-test(analyst) → cc-implement(builder) → cc-review(reviewer) → cc-remediate(builder+reviewer)`
 
 ## References
 

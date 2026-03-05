@@ -22,15 +22,15 @@
 
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
 |-------|--------------|---------------------|---------------|------------|
-| `/define` | analyst | Explore | reviewer | — |
-| `/design` | architect | Plan | reviewer | — |
-| `/test` | analyst | — | reviewer | implement (builder) |
-| `/implement` | builder | general-purpose | reviewer | — |
-| `/review` | reviewer | — | (self) | — |
-| `/remediate` | builder | — | reviewer | architect (systemic) |
-| `/adr` | (template) | — | — | — |
+| `/cc-define` | analyst | Explore | reviewer | — |
+| `/cc-design` | architect | Plan | reviewer | — |
+| `/cc-test` | analyst | — | reviewer | implement (builder) |
+| `/cc-implement` | builder | general-purpose | reviewer | — |
+| `/cc-review` | reviewer | — | (self) | — |
+| `/cc-remediate` | builder | — | reviewer | architect (systemic) |
+| `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `define(analyst) → design(architect) → test(analyst) → implement(builder) → review(reviewer) → remediate(builder+reviewer)`
+**Workflow chain:** `cc-define(analyst) → cc-design(architect) → cc-test(analyst) → cc-implement(builder) → cc-review(reviewer) → cc-remediate(builder+reviewer)`
 
 ## Quick commands
 ### Agent/AI workflows
@@ -49,16 +49,16 @@
 Available slash commands for common workflows:
 
 **Git workflows:**
-- `/commit` — Stage changes and create conventional commit
-- `/push` — Push changes with safety checks
-- `/pr.create` — Create pull request with generated description
+- `/cc-commit` — Stage changes and create conventional commit
+- `/cc-push` — Push changes with safety checks
+- `/cc-pr-create` — Create pull request with generated description
 
 **DevContainer lifecycle:**
-- `/devcontainer.up` — Start development environment
-- `/devcontainer.down` — Stop development environment
-- `/devcontainer.rebuild` — Rebuild environment from scratch
+- `/cc-devcontainer-up` — Start development environment
+- `/cc-devcontainer-down` — Stop development environment
+- `/cc-devcontainer-rebuild` — Rebuild environment from scratch
 
-**Naming convention:** Dot notation for namespaces (e.g., `namespace.action`)
+**Naming convention:** `cc-` prefix with hyphen-separated namespaces (e.g., `cc-namespace-action`)
 **Structure:** Flat files in `.claude/commands/*.md` (like agents, not nested like skills)
 **Source of truth:** `.agent/commands/` → synced to `.claude/commands/` via `make sync`
 

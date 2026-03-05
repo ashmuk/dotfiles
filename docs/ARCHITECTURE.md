@@ -285,15 +285,15 @@ In templated projects, the `.agent/` directory serves as the master configuratio
 │   └── reviewer.md
 │
 ├── commands/
-│   ├── commit.md           ──►    .claude/commands/commit.md (symlink)
-│   ├── push.md
-│   └── pr.create.md
+│   ├── cc-commit.md        ──►    .claude/commands/cc-commit.md (symlink)
+│   ├── cc-push.md
+│   └── cc-pr-create.md
 │
 ├── skills/
-│   ├── define.md           ──►    .claude/skills/define/SKILL.md
-│   ├── design.md           ──►    .cursor/rules/skills/design/RULE.md
-│   ├── implement.md        ──►    .codex/skills/implement/SKILL.md
-│   └── review.md
+│   ├── cc-define.md        ──►    .claude/skills/cc-define/SKILL.md
+│   ├── cc-design.md        ──►    .cursor/rules/skills/cc-design/RULE.md
+│   ├── cc-implement.md     ──►    .codex/skills/cc-implement/SKILL.md
+│   └── cc-review.md
 │
 └── mcp/servers/
     └── *.json              ──►    Claude Code MCP configuration
@@ -322,11 +322,11 @@ make sync-verify       # Sync + verification
 
 | Skill | Purpose | Triggers |
 |-------|---------|----------|
-| `/define` | Requirements gathering | Explore agents |
-| `/design` | Architecture planning | Plan agents |
-| `/implement` | Code generation | General-purpose agents |
-| `/review` | Validation | Reviewer agents |
-| `/adr` | Decision documentation | Architect agent |
+| `/cc-define` | Requirements gathering | Explore agents |
+| `/cc-design` | Architecture planning | Plan agents |
+| `/cc-implement` | Code generation | General-purpose agents |
+| `/cc-review` | Validation | Reviewer agents |
+| `/cc-adr` | Decision documentation | Architect agent |
 
 ---
 

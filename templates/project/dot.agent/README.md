@@ -102,18 +102,18 @@ This directory (`.agent/`) is the **centralized source of truth** for AI tool co
 .agent/
 ├── README.md           # This file
 ├── commands/           # Git workflow commands (Claude Code slash commands)
-│   ├── commit.md       # /commit - Stage and commit with generated message
-│   ├── push.md         # /push - Push with safety checks
-│   ├── pr.create.md    # /pr.create - Create PR with generated description
-│   ├── devcontainer.up.md
-│   ├── devcontainer.down.md
-│   └── devcontainer.rebuild.md
+│   ├── cc-commit.md       # /cc-commit - Stage and commit with generated message
+│   ├── cc-push.md         # /cc-push - Push with safety checks
+│   ├── cc-pr-create.md    # /cc-pr-create - Create PR with generated description
+│   ├── cc-devcontainer-up.md
+│   ├── cc-devcontainer-down.md
+│   └── cc-devcontainer-rebuild.md
 ├── skills/             # Workflow skills (multi-step tasks)
-│   ├── define.md       # /define - Requirements gathering
-│   ├── design.md       # /design - Architecture and planning
-│   ├── implement.md    # /implement - Build software
-│   ├── review.md       # /review - Validate and review
-│   └── adr.md          # /adr - Create Architecture Decision Records
+│   ├── cc-define.md       # /cc-define - Requirements gathering
+│   ├── cc-design.md       # /cc-design - Architecture and planning
+│   ├── cc-implement.md    # /cc-implement - Build software
+│   ├── cc-review.md       # /cc-review - Validate and review
+│   └── cc-adr.md          # /cc-adr - Create Architecture Decision Records
 ├── subagents/          # Agent definitions
 │   ├── analyst.md      # System analysis, planning, risk identification
 │   ├── architect.md    # Technology decisions, trade-offs
@@ -191,8 +191,8 @@ toolbox:
 - No stages, no gates
 - Uses `BACKLOG.md` for task tracking
 - Workflow scales to task size:
-  - Small (1 file, <50 LOC): `/implement` directly
-  - Medium (2-5 files, 50-500 LOC): `/design` → `/implement`
+  - Small (1 file, <50 LOC): `/cc-implement` directly
+  - Medium (2-5 files, 50-500 LOC): `/cc-design` → `/cc-implement`
   - Large (cross-cutting, >500 LOC): Full workflow
 
 ## Quick Start

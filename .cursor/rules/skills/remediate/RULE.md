@@ -1,1 +1,0 @@
-../../../../templates/project/dot.agent/skills/remediate.md

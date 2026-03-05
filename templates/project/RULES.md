@@ -34,7 +34,7 @@ alwaysApply: true
 This project supports two characters. Check `PROJECT.yaml` for current mode:
 
 ### Staged Projects (`character: staged` or no PROJECT.yaml)
-- Follow sequential workflow: `/define` → `/design` → `/test` → `/implement` → `/review` → `/remediate` (if needed)
+- Follow sequential workflow: `/cc-define` → `/cc-design` → `/cc-test` → `/cc-implement` → `/cc-review` → `/cc-remediate` (if needed)
 - No production deployment until `staged.deployment_gate` stage
 - Update `PLANS.md` when stage transitions occur
 - Respect stage constraints (e.g., "read-only analysis" in Stage 1)
@@ -42,8 +42,8 @@ This project supports two characters. Check `PROJECT.yaml` for current mode:
 ### Toolbox Projects (`character: toolbox`)
 - Ship independently per component
 - Workflow scales to task size:
-  - Small (1 file, <50 LOC): `/implement` directly
-  - Medium (2-5 files): `/design` → `/implement`
+  - Small (1 file, <50 LOC): `/cc-implement` directly
+  - Medium (2-5 files): `/cc-design` → `/cc-implement`
   - Large (cross-cutting): Full workflow
 - Update `BACKLOG.md` on completion
 - No stage gates - discuss impact before major changes
