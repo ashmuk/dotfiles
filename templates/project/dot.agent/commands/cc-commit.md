@@ -14,6 +14,24 @@ Then:
    - If specific files were mentioned: `git add <files>`
    - If no files specified: show changed files list and ask user which to stage
 
+   **Safety Rule A — Secrets protection (check BEFORE staging):**
+   Before running `git add`, check file names against these patterns:
+   `.env`, `.env.*` (except `.env.example`, `.env.sample`, `.env.template`),
+   `credentials.json`, `*secret*.json`, `token.json`,
+   `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.keystore`, `*.jks`,
+   `id_rsa*`, `id_ed25519*`, `id_ecdsa*`,
+   `secrets.*`, `.npmrc`, `.pypirc`.
+   If a matching file is detected: **refuse to stage it** and warn the user.
+   If the user insists, require explicit confirmation with a warning that
+   secrets committed to git history are nearly impossible to fully remove.
+
+   **Safety Rule B — .gitignore-blocked files (check AFTER staging):**
+   Before running `git add`, use `git check-ignore -v <files>` to identify
+   which files are blocked by `.gitignore`. For any blocked files:
+   **stop**, list them with their matching `.gitignore` patterns,
+   and ask the user whether to force-add (`git add -f`) or skip each file.
+   Never use `git add -f` without explicit user approval.
+
 2. Generate a commit message following conventional commits format:
    - Follow RULES.md (if present in this project)
     Otherwise,
