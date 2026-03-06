@@ -23,6 +23,7 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 3. Review using my-reviewer checklist:
    - Alignment with plan/requirements
    - Security vulnerabilities
+   - For security-focused reviews, read .agent/prompts/security/ for detailed guidance
    - Code quality and maintainability
    - Safety for destructive actions
 4. Provide findings with severity: MUST-FIX / SHOULD-FIX / SUGGESTION
