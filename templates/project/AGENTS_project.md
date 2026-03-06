@@ -15,6 +15,7 @@
 ## Available agents
 - my-analyst — Analyze systems, break down work, identify risks, plan execution
 - my-architect — Technology choices, trade-offs, ADR documentation
+- my-designer — UX/UI design, API design, user flows, accessibility, Apple HIG
 - my-builder — Implement code, scripts, CI/CD, infrastructure, collect assets
 - my-reviewer — Code review, security, safety escalation, integrity verification
 
@@ -23,14 +24,14 @@
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
 |-------|--------------|---------------------|---------------|------------|
 | `/cc-define` | my-analyst | Explore | my-reviewer | — |
-| `/cc-design` | my-architect | Plan | my-reviewer | — |
+| `/cc-design` | my-architect + my-designer | Plan | my-reviewer | — |
 | `/cc-test` | my-analyst | — | my-reviewer | implement (my-builder) |
 | `/cc-implement` | my-builder | general-purpose | my-reviewer | — |
 | `/cc-review` | my-reviewer | — | (self) | — |
 | `/cc-remediate` | my-builder | — | my-reviewer | my-architect (systemic) |
 | `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect) → cc-test(my-analyst) → cc-implement(my-builder) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer)`
+**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect+my-designer) → cc-test(my-analyst) → cc-implement(my-builder) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer)`
 
 ## Model Selection Matrix
 
@@ -48,9 +49,10 @@
 | `/cc-define` | Requirements synthesis | my-analyst | Opus | Judgment under ambiguity |
 | `/cc-define` | Validation | my-reviewer (policy) | Sonnet | Checklist-driven |
 | `/cc-design` | Phase A: Architecture | my-architect + Plan | Opus | Novel trade-offs |
-| `/cc-design` | Phase B: System Design | my-architect + Plan | Opus | Lasting design choices |
-| `/cc-design` | Phase C: Task Breakdown | Plan agents | Sonnet | Structured decomposition |
-| `/cc-design` | Phase D: Planning | Plan agents | Sonnet | Sequencing |
+| `/cc-design` | Phase B: UX/API Design | my-designer + Plan | Opus | Design judgment, HIG, API ergonomics |
+| `/cc-design` | Phase C: System Design | my-architect + Plan | Opus | Lasting design choices |
+| `/cc-design` | Phase D: Task Breakdown | Plan agents | Sonnet | Structured decomposition |
+| `/cc-design` | Phase E: Planning | Plan agents | Sonnet | Sequencing |
 | `/cc-test` | Test planning/strategy | my-analyst | Opus | Coverage gaps, risk reasoning |
 | `/cc-test` | Strategy validation | my-reviewer | Sonnet | Checklist completeness |
 | `/cc-implement` | Feature code | my-builder | Sonnet | Standard implementation |
@@ -109,5 +111,6 @@ Available slash commands for common workflows:
 1) Read RULES.md and {PLANS.md, BACKLOG.md}
 2) Use my-analyst agent to understand situation and plan work
 3) Use my-architect agent for technology decisions (creates ADRs)
-4) Use my-builder agent to implement changes
-5) Use my-reviewer agent to verify before commit
+4) Use my-designer agent for design (UX, API, accessibility)
+5) Use my-builder agent to implement changes
+6) Use my-reviewer agent to verify before commit

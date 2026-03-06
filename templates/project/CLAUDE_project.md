@@ -49,7 +49,7 @@ Use these commands for common workflows:
 
 **Workflow Skills** (coordinate multi-step tasks):
 - `/cc-define` — Understand context and define requirements (uses Explore agents)
-- `/cc-design` — Create architecture, designs, and implementation plans (uses Plan agents)
+- `/cc-design` — Create architecture, UI/UX and API designs, and implementation plans (uses my-architect + my-designer + Plan agents)
 - `/cc-test` — Create test strategy and coverage plans (uses my-analyst + my-reviewer agents)
 - `/cc-implement` — Build software and artifacts (uses general-purpose agents)
 - `/cc-review` — Review project progress and validate implementations
@@ -104,6 +104,9 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 
 - **my-architect** — Technology decisions, trade-offs, ADR creation
   - Use for: Choosing tech stack, designing architecture, creating ADRs
+
+- **my-designer** — UX/UI design, API design, user flows, accessibility
+  - Use for: Visual design systems, interaction patterns, Apple HIG, API contracts, data modeling, accessibility audits
 
 - **my-builder** — Implementation (code, scripts, CI/CD, infrastructure)
   - Use for: Writing code, creating scripts, setting up infrastructure
