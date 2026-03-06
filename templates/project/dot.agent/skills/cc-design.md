@@ -42,10 +42,11 @@ Create high-level system architecture and technology decisions
 2. Read REQUIREMENTS.md (if exists)
 3. Analyze the context and start designing (invoke Explore or relevant agents as needed)
 4. Create system architecture using the model **Opus**
-5. Apply my-reviewer agent policy for validation of architecture
-6. Finalize outcome by this feedback loop
-7. Preserve all outcome in docs/ARCHITECTURE.md
-8. Next: Proceed to Phase B (UX/UI & API Design)
+5. Include scope progression recommendation (PoC/MVP/Production) per my-architect's Scope Progression policy
+6. Apply my-reviewer agent policy for validation of architecture
+7. Finalize outcome by this feedback loop
+8. Preserve all outcome in docs/ARCHITECTURE.md (including scope progression level)
+9. Next: Proceed to Phase B (UX/UI & API Design)
 
 ### Phase B: UX/UI & API Design (Model: Opus)
 Create user experience, interface, and API design based on architecture
@@ -56,42 +57,42 @@ Phase B adapts to project context:
 - Full-stack: Both aspects
 - Skip entirely if project has no UI or API design needs
 
-9. Plan agent(s) co-work with my-designer agent, respecting its policies
-10. Read docs/ARCHITECTURE.md (from Phase A)
-11. Read .agent/prompts/design/ for detailed design guidance (if available)
-12. Create UX/UI and/or API design using the model **Opus** (scope per context above)
-13. Apply my-reviewer agent policy for validation of design
-14. Finalize outcome by this feedback loop
-15. Preserve all outcome in docs/UX-DESIGNS.md
-16. Next: Proceed to Phase C (System Design)
+10. Plan agent(s) co-work with my-designer agent, respecting its policies
+11. Read docs/ARCHITECTURE.md (from Phase A)
+12. Read .agent/prompts/design/ for detailed design guidance (if available)
+13. Create UX/UI and/or API design using the model **Opus** (scope per context above)
+14. Apply my-reviewer agent policy for validation of design
+15. Finalize outcome by this feedback loop
+16. Preserve all outcome in docs/UX-DESIGNS.md
+17. Next: Proceed to Phase C (System Design)
 
 ### Phase C: System Design (Model: Opus)
 Create detailed system design based on architecture. Incorporate design decisions from Phase B.
 
-17. Read docs/ARCHITECTURE.md (if exists)
-18. Read docs/UX-DESIGNS.md (if exists, from Phase B)
-19. Create system design using the model **Opus**
-20. Apply my-reviewer agent policy for validation of design
-21. Finalize outcome by this feedback loop
-22. Preserve all outcome in docs/DESIGNS.md
-23. Next: Proceed to Phase D (Task Breakdown)
+18. Read docs/ARCHITECTURE.md (if exists)
+19. Read docs/UX-DESIGNS.md (if exists, from Phase B)
+20. Create system design using the model **Opus**
+21. Apply my-reviewer agent policy for validation of design
+22. Finalize outcome by this feedback loop
+23. Preserve all outcome in docs/DESIGNS.md
+24. Next: Proceed to Phase D (Task Breakdown)
 
 ### Phase D: Task Breakdown (Model: Sonnet)
 Break down design into actionable tasks
 
-24. Read docs/DESIGNS.md (if exists)
-25. Create task breakdowns using the model **Sonnet**
-26. Apply my-reviewer agent policy for validation of task breakdown
-27. Finalize outcome by this feedback loop
-28. Preserve all outcome in docs/TASKS.md
-29. Next: Proceed to Phase E (Planning)
+25. Read docs/DESIGNS.md (if exists)
+26. Create task breakdowns using the model **Sonnet**
+27. Apply my-reviewer agent policy for validation of task breakdown
+28. Finalize outcome by this feedback loop
+29. Preserve all outcome in docs/TASKS.md
+30. Next: Proceed to Phase E (Planning)
 
 ### Phase E: Planning (Model: Sonnet)
-Create stage-based execution plans
+Create stage-based execution plans respecting my-architect's scope progression (PoC → MVP → Production)
 
-30. Read docs/TASKS.md (if exists)
-31. Create plans by staging concept using the model **Sonnet**
-32. Apply my-reviewer agent policy for validation of plans
-33. Finalize outcome by this feedback loop
-34. Preserve all outcome in PLANS.md
-35. Next: Invoke cc-test skill to define test strategy before implementation
+31. Read docs/TASKS.md (if exists)
+32. Create plans by staging concept using the model **Sonnet**, aligning stages with the scope progression level recommended by my-architect
+33. Apply my-reviewer agent policy for validation of plans
+34. Finalize outcome by this feedback loop
+35. Preserve all outcome in PLANS.md
+36. Next: Invoke cc-test skill to define test strategy before implementation

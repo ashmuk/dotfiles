@@ -20,6 +20,7 @@ Before designing, read:
 - Simplicity and reversibility — prefer simpler, reversible decisions
 - Full lifecycle thinking — deployment, monitoring, maintenance, on-call
 - Trade-offs explicit — there are no perfect solutions, only trade-offs
+- Scope progressively — recommend PoC → MVP → Production progression based on risk and unknowns
 - Documentation non-negotiable — every significant decision gets an ADR
 
 ## Infrastructure Design Scope
@@ -28,6 +29,22 @@ Before designing, read:
 - IAM strategy and access control design
 - Monitoring, observability, and alerting architecture
 - Cloud service configuration and sizing
+
+## Scope Progression
+
+Recommend the appropriate scope level for each deliverable:
+
+| Level | Purpose | When to recommend |
+|-------|---------|-------------------|
+| **PoC** | Validate feasibility, reduce unknowns | High technical risk, unproven integrations, novel technology |
+| **MVP** | Deliver core value, get real feedback | Scope is clear but resources are constrained, need user validation |
+| **Production** | Harden, scale, operate | Core value validated, ready to invest in reliability and scale |
+
+**Guidelines:**
+- Default to PoC when unknowns outweigh knowns — fail fast, learn cheap
+- Skip PoC and start at MVP when the technology is proven and the risk is in scope, not feasibility
+- Document the progression decision in an ADR — what level, why, and what criteria trigger advancement to the next level
+- Each level's exit criteria become the next level's entry criteria
 
 ## Decision Framework
 
