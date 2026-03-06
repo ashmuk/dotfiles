@@ -354,19 +354,24 @@ push_tier1_file() {
       show_diff "${local_path}" "${upstream_file}" "${label}"
 
       if [[ "${FORCE_MODE}" == "false" ]]; then
-        if ! prompt_user "Push ${label} to upstream?" "y/n/d"; then
-          local result=$?
-          if [[ ${result} -eq 2 ]]; then
+        prompt_user "Push ${label} to upstream?" "y/n/d" || local result=$?
+        result=${result:-0}
+        case $result in
+          0) ;; # yes - proceed
+          2) # show diff, then re-prompt
             show_diff "${local_path}" "${upstream_file}" "${label}"
-            if ! prompt_user "Push ${label} to upstream?" "y/n"; then
+            prompt_user "Push ${label} to upstream?" "y/n" || local result2=$?
+            result2=${result2:-0}
+            if [[ ${result2} -ne 0 ]]; then
               log INFO "${label}: skipped by user"
               return 0
             fi
-          else
+            ;;
+          *) # no/skip
             log INFO "${label}: skipped by user"
             return 0
-          fi
-        fi
+            ;;
+        esac
       fi
 
       # Create backup and push
@@ -436,19 +441,24 @@ push_tier2_file() {
           prompt_msg="Push ${label} to upstream? (will overwrite upstream changes)"
         fi
 
-        if ! prompt_user "${prompt_msg}" "y/n/d"; then
-          local result=$?
-          if [[ ${result} -eq 2 ]]; then
+        prompt_user "${prompt_msg}" "y/n/d" || local result=$?
+        result=${result:-0}
+        case $result in
+          0) ;; # yes - proceed
+          2) # show diff, then re-prompt
             show_diff "${local_path}" "${upstream_file}" "${label}"
-            if ! prompt_user "${prompt_msg}" "y/n"; then
+            prompt_user "${prompt_msg}" "y/n" || local result2=$?
+            result2=${result2:-0}
+            if [[ ${result2} -ne 0 ]]; then
               log INFO "${label}: skipped by user"
               return 0
             fi
-          else
+            ;;
+          *) # no/skip
             log INFO "${label}: skipped by user"
             return 0
-          fi
-        fi
+            ;;
+        esac
       fi
 
       # Create backup and push

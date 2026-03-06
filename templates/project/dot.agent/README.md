@@ -109,16 +109,19 @@ This directory (`.agent/`) is the **centralized source of truth** for AI tool co
 │   ├── cc-devcontainer-down.md
 │   └── cc-devcontainer-rebuild.md
 ├── skills/             # Workflow skills (multi-step tasks)
+│   ├── cc-adr.md          # /cc-adr - Create Architecture Decision Records
 │   ├── cc-define.md       # /cc-define - Requirements gathering
 │   ├── cc-design.md       # /cc-design - Architecture and planning
 │   ├── cc-implement.md    # /cc-implement - Build software
+│   ├── cc-remediate.md    # /cc-remediate - Apply fixes and re-validate
 │   ├── cc-review.md       # /cc-review - Validate and review
-│   └── cc-adr.md          # /cc-adr - Create Architecture Decision Records
+│   └── cc-test.md         # /cc-test - Test strategy and coverage plans
 ├── subagents/          # Agent definitions
-│   ├── analyst.md      # System analysis, planning, risk identification
-│   ├── architect.md    # Technology decisions, trade-offs
-│   ├── builder.md      # Implementation specialist
-│   └── reviewer.md     # Code review, security validation
+│   ├── my-analyst.md   # System analysis, planning, risk identification
+│   ├── my-architect.md # Technology decisions, trade-offs
+│   ├── my-builder.md   # Implementation specialist
+│   ├── my-designer.md  # UX/UI design, API design, user flows
+│   └── my-reviewer.md  # Code review, security validation
 └── starters/           # Project initialization templates
     ├── PROJECT.staged.yaml   # For staged development projects
     ├── PROJECT.toolbox.yaml  # For ad-hoc toolbox projects
