@@ -77,11 +77,7 @@ Deliverables should follow **Apple HIG principles**.
 ## Spacing System
 
 -   **8px base unit scale**
-
-```{=html}
-<!-- -->
-```
-    4, 8, 12, 16, 24, 32, 48, 64, 96, 128
+    -   4, 8, 12, 16, 24, 32, 48, 64, 96, 128
 
 -   Usage guidelines for each scale step
 

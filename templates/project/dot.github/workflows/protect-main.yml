@@ -18,9 +18,16 @@ jobs:
           # Get the commit message
           COMMIT_MSG="${{ github.event.head_commit.message }}"
 
-          # Check if it's a merge commit from a PR (GitHub adds this automatically)
-          if [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request|^Squash\ and\ merge\ pull\ request|^Rebase\ and\ merge\ pull\ request ]]; then
-            echo "✅ This is a PR merge - allowed"
+          # Check if it's a merge commit from a PR (GitHub generates "Merge pull request #N")
+          if [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request ]]; then
+            echo "✅ This is a PR merge commit - allowed"
+            exit 0
+          fi
+
+          # Check if this is any GitHub UI merge (squash, rebase, or merge)
+          # GitHub's web-flow bot is the committer for all merges performed via the UI
+          if [[ "${{ github.event.head_commit.committer.username }}" == "web-flow" ]]; then
+            echo "✅ This is a GitHub web merge - allowed"
             exit 0
           fi
 

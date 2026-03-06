@@ -16,10 +16,10 @@ description: Command - Create a pull request with generated title and descriptio
 1. Get current branch: `git branch --show-current`
    - If on main/master, stop and ask user to checkout a develop or feature branch
 
-2. Get default branch: `gh repo view --json defaultBranchRef -q '.defaultBranchRef.name'`
+2. Detect default branch dynamically: `gh repo view --json defaultBranchRef -q '.defaultBranchRef.name'`
    - This will be the target (base) branch for the PR
-   - Typically main or master (production branch)
-   - Main use case for this slash command is creating a PR from develop to main/master
+   - For Git Flow projects, feature branches typically target `develop` rather than the default branch
+   - If the user specifies `--base`, use that instead
 
 3. Ensure all commits are pushed: `git log origin/$(git branch --show-current)..HEAD --oneline`
    - If unpushed commits exist, ask user if they want to push first

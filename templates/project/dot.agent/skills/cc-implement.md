@@ -21,7 +21,7 @@ Implement softwares and relevant artifacts, co-working with ClaudeCode built-in 
 1. general-purpose agent(s) is co-working with my-builder agent and respect its policies
 2. Read PLANS.md (if exists)
 3. Analyze the context and start implementations (invoke general-purpose or relevant agents in your needs)
-4. Implement using the model **Haiku** or **Sonnet**
+4. Implement using the appropriate model: **Sonnet** for multi-file or complex logic; **Haiku** for single-file, well-scoped tasks
 5. Apply my-reviewer agent policy for validation of what was implemented
 6. Finalize outcome by this feedback loop
 7. Preserve notable points in docs/IMPLEMENTATIONS.md

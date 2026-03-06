@@ -29,8 +29,8 @@ This skill involves strategic and tactical work, requiring different model capab
 | **Phase E: Planning** | Sonnet | Stage-based execution planning, resource estimation, dependency mapping |
 
 **How to apply:**
-- When invoking Task tool for Plan agents in Phases A-B-C, use `model='opus'`
-- When invoking Task tool for Plan agents in Phases D-E, use default Sonnet
+- For Phases A-B-C, prefer deeper reasoning (Opus-class agents) for strategic decisions
+- For Phases D-E, default Sonnet is sufficient for tactical decomposition
 - Claude (assistant) should apply these preferences when orchestrating agents
 
 ## Workflow

@@ -9,22 +9,26 @@ Before pushing, perform these safety checks:
 1. Run `git status` to ensure working directory is clean
    - If there are uncommitted changes, ask user if they want to commit first
 
-2. Run `git log origin/$(git branch --show-current)..HEAD --oneline` to show unpushed commits
+2. Check if the current branch has an upstream:
+   `git rev-parse --abbrev-ref @{u} 2>/dev/null`
+   - If no upstream: inform user this will be a first push, skip unpushed-commits check
+
+3. If upstream exists, run `git log origin/$(git branch --show-current)..HEAD --oneline` to show unpushed commits
    - If no commits to push, inform user and stop
 
-3. Run `git branch --show-current` to confirm current branch
+4. Run `git branch --show-current` to confirm current branch
    - Warn if pushing to main/master directly
 
-4. Optional pre-push checks (if configured):
+5. Optional pre-push checks (if configured):
    - Run `npm test` or equivalent test command
    - Run `npm run lint` or equivalent lint command
    - Run `npm run typecheck` or equivalent type check
 
-5. If all checks pass, execute:
+6. If all checks pass, execute:
    - First push: `git push -u origin $(git branch --show-current)`
    - Subsequent: `git push`
 
-6. Report push result and show remote URL for reference
+7. Report push result and show remote URL for reference
 
 ## Safety warnings
 

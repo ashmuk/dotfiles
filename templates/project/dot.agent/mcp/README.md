@@ -54,8 +54,9 @@ export AWS_REGION="us-east-1"
 
 ## Manual Configuration
 
-If you prefer manual configuration, copy the desired server config from
-`servers/*.json` into your project's `.mcp.json`:
+If you prefer manual configuration, compose your own `.mcp.json` at the
+project root. Individual server config templates are planned; for now,
+use the examples below as a starting point:
 
 ```json
 {

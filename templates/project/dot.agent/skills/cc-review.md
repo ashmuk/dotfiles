@@ -18,7 +18,7 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 - Review is strictly read-only — no code modifications. All fixes flow through cc-remediate skill to my-builder agent.
 
 ## Workflow
-1. Apply my-reviewer agent policies (from .claude/agents/my-reviewer.md)
+1. Apply my-reviewer agent policies (from .agent/subagents/my-reviewer.md)
 2. Understand context from input or artifacts (REQUIREMENTS.md, ARCHITECTURE.md, etc.)
 3. Review using my-reviewer checklist:
    - Alignment with plan/requirements

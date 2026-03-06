@@ -6,7 +6,7 @@
 # to set up. If no requirements.yaml exists, it falls back to the DEV_PROFILE
 # environment variable or defaults to the 'fullstack' profile.
 
-set -e
+set -euo pipefail
 
 WORKSPACE="${WORKSPACE:-/workspace}"
 REQUIREMENTS_FILE="${WORKSPACE}/.devcontainer/requirements.yaml"
@@ -17,88 +17,16 @@ HOME_DIR="/home/developer"
 echo "[post-create] Starting post-create setup..."
 
 # =============================================================================
-# Profile Detection and Configuration Loading
+# Configuration Loading (via shared library)
 # =============================================================================
 
-# Determine profile
-if [[ -f "$REQUIREMENTS_FILE" ]] && command -v yq &>/dev/null; then
-    PROFILE=$(yq -r '.profile // "fullstack"' "$REQUIREMENTS_FILE")
-    echo "[post-create] Using profile from requirements.yaml: $PROFILE"
-elif [[ -n "${DEV_PROFILE:-}" ]]; then
-    PROFILE="$DEV_PROFILE"
-    echo "[post-create] Using profile from DEV_PROFILE env: $PROFILE"
-else
-    PROFILE="fullstack"
-    echo "[post-create] Using default profile: $PROFILE"
-fi
+source "$(dirname "$0")/lib/parse-requirements.sh"
 
-# Load profile configuration
-PROFILE_FILE="${PROFILES_DIR}/${PROFILE}.yaml"
-if [[ ! -f "$PROFILE_FILE" ]]; then
-    echo "[post-create] WARNING: Profile '$PROFILE' not found, using fullstack"
-    PROFILE_FILE="${PROFILES_DIR}/fullstack.yaml"
-fi
-
-# Helper function to get config value (merges requirements.yaml over profile)
-get_config() {
-    local path="$1"
-    local default="$2"
-
-    if ! command -v yq &>/dev/null; then
-        echo "$default"
-        return
-    fi
-
-    local value=""
-
-    # First check requirements.yaml
-    if [[ -f "$REQUIREMENTS_FILE" ]]; then
-        value=$(yq -r "$path // \"\"" "$REQUIREMENTS_FILE" 2>/dev/null || echo "")
-    fi
-
-    # Fall back to profile if not set in requirements.yaml
-    if [[ -z "$value" || "$value" == "null" ]] && [[ -f "$PROFILE_FILE" ]]; then
-        value=$(yq -r "$path // \"\"" "$PROFILE_FILE" 2>/dev/null || echo "")
-    fi
-
-    # Use default if still not set
-    if [[ -z "$value" || "$value" == "null" ]]; then
-        echo "$default"
-    else
-        echo "$value"
-    fi
-}
-
-# Helper to get array values as newline-separated list
-get_config_array() {
-    local path="$1"
-
-    if ! command -v yq &>/dev/null; then
-        return
-    fi
-
-    local values=""
-
-    # First check requirements.yaml
-    if [[ -f "$REQUIREMENTS_FILE" ]]; then
-        values=$(yq -r "$path // [] | .[]" "$REQUIREMENTS_FILE" 2>/dev/null || echo "")
-    fi
-
-    # If empty, fall back to profile
-    if [[ -z "$values" ]] && [[ -f "$PROFILE_FILE" ]]; then
-        values=$(yq -r "$path // [] | .[]" "$PROFILE_FILE" 2>/dev/null || echo "")
-    fi
-
-    echo "$values"
-}
+PROFILE="$DEVCONTAINER_PROFILE"
 
 # =============================================================================
 # Runtime Configuration
 # =============================================================================
-
-PYTHON_ENABLED=$(get_config '.runtimes.python.enabled' 'true')
-NODE_ENABLED=$(get_config '.runtimes.node.enabled' 'true')
-JAVA_ENABLED=$(get_config '.runtimes.java.enabled' 'false')
 
 echo "[post-create] Runtime configuration:"
 echo "[post-create]   Python: $PYTHON_ENABLED"
@@ -123,14 +51,14 @@ if [[ "$PYTHON_ENABLED" == "true" ]]; then
     pip install --upgrade pip --quiet
 
     # Install packages from configuration
-    PYTHON_PACKAGES=$(get_config_array '.runtimes.python.packages')
-    if [[ -n "$PYTHON_PACKAGES" ]]; then
+    PYTHON_PKGS=$(get_config_array '.runtimes.python.packages')
+    if [[ -n "$PYTHON_PKGS" ]]; then
         echo "[post-create] Installing Python packages..."
         while IFS= read -r package; do
             if [[ -n "$package" ]]; then
                 pip install --quiet "$package" || echo "[post-create]   WARNING: Failed to install $package"
             fi
-        done <<< "$PYTHON_PACKAGES"
+        done <<< "$PYTHON_PKGS"
     fi
 
     # Add venv activation to .zshrc if not already present
@@ -166,14 +94,14 @@ if [[ "$NODE_ENABLED" == "true" ]]; then
     fi
 
     # Install global packages from configuration
-    NODE_PACKAGES=$(get_config_array '.runtimes.node.packages')
-    if [[ -n "$NODE_PACKAGES" ]]; then
+    NODE_PKGS=$(get_config_array '.runtimes.node.packages')
+    if [[ -n "$NODE_PKGS" ]]; then
         echo "[post-create] Installing Node.js packages..."
         while IFS= read -r package; do
             if [[ -n "$package" ]]; then
                 npm install -g --quiet "$package" || echo "[post-create]   WARNING: Failed to install $package"
             fi
-        done <<< "$NODE_PACKAGES"
+        done <<< "$NODE_PKGS"
     fi
 
     echo "[post-create] Node.js setup complete"
@@ -222,22 +150,25 @@ fi
 # =============================================================================
 # Custom Hooks
 # =============================================================================
-# SECURITY NOTE: Hooks are executed via bash -c in a subshell.
-# Only use trusted requirements.yaml files. Malicious hooks could execute
-# arbitrary commands. This is intentional to allow flexibility, but be careful
-# when syncing requirements.yaml from untrusted sources.
+# SECURITY NOTE: Hooks execute arbitrary commands via bash -c in a subshell.
+# They are disabled by default and require explicit opt-in via the
+# DEVCONTAINER_ALLOW_HOOKS=true environment variable.
 # =============================================================================
 
-POST_CREATE_HOOKS=$(get_config_array '.hooks.post_create')
-if [[ -n "$POST_CREATE_HOOKS" ]]; then
-    echo "[post-create] Running custom post_create hooks..."
-    while IFS= read -r hook; do
-        if [[ -n "$hook" ]]; then
-            echo "[post-create]   Executing: $hook"
-            # Run in subshell to isolate from main script environment
-            (bash -c "$hook") || echo "[post-create]   WARNING: Hook failed: $hook"
-        fi
-    done <<< "$POST_CREATE_HOOKS"
+if [[ "${DEVCONTAINER_ALLOW_HOOKS:-false}" != "true" ]]; then
+    echo "[post-create] Custom hooks are disabled (set DEVCONTAINER_ALLOW_HOOKS=true to enable)"
+else
+    POST_CREATE_HOOKS=$(get_config_array '.hooks.post_create')
+    if [[ -n "$POST_CREATE_HOOKS" ]]; then
+        echo "[post-create] Running custom post_create hooks..."
+        while IFS= read -r hook; do
+            if [[ -n "$hook" ]]; then
+                echo "[post-create]   Executing: $hook"
+                # Run in subshell to isolate from main script environment
+                (bash -c "$hook") || echo "[post-create]   WARNING: Hook failed: $hook"
+            fi
+        done <<< "$POST_CREATE_HOOKS"
+    fi
 fi
 
 # =============================================================================

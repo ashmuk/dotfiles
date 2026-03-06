@@ -9,10 +9,27 @@ WORKSPACE="${WORKSPACE:-/workspace}"
 REQUIREMENTS_FILE="${WORKSPACE}/.devcontainer/requirements.yaml"
 PROFILES_DIR="${WORKSPACE}/.devcontainer/profiles"
 
-# Check if yq is available
+# Check if yq is available — graceful fallback when sourced, hard fail when run directly
 if ! command -v yq &>/dev/null; then
-    echo "[parse-requirements] ERROR: yq is not installed"
-    exit 1
+    if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+        # Sourced: export sensible defaults so the caller can proceed
+        echo "[parse-requirements] WARNING: yq is not installed, using defaults"
+        export DEVCONTAINER_PROFILE="fullstack"
+        export PYTHON_ENABLED="true"
+        export NODE_ENABLED="true"
+        export JAVA_ENABLED="false"
+        export PYTHON_PACKAGES=""
+        export NODE_PACKAGES=""
+        export PROJECT_DIRECTORIES=""
+        export POST_CREATE_HOOKS=""
+        export POST_START_HOOKS=""
+        get_config() { echo "${2:-}"; }
+        get_config_array() { true; }
+        return 0
+    else
+        echo "[parse-requirements] ERROR: yq is not installed"
+        exit 1
+    fi
 fi
 
 # Determine the profile to use
@@ -93,6 +110,38 @@ get_post_start_hooks() {
     local config="$1"
 
     echo "$config" | yq -r '.hooks.post_start // [] | .[]' 2>/dev/null || true
+}
+
+# Cached merged config (populated on first get_config/get_config_array call)
+_MERGED_CONFIG_CACHE=""
+
+_ensure_merged_config() {
+    if [[ -z "$_MERGED_CONFIG_CACHE" ]]; then
+        local profile
+        profile=$(get_profile)
+        _MERGED_CONFIG_CACHE=$(merge_config "$profile")
+    fi
+}
+
+# Get a single config value with fallback default (uses cached merged config)
+get_config() {
+    local path="$1"
+    local default="${2:-}"
+    _ensure_merged_config
+    local value
+    value=$(echo "$_MERGED_CONFIG_CACHE" | yq -r "$path // \"\"" 2>/dev/null || echo "")
+    if [[ -z "$value" || "$value" == "null" ]]; then
+        echo "$default"
+    else
+        echo "$value"
+    fi
+}
+
+# Get array values as newline-separated list (uses cached merged config)
+get_config_array() {
+    local path="$1"
+    _ensure_merged_config
+    echo "$_MERGED_CONFIG_CACHE" | yq -r "$path // [] | .[]" 2>/dev/null || true
 }
 
 # Export all configuration as environment variables

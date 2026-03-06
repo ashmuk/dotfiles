@@ -24,4 +24,4 @@ ClaudeCode built-in Explore agent(s) respects my-analyst agent's policies
 5. Apply my-reviewer agent policy for validation of what was investigated
 6. Finalize outcome by this feedback loop
 7. Preserve all outcome in REQUIREMENTS.md
-8. Next: Invoke cc-design skill with built-in Plan agent(s) following my-reviewer validation
+8. Next: Suggest cc-design skill as recommended next step following my-reviewer validation

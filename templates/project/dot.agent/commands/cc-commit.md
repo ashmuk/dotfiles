@@ -12,7 +12,7 @@ Then:
 
 1. Stage the appropriate files using `git add`:
    - If specific files were mentioned: `git add <files>`
-   - If no files specified: ask user what to stage, or use `git add -p` for interactive staging
+   - If no files specified: show changed files list and ask user which to stage
 
 2. Generate a commit message following conventional commits format:
    - Follow RULES.md (if present in this project)
