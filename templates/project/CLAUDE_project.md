@@ -57,7 +57,7 @@ Use these commands for common workflows:
 
 **Git Workflows**:
 - `/cc-commit` — Stage changes and create conventional commit with generated message
-- `/cc-merge` — Merge branches with safety checks and conflict detection
+- `/cc-pr-merge` — Sync local branches after PR merges on GitHub
 - `/cc-push` — Push changes to remote with safety checks
 - `/cc-pr-create` — Create pull request with auto-generated title and description
 

@@ -1,0 +1,1 @@
+../../templates/project/dot.agent/commands/cc-pr-merge.md
