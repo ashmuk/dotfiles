@@ -34,22 +34,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Detect project type
+        id: detect
+        run: |
+          if [ -f package.json ]; then
+            echo "has_nodejs=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_nodejs=false" >> "$GITHUB_OUTPUT"
+          fi
+          # TODO: Add detection for other runtimes as needed, e.g.:
+          #   [ -f requirements.txt ] && echo "has_python=true" >> "$GITHUB_OUTPUT"
+          #   [ -f go.mod ] && echo "has_go=true" >> "$GITHUB_OUTPUT"
+
       # TODO: Replace with your language/runtime setup.
       # Examples:
       #   Node.js:   actions/setup-node@v4
       #   Python:    actions/setup-python@v5
       #   Go:        actions/setup-go@v5
       - name: Set up runtime
+        if: steps.detect.outputs.has_nodejs == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.detect.outputs.has_nodejs == 'true'
         # TODO: Replace with your package manager command.
         run: npm ci
 
       - name: Build
+        if: steps.detect.outputs.has_nodejs == 'true'
         # TODO: Replace with your build command and inject any required build-time env vars.
         # Example env vars:
         #   PUBLIC_API_URL: ${{ vars.PUBLIC_API_URL }}
