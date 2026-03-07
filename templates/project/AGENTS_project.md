@@ -73,6 +73,7 @@
 | `/cc-commit` | Haiku | Read diff, generate conventional commit |
 | `/cc-push` | Haiku | Rule-based safety checks |
 | `/cc-pr-create` | Sonnet | Summarization quality for PR descriptions |
+| `/cc-pr-merge` | Sonnet | Validation logic and merge execution |
 | `/cc-devcontainer-up` | Haiku | Shell command execution |
 | `/cc-devcontainer-down` | Haiku | Shell command execution |
 | `/cc-devcontainer-rebuild` | Haiku | Shell command execution |
@@ -97,6 +98,7 @@ Available slash commands for common workflows:
 - `/cc-commit` — Stage changes and create conventional commit
 - `/cc-push` — Push changes with safety checks
 - `/cc-pr-create` — Create pull request with generated description
+- `/cc-pr-merge` — Validate and merge an open pull request
 
 **DevContainer lifecycle:**
 - `/cc-devcontainer-up` — Start development environment
