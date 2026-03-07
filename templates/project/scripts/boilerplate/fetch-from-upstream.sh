@@ -13,6 +13,10 @@ set -euo pipefail
 #   --force           Skip prompts for Tier 1 files (still ask for Tier 2)
 #   --help            Show this help message
 #
+# Configuration:
+#   .template-sync-ignore   List of paths (relative to project root) to exclude
+#                           from upstream sync. One path per line, # comments.
+#
 # Files (optional):
 #   AGENTS_global     Sync only AGENTS_global.md
 #   CLAUDE_global     Sync only CLAUDE_global.md
@@ -90,6 +94,72 @@ check_upstream_exists() {
 
   log INFO "Using template: ${TEMPLATE_ROOT}"
   return 0
+}
+
+# ============================================================================
+# Template Sync Ignore
+# ============================================================================
+
+# Global array populated by load_sync_ignore
+SYNC_IGNORE_PATHS=()
+
+load_sync_ignore() {
+  local ignore_file="${PROJECT_ROOT}/.template-sync-ignore"
+  SYNC_IGNORE_PATHS=()
+  [[ ! -f "${ignore_file}" ]] && return 0
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "${line// }" ]] && continue
+    line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    SYNC_IGNORE_PATHS+=("$line")
+  done < "${ignore_file}"
+  if [[ ${#SYNC_IGNORE_PATHS[@]} -gt 0 ]]; then
+    log INFO "Loaded ${#SYNC_IGNORE_PATHS[@]} exclusion(s) from .template-sync-ignore"
+  fi
+}
+
+is_sync_ignored() {
+  local path="$1"
+  [[ ${#SYNC_IGNORE_PATHS[@]} -eq 0 ]] && return 1
+  for ignored in "${SYNC_IGNORE_PATHS[@]}"; do
+    [[ "$path" == "$ignored" ]] && return 0
+  done
+  return 1
+}
+
+# Build exclude list for a given directory prefix
+# Usage: get_dir_excludes ".devcontainer"  →  populates DIR_EXCLUDE_FLAGS array
+DIR_EXCLUDE_FLAGS=()
+get_dir_excludes() {
+  local dir_prefix="$1"
+  DIR_EXCLUDE_FLAGS=()
+  [[ ${#SYNC_IGNORE_PATHS[@]} -eq 0 ]] && return 0
+  for ignored in "${SYNC_IGNORE_PATHS[@]}"; do
+    if [[ "$ignored" == ${dir_prefix}/* ]]; then
+      DIR_EXCLUDE_FLAGS+=("${ignored#${dir_prefix}/}")
+    fi
+  done
+}
+
+# Replace directory contents, preserving ignored files when rsync is available
+sync_directory_with_excludes() {
+  local upstream_dir="$1"
+  local local_dir="$2"
+  shift 2
+  local -a rsync_excludes=("$@")
+
+  if [[ ${#rsync_excludes[@]} -gt 0 ]]; then
+    if command -v rsync &>/dev/null; then
+      rsync -a --delete "${rsync_excludes[@]}" "${upstream_dir}/" "${local_dir}/"
+    else
+      log WARN "rsync not found; ignored files in ${local_dir}/ will NOT be preserved"
+      rm -rf "${local_dir}"
+      cp -R "${upstream_dir}" "${local_dir}"
+    fi
+  else
+    rm -rf "${local_dir}"
+    cp -R "${upstream_dir}" "${local_dir}"
+  fi
 }
 
 has_local_modifications() {
@@ -260,6 +330,11 @@ sync_tier1_file() {
   local local_file="$2"
   local label="$3"
 
+  if is_sync_ignored "${local_file}"; then
+    log OK "${label}: protected by .template-sync-ignore"
+    return 0
+  fi
+
   local upstream_path="${upstream_file}"
   local local_path="${PROJECT_ROOT}/${local_file}"
 
@@ -322,6 +397,11 @@ sync_tier2_file() {
   local upstream_file="$1"
   local local_file="$2"
   local label="$3"
+
+  if is_sync_ignored "${local_file}"; then
+    log OK "${label}: protected by .template-sync-ignore"
+    return 0
+  fi
 
   local upstream_path="${upstream_file}"
   local local_path="${PROJECT_ROOT}/${local_file}"
@@ -407,12 +487,23 @@ sync_agent_directory() {
     return 0
   fi
 
+  # Build exclude flags from .template-sync-ignore
+  get_dir_excludes ".agent"
+  local -a extra_x=()
+  local -a rsync_excludes=()
+  if [[ ${#DIR_EXCLUDE_FLAGS[@]} -gt 0 ]]; then
+    for exc in "${DIR_EXCLUDE_FLAGS[@]}"; do
+      extra_x+=(-x "$exc")
+      rsync_excludes+=(--exclude "/$exc")
+    done
+  fi
+
   # Simple directory comparison (check if any files differ)
   local dirs_differ=false
   if [[ ! -d "${local_dir}" ]]; then
     dirs_differ=true
   else
-    # Compare directory trees (excluding system files)
+    # Compare directory trees (excluding system files and ignored files)
     if ! diff -qr \
       -x ".DS_Store" \
       -x ".AppleDouble" \
@@ -420,6 +511,7 @@ sync_agent_directory() {
       -x "Thumbs.db" \
       -x "Desktop.ini" \
       -x ".git" \
+      ${extra_x[@]+"${extra_x[@]}"} \
       "${upstream_dir}" "${local_dir}" &>/dev/null; then
       dirs_differ=true
     fi
@@ -448,7 +540,7 @@ sync_agent_directory() {
       log INFO "${label}: differs from upstream"
 
       if [[ "${FORCE_MODE}" == "false" ]]; then
-        preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+        preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}" ".agent"
 
         echo -e "${YELLOW}Warning:${NC} .agent/ directory will be completely replaced"
         echo "Current .agent/ will be backed up to .template-backups/"
@@ -460,10 +552,9 @@ sync_agent_directory() {
         fi
       fi
 
-      # Replace directory
+      # Replace directory (preserving ignored files)
       create_backup_dir ".agent"
-      rm -rf "${local_dir}"
-      cp -R "${upstream_dir}" "${local_dir}"
+      sync_directory_with_excludes "${upstream_dir}" "${local_dir}" ${rsync_excludes[@]+"${rsync_excludes[@]}"}
       log OK "${label}: synced from upstream"
 
       # Run local sync to propagate changes to Claude, Cursor, and Codex
@@ -482,6 +573,20 @@ preview_directory_changes() {
   local upstream_dir="$1"
   local local_dir="$2"
   local label="$3"
+  local dir_prefix="${4:-}"  # e.g., ".devcontainer" for building excludes
+
+  # Build exclude flags for ignored files (snapshot into locals to avoid clobbering caller)
+  local -a extra_x=()
+  local -a protected_files=()
+  if [[ -n "$dir_prefix" ]]; then
+    get_dir_excludes "$dir_prefix"
+    if [[ ${#DIR_EXCLUDE_FLAGS[@]} -gt 0 ]]; then
+      protected_files=("${DIR_EXCLUDE_FLAGS[@]}")
+      for exc in "${protected_files[@]}"; do
+        extra_x+=(-x "$exc")
+      done
+    fi
+  fi
 
   echo ""
   echo -e "${BLUE}Preview of changes for ${label}:${NC}"
@@ -491,6 +596,7 @@ preview_directory_changes() {
   local to_add=$(diff -qr \
     -x ".DS_Store" -x ".AppleDouble" -x ".LSOverride" \
     -x "Thumbs.db" -x "Desktop.ini" -x ".git" \
+    ${extra_x[@]+"${extra_x[@]}"} \
     "${upstream_dir}" "${local_dir}" 2>/dev/null | \
     grep "Only in ${upstream_dir}" | \
     sed "s|Only in ${upstream_dir}[:/] *||")
@@ -507,6 +613,7 @@ preview_directory_changes() {
   local to_remove=$(diff -qr \
     -x ".DS_Store" -x ".AppleDouble" -x ".LSOverride" \
     -x "Thumbs.db" -x "Desktop.ini" -x ".git" \
+    ${extra_x[@]+"${extra_x[@]}"} \
     "${upstream_dir}" "${local_dir}" 2>/dev/null | \
     grep "Only in ${local_dir}" | \
     sed "s|Only in ${local_dir}[:/] *||")
@@ -523,6 +630,7 @@ preview_directory_changes() {
   local to_modify=$(diff -qr \
     -x ".DS_Store" -x ".AppleDouble" -x ".LSOverride" \
     -x "Thumbs.db" -x "Desktop.ini" -x ".git" \
+    ${extra_x[@]+"${extra_x[@]}"} \
     "${upstream_dir}" "${local_dir}" 2>/dev/null | \
     grep "^Files " | \
     sed "s|Files ${upstream_dir}/\(.*\) and ${local_dir}/\(.*\) differ|\1|")
@@ -531,6 +639,15 @@ preview_directory_changes() {
     echo -e "${YELLOW}Files to be modified:${NC}"
     echo "$to_modify" | while read -r file; do
       echo "  ~ $file"
+    done
+    echo ""
+  fi
+
+  # Show protected files
+  if [[ ${#protected_files[@]} -gt 0 ]]; then
+    echo -e "${BLUE}Protected by .template-sync-ignore:${NC}"
+    for exc in "${protected_files[@]}"; do
+      echo "  # $exc"
     done
     echo ""
   fi
@@ -547,12 +664,23 @@ sync_boilerplate_directory() {
     return 0
   fi
 
+  # Build exclude flags from .template-sync-ignore
+  get_dir_excludes "scripts/boilerplate"
+  local -a extra_x=()
+  local -a rsync_excludes=()
+  if [[ ${#DIR_EXCLUDE_FLAGS[@]} -gt 0 ]]; then
+    for exc in "${DIR_EXCLUDE_FLAGS[@]}"; do
+      extra_x+=(-x "$exc")
+      rsync_excludes+=(--exclude "/$exc")
+    done
+  fi
+
   # Simple directory comparison
   local dirs_differ=false
   if [[ ! -d "${local_dir}" ]]; then
     dirs_differ=true
   else
-    # Compare directory trees (excluding system files)
+    # Compare directory trees (excluding system files and ignored files)
     if ! diff -qr \
       -x ".DS_Store" \
       -x ".AppleDouble" \
@@ -560,6 +688,7 @@ sync_boilerplate_directory() {
       -x "Thumbs.db" \
       -x "Desktop.ini" \
       -x ".git" \
+      ${extra_x[@]+"${extra_x[@]}"} \
       "${upstream_dir}" "${local_dir}" &>/dev/null; then
       dirs_differ=true
     fi
@@ -588,7 +717,7 @@ sync_boilerplate_directory() {
       log INFO "${label}: differs from upstream"
 
       if [[ "${FORCE_MODE}" == "false" ]]; then
-        preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+        preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}" "scripts/boilerplate"
 
         echo -e "${YELLOW}Warning:${NC} scripts/boilerplate/ directory will be completely replaced"
         echo "Current scripts/boilerplate/ will be backed up to .template-backups/"
@@ -600,10 +729,9 @@ sync_boilerplate_directory() {
         fi
       fi
 
-      # Replace directory
+      # Replace directory (preserving ignored files)
       create_backup_dir "scripts/boilerplate"
-      rm -rf "${local_dir}"
-      cp -R "${upstream_dir}" "${local_dir}"
+      sync_directory_with_excludes "${upstream_dir}" "${local_dir}" ${rsync_excludes[@]+"${rsync_excludes[@]}"}
 
       # Ensure scripts are executable
       chmod +x "${local_dir}"/*.sh 2>/dev/null || true
@@ -624,6 +752,17 @@ sync_devcontainer_directory() {
     return 0
   fi
 
+  # Build exclude flags from .template-sync-ignore
+  get_dir_excludes ".devcontainer"
+  local -a extra_x=()
+  local -a rsync_excludes=()
+  if [[ ${#DIR_EXCLUDE_FLAGS[@]} -gt 0 ]]; then
+    for exc in "${DIR_EXCLUDE_FLAGS[@]}"; do
+      extra_x+=(-x "$exc")
+      rsync_excludes+=(--exclude "/$exc")
+    done
+  fi
+
   # Directory comparison (same pattern as boilerplate)
   local dirs_differ=false
   if [[ ! -d "${local_dir}" ]]; then
@@ -636,6 +775,7 @@ sync_devcontainer_directory() {
       -x "Thumbs.db" \
       -x "Desktop.ini" \
       -x ".git" \
+      ${extra_x[@]+"${extra_x[@]}"} \
       "${upstream_dir}" "${local_dir}" &>/dev/null; then
       dirs_differ=true
     fi
@@ -683,7 +823,7 @@ sync_devcontainer_directory() {
         log INFO "${label}: differs from upstream"
       fi
 
-      preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+      preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}" ".devcontainer"
 
       echo -e "${YELLOW}Warning:${NC} .devcontainer/ directory will be completely replaced"
       echo "Current .devcontainer/ will be backed up to .template-backups/"
@@ -695,15 +835,14 @@ sync_devcontainer_directory() {
         case ${result} in
           0)  # Yes
             create_backup_dir ".devcontainer"
-            rm -rf "${local_dir}"
-            cp -R "${upstream_dir}" "${local_dir}"
+            sync_directory_with_excludes "${upstream_dir}" "${local_dir}" ${rsync_excludes[@]+"${rsync_excludes[@]}"}
             # Ensure scripts are executable
             find "${local_dir}" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
             log OK "${label}: synced from upstream"
             break
             ;;
           2)  # Diff
-            preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}"
+            preview_directory_changes "${upstream_dir}" "${local_dir}" "${label}" ".devcontainer"
             ;;
           *)  # No or Skip
             log INFO "${label}: skipped by user"
@@ -750,6 +889,11 @@ sync_claude_config_file() {
   local local_file="$2"
   local label="$3"
   local file_type="${4:-}"  # "executable" or empty
+
+  if is_sync_ignored "${label}"; then
+    log OK "${label}: protected by .template-sync-ignore"
+    return 0
+  fi
 
   # Check if files differ
   if ! files_differ "${upstream_file}" "${local_file}"; then
@@ -808,6 +952,8 @@ sync_all_files() {
   log INFO "Project: ${PROJECT_ROOT}"
   log INFO "Template: ${TEMPLATE_ROOT}"
   echo ""
+
+  load_sync_ignore
 
   # Determine which files to sync
   local sync_agents_global=false
