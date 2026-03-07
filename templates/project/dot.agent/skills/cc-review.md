@@ -24,6 +24,7 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
    - Alignment with plan/requirements
    - Security vulnerabilities
    - For security-focused reviews, read .agent/prompts/security/ for detailed guidance
+   - For OSS license and legal compliance reviews, read .agent/prompts/legal/ for detailed guidance
    - Code quality and maintainability
    - Safety for destructive actions
 4. Provide findings with severity: MUST-FIX / SHOULD-FIX / SUGGESTION
