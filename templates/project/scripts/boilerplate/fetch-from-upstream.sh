@@ -481,6 +481,12 @@ sync_agent_directory() {
   local local_dir="${PROJECT_ROOT}/.agent"
   local label=".agent/"
 
+  # Check if entire directory is ignored
+  if is_sync_ignored ".agent" || is_sync_ignored ".agent/"; then
+    log INFO "${label}: skipped (in .template-sync-ignore)"
+    return 0
+  fi
+
   # Check if upstream directory exists
   if [[ ! -d "${upstream_dir}" ]]; then
     log WARN "${label}: upstream directory not found"
@@ -658,6 +664,12 @@ sync_boilerplate_directory() {
   local local_dir="${PROJECT_ROOT}/scripts/boilerplate"
   local label="scripts/boilerplate/"
 
+  # Check if entire directory is ignored
+  if is_sync_ignored "scripts/boilerplate" || is_sync_ignored "scripts/boilerplate/"; then
+    log INFO "${label}: skipped (in .template-sync-ignore)"
+    return 0
+  fi
+
   # Check if upstream directory exists
   if [[ ! -d "${upstream_dir}" ]]; then
     log WARN "${label}: upstream directory not found"
@@ -745,6 +757,12 @@ sync_devcontainer_directory() {
   local upstream_dir="${TEMPLATE_PROJECT}/dot.devcontainer"
   local local_dir="${PROJECT_ROOT}/.devcontainer"
   local label=".devcontainer/"
+
+  # Check if entire directory is ignored
+  if is_sync_ignored ".devcontainer" || is_sync_ignored ".devcontainer/"; then
+    log INFO "${label}: skipped (in .template-sync-ignore)"
+    return 0
+  fi
 
   # Check if upstream directory exists
   if [[ ! -d "${upstream_dir}" ]]; then
