@@ -23,6 +23,15 @@ _new_path="$(IFS=:; echo "${_path_parts[*]}"):$PATH"
 export PATH="$_new_path"
 unset _path_parts _new_path
 
+# Dotfiles root (needed early for .env and performance.sh)
+export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
+
+# =============================================================================
+# Load dotfiles .env (global secrets — gitignored)
+# =============================================================================
+# shellcheck disable=SC1091
+if [ -f "$DOTFILES_DIR/.env" ]; then set -a; source "$DOTFILES_DIR/.env" || true; set +a; fi
+
 # =============================================================================
 # Basic Shell Settings
 # =============================================================================
@@ -202,8 +211,6 @@ fi
 # =============================================================================
 # Source Common Aliases
 # =============================================================================
-export DOTFILES_DIR=${DOTFILES_DIR:-$HOME/dotfiles}
-
 # Source common aliases (works for both bash and zsh)
 if [ -f "$DOTFILES_DIR/shell/aliases.common" ]; then
   # shellcheck disable=SC1091

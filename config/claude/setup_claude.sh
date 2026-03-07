@@ -47,6 +47,12 @@ create_claude_directory() {
         print_status "Created $HOME/.claude/logs directory"
     fi
 
+    # Create hooks directory
+    if [[ ! -d "$HOME/.claude/hooks" ]]; then
+        mkdir -p "$HOME/.claude/hooks"
+        print_status "Created $HOME/.claude/hooks directory"
+    fi
+
     return 0
 }
 
@@ -59,6 +65,15 @@ create_symlinks() {
 
     # Create symlink to Claude statusline script
     ln -sf "$DOTFILES_DIR/config/claude/statusline.sh" "$HOME/.claude/statusline.sh"
+
+    # Deploy hook scripts
+    if [[ -d "$DOTFILES_DIR/config/claude/hooks" ]]; then
+        for hook_script in "$DOTFILES_DIR/config/claude/hooks/"*.sh; do
+            [[ -f "$hook_script" ]] || continue
+            ln -sf "$hook_script" "$HOME/.claude/hooks/$(basename "$hook_script")"
+        done
+        print_status "Hook scripts deployed to $HOME/.claude/hooks/"
+    fi
 
     print_success "Symbolic links created in home directory"
 }
