@@ -358,10 +358,10 @@ init_git() {
 }
 
 # ============================================
-# Step 7: Git Hooks (after remote push, for PR workflow)
+# Step 8: Git Hooks (after remote push, for PR workflow)
 # ============================================
 setup_hooks() {
-  CURRENT_STEP="Step 7: Git Hooks"
+  CURRENT_STEP="Step 8: Git Hooks"
   print_header "$CURRENT_STEP"
 
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -437,10 +437,97 @@ setup_env() {
 }
 
 # ============================================
-# Step 3: Sync Agents (non-interactive - always runs)
+# Step 3: Project Character (toolbox or staged)
+# ============================================
+setup_character() {
+  CURRENT_STEP="Step 3: Project Character"
+  print_header "$CURRENT_STEP"
+
+  if [[ -f "PROJECT.yaml" ]]; then
+    local character
+    character=$(grep "^character:" PROJECT.yaml | awk '{print $2}')
+    print_success "PROJECT.yaml already exists (character: ${character:-unknown})"
+    return 0
+  fi
+
+  if [[ ! -d ".agent/starters" ]]; then
+    print_warning ".agent/starters/ not found — skipping project character setup"
+    print_info "Run 'make fetch-from-upstream' first to get starter templates"
+    return 0
+  fi
+
+  if [[ "$MODE" == "wizard" ]]; then
+    echo ""
+    echo "Project character determines your workflow:"
+    echo "  1) Staged — Linear progression through defined stages (PLANS.md)"
+    echo "     Best for: new products, migrations, structured development"
+    echo "  2) Toolbox — Ad-hoc tasks with a backlog (BACKLOG.md)"
+    echo "     Best for: utility repos, plugins, ongoing maintenance"
+    echo ""
+    read -p "Choose project character [1/2] (default: 1 Staged): " -n 1 -r character_choice
+    echo ""
+  else
+    # CLI mode defaults to staged
+    character_choice="1"
+  fi
+
+  case "$character_choice" in
+    2)
+      if [[ ! -f ".agent/starters/PROJECT.toolbox.yaml" ]]; then
+        print_error "Starter file missing: .agent/starters/PROJECT.toolbox.yaml"
+        return 1
+      fi
+      cp .agent/starters/PROJECT.toolbox.yaml PROJECT.yaml
+      print_success "Initialized as TOOLBOX project"
+
+      if [[ -f "BACKLOG.md" ]]; then
+        if [[ "$MODE" == "wizard" ]] && ask_yes_no "BACKLOG.md already exists. Overwrite (backup will be created)?" "n"; then
+          mv BACKLOG.md BACKLOG.md.bak
+          cp .agent/starters/BACKLOG.md BACKLOG.md
+          print_success "BACKLOG.md replaced (backup: BACKLOG.md.bak)"
+        else
+          print_info "BACKLOG.md already exists, keeping it"
+        fi
+      else
+        cp .agent/starters/BACKLOG.md BACKLOG.md
+        print_success "Created BACKLOG.md"
+      fi
+
+      mkdir -p docs/decisions
+      print_info "Add tasks to BACKLOG.md to get started"
+      ;;
+    *)
+      if [[ ! -f ".agent/starters/PROJECT.staged.yaml" ]]; then
+        print_error "Starter file missing: .agent/starters/PROJECT.staged.yaml"
+        return 1
+      fi
+      cp .agent/starters/PROJECT.staged.yaml PROJECT.yaml
+      print_success "Initialized as STAGED project"
+
+      if [[ -f "PLANS.md" ]]; then
+        if [[ "$MODE" == "wizard" ]] && ask_yes_no "PLANS.md already exists. Overwrite (backup will be created)?" "n"; then
+          mv PLANS.md PLANS.md.bak
+          cp .agent/starters/PLANS.md PLANS.md
+          print_success "PLANS.md replaced (backup: PLANS.md.bak)"
+        else
+          print_info "PLANS.md already exists, keeping it"
+        fi
+      else
+        cp .agent/starters/PLANS.md PLANS.md
+        print_success "Created PLANS.md"
+      fi
+
+      mkdir -p docs/decisions
+      print_info "Edit PROJECT.yaml to set current_stage, edit PLANS.md to define roadmap"
+      ;;
+  esac
+}
+
+# ============================================
+# Step 4: Sync Agents (non-interactive - always runs)
 # ============================================
 run_sync() {
-  CURRENT_STEP="Step 3: Sync Agent Configuration"
+  CURRENT_STEP="Step 4: Sync Agent Configuration"
   print_header "$CURRENT_STEP"
 
   if [[ ! -f "Makefile" ]]; then
@@ -472,10 +559,10 @@ run_sync() {
 }
 
 # ============================================
-# Step 4: Initial Commit (wizard only)
+# Step 5: Initial Commit (wizard only)
 # ============================================
 initial_commit() {
-  CURRENT_STEP="Step 4: Initial Commit"
+  CURRENT_STEP="Step 5: Initial Commit"
   if [[ "$MODE" != "wizard" ]]; then
     return 0
   fi
@@ -519,10 +606,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 }
 
 # ============================================
-# Step 6: Branch Strategy (wizard only)
+# Step 7: Branch Strategy (wizard only)
 # ============================================
 setup_branches() {
-  CURRENT_STEP="Step 6: Branch Strategy"
+  CURRENT_STEP="Step 7: Branch Strategy"
   if [[ "$MODE" != "wizard" ]]; then
     return 0
   fi
@@ -619,10 +706,10 @@ setup_branches() {
 }
 
 # ============================================
-# Step 5: Remote Repository (wizard only)
+# Step 6: Remote Repository (wizard only)
 # ============================================
 setup_remote() {
-  CURRENT_STEP="Step 5: Remote Repository"
+  CURRENT_STEP="Step 6: Remote Repository"
   if [[ "$MODE" != "wizard" ]]; then
     return 0
   fi
@@ -989,11 +1076,12 @@ main() {
 
   init_git
   setup_env
+  setup_character   # Step 3: Choose toolbox or staged
   run_sync
   initial_commit
-  setup_remote      # Step 5: Push main first (while on main)
-  setup_branches    # Step 6: Then create develop branch
-  setup_hooks       # Step 7: Enable hooks after setup is done
+  setup_remote      # Step 6: Push main first (while on main)
+  setup_branches    # Step 7: Then create develop branch
+  setup_hooks       # Step 8: Enable hooks after setup is done
   print_summary
 }
 
