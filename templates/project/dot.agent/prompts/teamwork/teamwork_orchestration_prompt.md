@@ -56,9 +56,12 @@ Reviewer escalates blockers to the lead agent (you) for user decision.
 
 # 3. Initial Stage Execution (Immediate Action)
 
-If this is the **initial action** in the project (no stages completed yet),
-begin with **Requirements Definition** — use `/cc-define` and read `Vision.md`
-to establish project context before proceeding.
+If this is the **initial action** in the project (no stages completed yet):
+1.  Begin with **Requirements Definition** — use `/cc-define` and read `Vision.md`
+    to establish project context
+2.  Once REQUIREMENTS.md is established, proceed to the next stage as guided by
+    project context
+3.  Pause for user review once ARCHITECTURE.md is drafted
 
 Each PLANS.md *stage* is executed through these phases: analysis → design →
 build → review. Begin the analysis phase now. Assign the following tasks
