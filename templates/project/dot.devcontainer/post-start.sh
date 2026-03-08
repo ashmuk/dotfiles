@@ -113,6 +113,13 @@ if [ -d "$HOST_DIR" ] && [ -n "$(ls -A "$HOST_DIR" 2>/dev/null)" ]; then
             "$CLAUDE_DIR/plugins/installed_plugins.json"
     fi
 
+    # Rewrite host paths in marketplace registry
+    if [ -f "$CLAUDE_DIR/plugins/known_marketplaces.json" ]; then
+        _escaped_home=${_escaped_home:-$(printf '%s' "$HOME" | sed 's/[&\\/]/\\&/g')}
+        sed -i "s|/Users/[^/]*/\.claude/|${_escaped_home}/.claude/|g; s|/home/[^/]*/\.claude/|${_escaped_home}/.claude/|g" \
+            "$CLAUDE_DIR/plugins/known_marketplaces.json"
+    fi
+
     # Platform compatibility: replace macOS afplay hooks with terminal bell on Linux
     # Claude Code merges settings.local.json over settings.json
     if [ "$(uname)" != "Darwin" ]; then
