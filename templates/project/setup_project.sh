@@ -96,16 +96,16 @@ replace_devcontainer_names() {
   if [ -f "$devcontainer_dir/devcontainer.json" ]; then
     if command -v sed >/dev/null 2>&1; then
       if [[ "$OSTYPE" == darwin* ]]; then
-        # Replace service name (devcontainer -> ${docker_name}_dev)
-        sed -i '' "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
+        # Replace service name (devcontainer -> ${docker_name})
+        sed -i '' "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}\"|g" "$devcontainer_dir/devcontainer.json"
         # Replace volume names (project- -> ${docker_name}-)
         sed -i '' "s|project-bashhistory-|${docker_name}-bashhistory-|g" "$devcontainer_dir/devcontainer.json"
-        sed -i '' "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
+        sed -i '' "s|project-claude-state-|${docker_name}-claude-state-|g" "$devcontainer_dir/devcontainer.json"
       else
         # Linux sed
-        sed -i "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}_dev\"|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|\"service\": \"devcontainer\"|\"service\": \"${docker_name}\"|g" "$devcontainer_dir/devcontainer.json"
         sed -i "s|project-bashhistory-|${docker_name}-bashhistory-|g" "$devcontainer_dir/devcontainer.json"
-        sed -i "s|project-claude-config-|${docker_name}-claude-config-|g" "$devcontainer_dir/devcontainer.json"
+        sed -i "s|project-claude-state-|${docker_name}-claude-state-|g" "$devcontainer_dir/devcontainer.json"
       fi
     fi
   fi
@@ -114,20 +114,20 @@ replace_devcontainer_names() {
   if [ -f "$devcontainer_dir/compose.yml" ]; then
     if command -v sed >/dev/null 2>&1; then
       if [[ "$OSTYPE" == darwin* ]]; then
-        # Replace service names (devcontainer -> ${docker_name}_dev)
-        sed -i '' "s|^  devcontainer:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
-        sed -i '' "s|^  devcontainer_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
+        # Replace service names (devcontainer -> ${docker_name})
+        sed -i '' "s|^  devcontainer:|  ${docker_name}:|g" "$devcontainer_dir/compose.yml"
+        sed -i '' "s|^  devcontainer_nonet:|  ${docker_name}_nonet:|g" "$devcontainer_dir/compose.yml"
         # Replace extends reference
-        sed -i '' "s|extends: devcontainer$|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
-        # Replace image name (project-devcontainer -> ${docker_name}-dev)
-        sed -i '' "s|image: project-devcontainer|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
+        sed -i '' "s|extends: devcontainer$|extends: ${docker_name}|g" "$devcontainer_dir/compose.yml"
+        # Replace image name (project-devcontainer -> ${docker_name}-devcontainer)
+        sed -i '' "s|image: project-devcontainer|image: ${docker_name}-devcontainer|g" "$devcontainer_dir/compose.yml"
         # Replace user (developer -> keep as developer, no change needed)
       else
         # Linux sed
-        sed -i "s|^  devcontainer:|  ${docker_name}_dev:|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|^  devcontainer_nonet:|  ${docker_name}_dev_nonet:|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|extends: devcontainer$|extends: ${docker_name}_dev|g" "$devcontainer_dir/compose.yml"
-        sed -i "s|image: project-devcontainer|image: ${docker_name}-dev|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|^  devcontainer:|  ${docker_name}:|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|^  devcontainer_nonet:|  ${docker_name}_nonet:|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|extends: devcontainer$|extends: ${docker_name}|g" "$devcontainer_dir/compose.yml"
+        sed -i "s|image: project-devcontainer|image: ${docker_name}-devcontainer|g" "$devcontainer_dir/compose.yml"
       fi
     fi
   fi
