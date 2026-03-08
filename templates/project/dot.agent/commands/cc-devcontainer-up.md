@@ -25,5 +25,5 @@ environment. Both humans and AI agents must follow this procedure.
 devcontainer up --workspace-folder .
 
 # (Optional) Open a shell inside the running container
-devcontainer exec --workspace-folder . bash
+devcontainer exec --workspace-folder . zsh
 ```
