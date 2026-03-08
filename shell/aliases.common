@@ -40,6 +40,21 @@ alias ds='dirs -v'
 alias claude-teams='tmux new-session -s claude-agents "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --teammate-mode tmux"'
 
 # =============================================================================
+# DevContainer Aliases
+# =============================================================================
+
+# Lifecycle
+alias dc-up='devcontainer up --workspace-folder .'
+alias dc-down='devcontainer down --workspace-folder .'
+alias dc-rebuild='devcontainer up --workspace-folder . --remove-existing-container --build-no-cache'
+alias dc-exec='devcontainer exec --workspace-folder . bash'
+
+# Utilities
+alias dc-stat='docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"'
+alias dc-logs='docker compose logs -f'
+alias dc-sh='docker compose exec devcontainer bash'
+
+# =============================================================================
 # tmux Aliases
 # =============================================================================
 

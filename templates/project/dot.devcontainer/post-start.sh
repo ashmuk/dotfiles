@@ -1,36 +1,131 @@
 #!/bin/bash
 # post-start.sh - DevContainer post-start setup script
 # Called by postStartCommand in devcontainer.json
-# Ensures symlinks for global templates exist in user home directory
+#
+# Reconstructs ~/.claude/ from three sources:
+#   1. Writable container state (volume at ~/.claude-state/)
+#   2. Host personal settings (read-only bind mount at ~/.claude-host/)
+#   3. Project-level overrides (/workspace/.claude/)
 
 set -e
+shopt -s nullglob
 
-# Ensure directories exist
-mkdir -p "$HOME/.claude"
+CLAUDE_DIR="$HOME/.claude"
+HOST_DIR="$HOME/.claude-host"
+STATE_DIR="$HOME/.claude-state"
+
+# ── Create ~/.claude directory ──────────────────────────────────────────
+mkdir -p "$CLAUDE_DIR"
+
+# ── Layer 1: Writable state (persisted in volume) ──────────────────────
+# These directories/files need write access during Claude Code operation.
+STATE_DIRS=(
+    "backups"
+    "cache"
+    "debug"
+    "downloads"
+    "file-history"
+    "ide"
+    "logs"
+    "paste-cache"
+    "plans"
+    "projects"
+    "session-env"
+    "shell-snapshots"
+    "statsig"
+    "tasks"
+    "teams"
+    "telemetry"
+    "todos"
+    "usage-data"
+)
+
+for dir in "${STATE_DIRS[@]}"; do
+    mkdir -p "$STATE_DIR/$dir"
+    ln -sfn "$STATE_DIR/$dir" "$CLAUDE_DIR/$dir"
+done
+
+# Writable state files (create in volume if not present, symlink into ~/.claude)
+STATE_FILES=(
+    "history.jsonl"
+    "stats-cache.json"
+    "mcp-needs-auth-cache.json"
+    "credentials.json"
+    ".credentials.json"
+)
+
+for file in "${STATE_FILES[@]}"; do
+    if [ ! -f "$STATE_DIR/$file" ]; then
+        case "$file" in
+            *.json) echo '{}' > "$STATE_DIR/$file" ;;
+            *)      touch "$STATE_DIR/$file" ;;
+        esac
+    fi
+    ln -sf "$STATE_DIR/$file" "$CLAUDE_DIR/$file"
+done
+
+# ── Layer 2: Host personal settings (from read-only bind mount) ────────
+if [ -d "$HOST_DIR" ] && [ -n "$(ls -A "$HOST_DIR" 2>/dev/null)" ]; then
+    # Personal CLAUDE.md (symlink — read-only is fine)
+    if [ -e "$HOST_DIR/CLAUDE.md" ]; then
+        ln -sf "$HOST_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+    fi
+
+    # User settings.json — copy so `claude config set` works in container
+    if [ -e "$HOST_DIR/settings.json" ]; then
+        cp -f "$HOST_DIR/settings.json" "$CLAUDE_DIR/settings.json"
+    fi
+
+    # Plugins directory — copy so plugin install/updates work in container
+    if [ -d "$HOST_DIR/plugins" ]; then
+        cp -rf "$HOST_DIR/plugins" "$CLAUDE_DIR/plugins"
+    fi
+
+    # Hooks — copy scripts (symlinks already resolved by initializeCommand)
+    if [ -d "$HOST_DIR/hooks" ]; then
+        mkdir -p "$CLAUDE_DIR/hooks"
+        for hook in "$HOST_DIR/hooks"/*; do
+            [ -f "$hook" ] || continue
+            cp -f "$hook" "$CLAUDE_DIR/hooks/$(basename "$hook")"
+            chmod +x "$CLAUDE_DIR/hooks/$(basename "$hook")"
+        done
+    fi
+
+    # Platform compatibility: replace macOS afplay hooks with terminal bell on Linux
+    # Claude Code merges settings.local.json over settings.json
+    if [ "$(uname)" != "Darwin" ]; then
+        cat > "$CLAUDE_DIR/settings.local.json" <<'SETTINGS_LOCAL'
+{
+  "hooks": {
+    "Stop": [{ "hooks": [{ "type": "command", "command": "printf '\\a\\a'" }] }],
+    "Notification": [{ "hooks": [{ "type": "command", "command": "printf '\\a'" }] }]
+  }
+}
+SETTINGS_LOCAL
+    fi
+else
+    # No host mount available — fall back to project-level configs
+    if [ -f "/workspace/CLAUDE_global.md" ]; then
+        if [ -L "$CLAUDE_DIR/CLAUDE.md" ] || [ ! -f "$CLAUDE_DIR/CLAUDE.md" ]; then
+            ln -sf /workspace/CLAUDE_global.md "$CLAUDE_DIR/CLAUDE.md"
+        fi
+    fi
+
+    if [ -f "/workspace/.claude/settings.json" ]; then
+        ln -sf /workspace/.claude/settings.json "$CLAUDE_DIR/settings.json"
+    fi
+fi
+
+# ── Layer 3: Project-level overrides ──────────────────────────────────
+# Project statusline always takes precedence
+if [ -f "/workspace/.claude/statusline.sh" ]; then
+    ln -sf /workspace/.claude/statusline.sh "$CLAUDE_DIR/statusline.sh"
+fi
+
+# ── Codex global config ──────────────────────────────────────────────
 mkdir -p "$HOME/.codex"
-
-# Create symbolic links for global templates in user home directory
-# Link AGENTS_global.md to ~/.codex/AGENTS.md
 if [ -f "/workspace/AGENTS_global.md" ]; then
     if [ -L "$HOME/.codex/AGENTS.md" ] || [ ! -f "$HOME/.codex/AGENTS.md" ]; then
         ln -sf /workspace/AGENTS_global.md "$HOME/.codex/AGENTS.md"
     fi
 fi
-
-# Link CLAUDE_global.md to ~/.claude/CLAUDE.md
-if [ -f "/workspace/CLAUDE_global.md" ]; then
-    if [ -L "$HOME/.claude/CLAUDE.md" ] || [ ! -f "$HOME/.claude/CLAUDE.md" ]; then
-        ln -sf /workspace/CLAUDE_global.md "$HOME/.claude/CLAUDE.md"
-    fi
-fi
-
-# Link Claude Code config files from workspace/.claude/ to ~/.claude/
-# These must be created here (not Dockerfile) because ~/.claude is a volume mount
-if [ -f "/workspace/.claude/statusline.sh" ]; then
-    ln -sf /workspace/.claude/statusline.sh "$HOME/.claude/statusline.sh"
-fi
-
-if [ -f "/workspace/.claude/settings.json" ]; then
-    ln -sf /workspace/.claude/settings.json "$HOME/.claude/settings.json"
-fi
-

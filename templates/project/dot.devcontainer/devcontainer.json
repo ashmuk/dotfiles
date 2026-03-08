@@ -70,10 +70,12 @@
     "--cap-add=NET_ADMIN",
     "--cap-add=NET_RAW"
   ],
+  "initializeCommand": "bash -c 'mkdir -p /tmp/claude-host-resolved && (rsync -aL --delete ~/.claude/ /tmp/claude-host-resolved/ 2>/dev/null || cp -rL ~/.claude/. /tmp/claude-host-resolved/ 2>/dev/null || true)'",
   "mounts": [
     "source=${localWorkspaceFolder}/.cache,target=/home/developer/.cache,type=bind",
     "source=project-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=project-claude-config-${devcontainerId},target=/home/developer/.claude,type=volume"
+    "source=/tmp/claude-host-resolved,target=/home/developer/.claude-host,type=bind,readonly",
+    "source=project-claude-state-${devcontainerId},target=/home/developer/.claude-state,type=volume"
   ],
   "containerEnv": {
     "NODE_OPTIONS": "--max-old-space-size=4096",
