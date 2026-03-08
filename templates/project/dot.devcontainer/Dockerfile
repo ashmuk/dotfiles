@@ -23,7 +23,7 @@ ARG YQ_VERSION=v4.44.1
 RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
  && apt-get install -y --no-install-recommends \
       # Core CLI tools
-      tmux vim nano less procps fzf zsh man-db unzip gnupg2 wget curl \
+      tmux vim nano less procps fzf zsh man-db unzip gnupg2 wget curl jq \
       # Python runtime
       python3 python3-venv python3-pip \
       # Java runtime (OpenJDK 21)
