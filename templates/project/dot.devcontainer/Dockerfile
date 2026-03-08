@@ -160,6 +160,7 @@ WORKDIR /workspace
 
 # Alias for dangerous mode
 RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias claude-teams-hard='tmux new-session -s claude-agents \"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --dangerously-skip-permissions --teammate-mode tmux\"'" >> "/home/${USERNAME}/.zshrc"
 
 # Enable vi mode
 RUN echo "bindkey -v" >> "/home/${USERNAME}/.zshrc"

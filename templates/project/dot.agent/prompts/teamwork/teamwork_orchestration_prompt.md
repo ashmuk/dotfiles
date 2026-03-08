@@ -7,6 +7,8 @@ teammates to progress a project through its PLANS.md stages.
 Assemble and coordinate a named team of specialized agents to progress the
 project through its current PLANS.md stage.
 
+Report the execution time and token usage after the run (approximate values are acceptable).
+
 ## Engagement Context
 
 -   **Team name:** `[TEAM NAME]` (e.g., "T1", "Alpha")
