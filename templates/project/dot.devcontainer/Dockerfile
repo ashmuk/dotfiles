@@ -137,8 +137,8 @@ RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 
 # Create directories for workspace and Claude config
 USER root
-RUN mkdir -p /workspace /home/${USERNAME}/.claude && \
- chown -R ${USERNAME}:${USERNAME} /workspace /home/${USERNAME}/.claude
+RUN mkdir -p /workspace /home/${USERNAME}/.claude /home/${USERNAME}/.claude-state && \
+ chown -R ${USERNAME}:${USERNAME} /workspace /home/${USERNAME}/.claude /home/${USERNAME}/.claude-state
 
 # Copy Powerlevel10k configuration
 COPY dot.p10k.zsh /home/${USERNAME}/.p10k.zsh
