@@ -45,14 +45,14 @@ alias claude-teams='tmux new-session -s claude-agents "CLAUDE_CODE_EXPERIMENTAL_
 
 # Lifecycle
 alias dc-up='devcontainer up --workspace-folder .'
-alias dc-down='devcontainer down --workspace-folder .'
+alias dc-down='docker compose down'
 alias dc-rebuild='devcontainer up --workspace-folder . --remove-existing-container --build-no-cache'
 alias dc-exec='devcontainer exec --workspace-folder . bash'
 
-# Utilities
+# Utilities (require docker-compose.yml / compose.yaml in current directory)
 alias dc-stat='docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"'
 alias dc-logs='docker compose logs -f'
-alias dc-sh='docker compose exec devcontainer bash'
+alias dc-sh='docker compose exec ${DC_SERVICE:-devcontainer} bash'
 
 # =============================================================================
 # tmux Aliases
