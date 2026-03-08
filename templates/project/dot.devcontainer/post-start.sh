@@ -143,3 +143,16 @@ if [ -f "/workspace/AGENTS_global.md" ]; then
         ln -sf /workspace/AGENTS_global.md "$HOME/.codex/AGENTS.md"
     fi
 fi
+
+# ── Load project .env into shell environment ─────────────────────────
+# devcontainer exec does not inherit compose env_file vars,
+# so we export them via shell profile for interactive sessions and Claude Code.
+ENV_EXPORTS="$HOME/.env_exports"
+if [ -f /workspace/.env ]; then
+    grep -E '^[A-Za-z_][A-Za-z0-9_]*=' /workspace/.env \
+        | grep -v '^#' \
+        | sed 's/^/export /' > "$ENV_EXPORTS"
+    chmod 600 "$ENV_EXPORTS"
+else
+    : > "$ENV_EXPORTS"
+fi
