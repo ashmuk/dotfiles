@@ -91,6 +91,28 @@ if [ -d "$HOST_DIR" ] && [ -n "$(ls -A "$HOST_DIR" 2>/dev/null)" ]; then
         done
     fi
 
+    # Global claude.json — extract only mcpServers for the container
+    # This is ~/.claude.json (at HOME root), NOT ~/.claude/settings.json
+    # Filter out stdio-type servers (they reference host-local binaries that
+    # won't exist in the container). HTTP/SSE servers pass through.
+    if [ -e "$HOST_DIR/_claude_root.json" ]; then
+        if command -v jq >/dev/null 2>&1; then
+            jq '{mcpServers: (.mcpServers // {} | to_entries | map(select(.value.type != "stdio")) | from_entries)}' \
+                "$HOST_DIR/_claude_root.json" > "$HOME/.claude.json" 2>/dev/null \
+            || cp -f "$HOST_DIR/_claude_root.json" "$HOME/.claude.json"
+        else
+            cp -f "$HOST_DIR/_claude_root.json" "$HOME/.claude.json"
+        fi
+        chmod 600 "$HOME/.claude.json"
+    fi
+
+    # Rewrite host plugin paths to container paths (handles macOS and Linux hosts)
+    if [ -f "$CLAUDE_DIR/plugins/installed_plugins.json" ]; then
+        _escaped_home=$(printf '%s' "$HOME" | sed 's/[&\\/]/\\&/g')
+        sed -i "s|/Users/[^/]*/\.claude/|${_escaped_home}/.claude/|g; s|/home/[^/]*/\.claude/|${_escaped_home}/.claude/|g" \
+            "$CLAUDE_DIR/plugins/installed_plugins.json"
+    fi
+
     # Platform compatibility: replace macOS afplay hooks with terminal bell on Linux
     # Claude Code merges settings.local.json over settings.json
     if [ "$(uname)" != "Darwin" ]; then

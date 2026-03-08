@@ -70,7 +70,7 @@
     "--cap-add=NET_ADMIN",
     "--cap-add=NET_RAW"
   ],
-  "initializeCommand": "bash -c 'mkdir -p /tmp/claude-host-resolved && (rsync -aL --delete ~/.claude/ /tmp/claude-host-resolved/ 2>/dev/null || cp -rL ~/.claude/. /tmp/claude-host-resolved/ 2>/dev/null || true)'",
+  "initializeCommand": "bash -c 'mkdir -p /tmp/claude-host-resolved && chmod 700 /tmp/claude-host-resolved && (rsync -aL --delete ~/.claude/ /tmp/claude-host-resolved/ 2>/dev/null || cp -rL ~/.claude/. /tmp/claude-host-resolved/ 2>/dev/null || true) && (cp -L ~/.claude.json /tmp/claude-host-resolved/_claude_root.json && chmod 600 /tmp/claude-host-resolved/_claude_root.json 2>/dev/null || true)'",
   "mounts": [
     "source=${localWorkspaceFolder}/.cache,target=/home/developer/.cache,type=bind",
     "source=project-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
