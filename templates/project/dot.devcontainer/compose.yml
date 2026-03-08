@@ -14,6 +14,9 @@ services:
     working_dir: /workspace
     volumes:
       - ..:/workspace:rw,cached
+    env_file:
+      - path: ../.env
+        required: false
     environment:
       # API Keys (passed through from host)
       - OPENAI_API_KEY
