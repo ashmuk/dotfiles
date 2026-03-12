@@ -1,6 +1,14 @@
 ---
 name: cc-design
-description: Skill - Create system architecture, UI/UX and API designs, task breakdowns and plans, co-working with ClaudeCode built-in Plan agent(s)
+description: >-
+  Create system architecture, UI/UX and API designs, task breakdowns and
+  implementation plans. Use when user asks for "architecture", "system design",
+  "UI/UX design", "API design", "task breakdown", or "implementation plan". Do
+  NOT use for requirements gathering (use cc-define) or code implementation
+  (use cc-implement).
+metadata:
+  version: 1.0.0
+  category: workflow-automation
 ---
 
 # SKILL - Design architecture, system, tasks and plans
@@ -96,3 +104,37 @@ Create stage-based execution plans respecting my-architect's scope progression (
 34. Finalize outcome by this feedback loop
 35. Preserve all outcome in PLANS.md
 36. Next: Invoke cc-test skill to define test strategy before implementation
+
+## Examples
+
+### Example 1: Full design from requirements
+User says: "Design the architecture for our new e-commerce platform"
+Actions:
+1. Phase A: my-architect creates system architecture with scope progression (PoC/MVP/Production)
+2. Phase B: my-designer creates UX flows and API contracts
+3. Phase C: Detailed system design with component interactions
+4. Phase D: Task breakdown into implementable units
+5. Phase E: Stage-based execution plan
+Result: docs/ARCHITECTURE.md, docs/UX-DESIGNS.md, docs/DESIGNS.md, docs/TASKS.md, PLANS.md
+
+### Example 2: API design only
+User says: "Design the REST API for the payment service"
+Actions:
+1. Phase A: my-architect defines service boundaries and technology choices
+2. Phase B: my-designer creates API contracts, data models, error patterns (skip UX)
+3. Phase C-E: System design, tasks, and plans for the API
+Result: Focused API design artifacts
+
+## Troubleshooting
+
+### REQUIREMENTS.md not found
+Cause: Requirements haven't been defined yet.
+Solution: Run cc-define skill first to produce REQUIREMENTS.md, or ask the user for specific design goals.
+
+### Phase B unclear (frontend vs. backend)
+Cause: Project context doesn't clearly indicate whether UI or API design is needed.
+Solution: Ask the user. Phase B adapts: frontend projects focus on UX/UI, backend on API contracts, full-stack on both. Skip entirely if neither applies.
+
+### Architecture scope too broad
+Cause: Trying to design everything at once.
+Solution: Use my-architect's scope progression (PoC → MVP → Production) to constrain initial scope. Start with the smallest viable architecture.

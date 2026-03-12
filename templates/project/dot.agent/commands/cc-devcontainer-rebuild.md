@@ -1,7 +1,6 @@
 ---
-
+name: cc-devcontainer-rebuild
 description: Command - Rebuild the DevContainer environment from scratch using the current DevContainer configuration.
-
 ---
 
 # Command: cc-devcontainer-rebuild

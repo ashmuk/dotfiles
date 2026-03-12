@@ -1,6 +1,13 @@
 ---
 name: cc-review
-description: Skill - Review all relevant aspects of project progress, co-working with ClaudeCode built-in agent(s) which are relevant
+description: >-
+  Review and validate project progress, code quality, and security. Use when
+  user asks to "review", "validate", "check code", "audit", or "verify" work
+  in progress. Do NOT use to fix issues (use cc-remediate) or write code (use
+  cc-implement). This skill is read-only.
+metadata:
+  version: 1.0.0
+  category: workflow-automation
 ---
 
 # SKILL - Review project progress
@@ -31,3 +38,31 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 5. Recommend concrete, actionable fixes
 6. Preserve findings in docs/REVIEW_FINDINGS.md
 7. Next: If MUST-FIX findings exist, invoke cc-remediate skill. Otherwise, accept.
+
+## Examples
+
+### Example 1: Pre-commit validation
+User says: "Review the changes before I commit"
+Actions:
+1. Read staged changes and related plan artifacts
+2. Apply my-reviewer checklist (alignment, security, quality, safety)
+3. Produce findings table with severity levels
+Result: docs/REVIEW_FINDINGS.md with actionable findings
+
+### Example 2: Security-focused audit
+User says: "Audit the auth module for security issues"
+Actions:
+1. Read .agent/prompts/security/ for detailed guidance
+2. Apply OWASP Top 10 and STRIDE analysis
+3. Check for injection, auth bypass, data exposure
+Result: docs/REVIEW_FINDINGS.md with security-specific findings
+
+## Troubleshooting
+
+### No artifacts to review
+Cause: No REQUIREMENTS.md, ARCHITECTURE.md, or code changes to review.
+Solution: Ask the user what specifically should be reviewed, or run cc-define / cc-design first.
+
+### Reviewer attempts to fix code
+Cause: Reviewer crossed into implementation territory.
+Solution: Stop immediately. Findings go to docs/REVIEW_FINDINGS.md. All fixes must flow through cc-remediate to my-builder.

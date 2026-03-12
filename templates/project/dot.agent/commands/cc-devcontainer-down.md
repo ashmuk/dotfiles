@@ -1,4 +1,5 @@
 ---
+name: cc-devcontainer-down
 description: Command - Stop and clean up the DevContainer environment for this repository.
 ---
 

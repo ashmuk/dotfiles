@@ -1,6 +1,8 @@
 ---
+name: cc-devcontainer-up
 description: Command - Start the development environment using DevContainer for this repository.
 ---
+
 # Command: cc-devcontainer-up
 
 ## Purpose

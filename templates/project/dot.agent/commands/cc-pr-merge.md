@@ -1,7 +1,6 @@
 ---
-
+name: cc-pr-merge
 description: Command - Validate and merge an open pull request on GitHub
-
 ---
 
 ## Prerequisites

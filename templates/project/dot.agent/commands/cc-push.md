@@ -1,7 +1,6 @@
 ---
-
+name: cc-push
 description: Command - Push changes to remote with safety checks
-
 ---
 
 Before pushing, perform these safety checks:

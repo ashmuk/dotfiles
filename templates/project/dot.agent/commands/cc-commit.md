@@ -1,4 +1,5 @@
 ---
+name: cc-commit
 description: Command - Stage changes and commit with generated message
 ---
 
@@ -25,7 +26,7 @@ Then:
    If the user insists, require explicit confirmation with a warning that
    secrets committed to git history are nearly impossible to fully remove.
 
-   **Safety Rule B — .gitignore-blocked files (check AFTER staging):**
+   **Safety Rule B — .gitignore-blocked files (check BEFORE staging):**
    Before running `git add`, use `git check-ignore -v <files>` to identify
    which files are blocked by `.gitignore`. For any blocked files:
    **stop**, list them with their matching `.gitignore` patterns,
@@ -34,7 +35,7 @@ Then:
 
 2. Generate a commit message following conventional commits format:
    - Follow RULES.md (if present in this project)
-    Otherwise,
+     Otherwise,
    - Type: feat|fix|docs|style|refactor|test|chore
    - Scope: optional, module or component affected
    - Description: imperative mood, lowercase, no period

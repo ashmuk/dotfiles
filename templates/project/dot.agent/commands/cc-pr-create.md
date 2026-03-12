@@ -1,7 +1,6 @@
 ---
-
+name: cc-pr-create
 description: Command - Create a pull request with generated title and description
-
 ---
 
 ## Prerequisites Check
@@ -16,10 +15,12 @@ description: Command - Create a pull request with generated title and descriptio
 1. Get current branch: `git branch --show-current`
    - If on main/master, stop and ask user to checkout a develop or feature branch
 
-2. Detect default branch dynamically: `gh repo view --json defaultBranchRef -q '.defaultBranchRef.name'`
-   - This will be the target (base) branch for the PR
-   - For Git Flow projects, feature branches typically target `develop` rather than the default branch
-   - If the user specifies `--base`, use that instead
+2. Detect base branch for the PR:
+   - If the user specifies `--base`, use that
+   - Otherwise, check if a `develop` branch exists: `git rev-parse --verify origin/develop 2>/dev/null`
+     - If `develop` exists AND current branch is a `feature/*`, `fix/*`, or `hotfix/*` branch: use `develop` as base (Git Flow convention)
+     - Otherwise: detect default branch dynamically: `gh repo view --json defaultBranchRef -q '.defaultBranchRef.name'`
+   - Show the chosen base branch to the user and confirm before proceeding
 
 3. Ensure all commits are pushed: `git log origin/$(git branch --show-current)..HEAD --oneline`
    - If unpushed commits exist, ask user if they want to push first

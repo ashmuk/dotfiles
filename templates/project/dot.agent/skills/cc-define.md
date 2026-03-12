@@ -1,6 +1,13 @@
 ---
 name: cc-define
-description: Skill - Understand context and define requirements for this project, co-working with ClaudeCode built-in Explore agent(s)
+description: >-
+  Understand context and define requirements for a project. Use when user asks
+  to "define requirements", "gather requirements", "analyze scope", or
+  "understand the project". Do NOT use for architecture or design (use
+  cc-design) or implementation (use cc-implement).
+metadata:
+  version: 1.0.0
+  category: workflow-automation
 ---
 
 # SKILL - Understand and Define Requirements
@@ -25,3 +32,32 @@ ClaudeCode built-in Explore agent(s) respects my-analyst agent's policies
 6. Finalize outcome by this feedback loop
 7. Preserve all outcome in REQUIREMENTS.md
 8. Next: Suggest cc-design skill as recommended next step following my-reviewer validation
+
+## Examples
+
+### Example 1: New project kickoff
+User says: "Define the requirements for our new authentication service"
+Actions:
+1. Explore agent reads existing codebase, Vision.md, and related docs
+2. my-analyst identifies stakeholders, constraints, and functional needs
+3. Requirements are structured into functional, non-functional, and constraints
+4. my-reviewer validates completeness and clarity
+Result: REQUIREMENTS.md created with prioritized requirements
+
+### Example 2: Mid-project scope clarification
+User says: "What exactly do we need for the API migration?"
+Actions:
+1. Explore agent investigates current API surface and dependencies
+2. my-analyst maps existing vs. target state
+3. Gap analysis produces clear requirement set
+Result: REQUIREMENTS.md updated with migration-specific requirements
+
+## Troubleshooting
+
+### Vision.md or input not found
+Cause: No Vision.md exists and user provided no input.
+Solution: Ask the user to describe the project goals, or create a minimal Vision.md with project objectives.
+
+### Requirements too broad or vague
+Cause: Insufficient context or overly ambitious scope.
+Solution: Break down into sub-domains. Use Explore agents to investigate each area separately, then consolidate.

@@ -1,6 +1,13 @@
 ---
 name: cc-remediate
-description: Skill - Close the broken review feedback loop by applying my-reviewer findings, co-working with my-builder and my-reviewer agents
+description: >-
+  Apply fixes for review findings and re-validate. Use when user asks to
+  "remediate", "fix findings", "resolve review issues", or "apply fixes from
+  review". Invoked after cc-review produces MUST-FIX findings. Do NOT use for
+  initial review (use cc-review) or new implementation (use cc-implement).
+metadata:
+  version: 1.0.0
+  category: workflow-automation
 ---
 
 # SKILL - Remediate Review Findings
@@ -62,3 +69,31 @@ An issue is "systemic" and requires escalation to my-architect when:
 ## Escalations (if any)
 - [Systemic issue description and reason for escalation]
 ```
+
+## Examples
+
+### Example 1: Straightforward fix cycle
+User says: "Fix the review findings"
+Actions:
+1. Read docs/REVIEW_FINDINGS.md — 2 MUST-FIX, 1 SHOULD-FIX
+2. my-builder fixes both MUST-FIX items and the SHOULD-FIX
+3. my-reviewer re-validates — all resolved
+Result: docs/REMEDIATION.md with Status: RESOLVED in 1 iteration
+
+### Example 2: Escalation to architect
+User says: "Remediate the security findings"
+Actions:
+1. Read docs/REVIEW_FINDINGS.md — 3 MUST-FIX (same auth pattern issue)
+2. my-builder fixes in iteration 1, but reviewer finds same category in iteration 2
+3. Systemic issue criteria met (same finding category across 2+ iterations)
+Result: Escalated to my-architect for architectural resolution
+
+## Troubleshooting
+
+### docs/REVIEW_FINDINGS.md not found
+Cause: No review has been run yet.
+Solution: Run cc-review skill first to produce findings.
+
+### Iteration cap reached without resolution
+Cause: Fixes keep introducing new issues or the root cause is architectural.
+Solution: Escalate to my-architect per systemic issue criteria. Document the pattern in docs/REMEDIATION.md.
