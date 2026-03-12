@@ -102,7 +102,7 @@ Commit format: `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`, etc.
 ├── scripts/                    # Utility and automation scripts
 ├── AGENTS.md                   # Repo map and quick commands
 ├── CLAUDE.md                   # AI assistant guidelines
-├── PLANS.md                    # Stage-based implementation plan
+├── PLANS.md                    # Scope-leveled implementation plan
 ├── RULES.md                    # Stable project policy
 └── README.md                   # This file
 ```

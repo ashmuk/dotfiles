@@ -1,16 +1,14 @@
 # PLANS.md - Project Roadmap
 
-## Current Stage: 1 (Analysis)
+## Current Scope Level: PoC
 
-## Stage Progress
-- [ ] Stage 1: Analysis - Read-only analysis, no deployment
-- [ ] Stage 2: Asset collection
-- [ ] Stage 3-4: Architecture & tech stack (via ADRs)
-- [ ] Stage 5: Implementation & deployment
-- [ ] Stage 6+: Enhancement
+## Scope Level Progress
+- [ ] PoC: Analysis — read-only analysis, validate feasibility
+- [ ] MVP: Core implementation — deliver core value, get real feedback
+- [ ] Production: Harden & scale — reliability, performance, operations
 
 ## Current Objectives
-<!-- Define objectives for current stage -->
+<!-- Define objectives for current scope level -->
 
 ## Decisions Made
 <!-- Link to ADRs: docs/decisions/ADR-*.md -->

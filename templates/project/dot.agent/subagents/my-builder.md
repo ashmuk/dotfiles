@@ -12,7 +12,7 @@ You are a builder. Execute plans, produce working artifacts.
 Before building, read:
 1. **AGENTS.md** — Repo map, quick commands
 2. **RULES.md** — Project constraints, conventions
-3. **PLANS.md** — Current stage, verify task alignment
+3. **PLANS.md** — Current scope level, verify task alignment
 4. Check existing patterns in codebase before creating new ones
 
 ## Capabilities

@@ -1,20 +1,26 @@
 ---
 name: cc-test
 description: >-
-  Define test strategy, coverage gap analysis, test architecture and test plans.
-  Use when user asks for "test strategy", "test plan", "test coverage",
-  "what to test", or "testing approach". This skill plans WHAT to test, not
-  writes test code. Do NOT use for writing tests (use cc-implement) or
-  reviewing test results (use cc-review).
+  Define test strategy, coverage gap analysis, test architecture and test plans
+  (Step 9 of the 9-step design pipeline). Use when user asks for "test strategy",
+  "test plan", "test coverage", "what to test", or "testing approach". This skill
+  plans WHAT to test, not writes test code. Do NOT use for writing tests (use
+  cc-implement), reviewing test results (use cc-review), or executing deployments
+  (use cc-deploy).
 metadata:
-  version: 1.0.0
+  version: 3.0.0
   category: workflow-automation
 ---
 
-# SKILL - Define Test Strategy
+# SKILL - Step 9: Test Strategy
 
 ## Purpose
 Own test strategy — coverage gap analysis, test architecture, test plans, and regression mapping. This skill plans WHAT to test; my-builder writes the actual test code.
+
+This skill owns **Step 9** of the 9-step design pipeline:
+`1 (cc-define) → 2 (STOP) → 3 → 4 (STOP) → 5 → 6 → 7 (STOP) → 8 (STOP) → 9`
+
+Steps 8–9 form the **execution loop** — they repeat for each scope level (PoC → MVP → Production) as defined in PLANS.md (Step 7).
 
 ## When to use
 - Use this skill when end-user asks for 'test strategy', 'test plan', 'test coverage', or 'testing'
@@ -39,7 +45,7 @@ Own test strategy — coverage gap analysis, test architecture, test plans, and 
 9. my-reviewer agent validates coverage completeness and strategy soundness
 10. Finalize outcome by this feedback loop
 11. Preserve all outcome in docs/TEST_STRATEGY.md or docs/TEST_PLAN.md
-12. Next: Invoke cc-implement skill so my-builder writes tests per the strategy
+12. Next: Invoke cc-implement skill so my-builder writes tests per the strategy, or invoke cc-deploy skill to execute deployment operations
 
 ## Examples
 
@@ -69,3 +75,14 @@ Solution: Start with framework selection and test pyramid definition. Recommend 
 ### User asks to "write tests"
 Cause: Confusion between test strategy and test implementation.
 Solution: Define the strategy first with cc-test, then invoke cc-implement to have my-builder write the actual test code.
+
+### Test strategy reveals design flaws
+Cause: During test planning, the design turns out to be untestable — circular dependencies, missing seams for mocking, tightly coupled components, or no clear contract boundaries.
+Solution: This is a design problem, not a testing problem. Recommend `/cc-design` re-entry at Step 5 (system design) to restructure for testability. Pass the specific testability concerns as context.
+
+### Test failures indicate wrong assumptions
+Cause: Tests fail not because of code bugs, but because the underlying assumptions are wrong (e.g., expected data shapes don't match reality, integration points behave differently than designed).
+Solution: Distinguish the root cause:
+- **Code bugs** (logic errors, typos, missing edge cases) → fix via `/cc-remediate`
+- **Design assumption failures** (component contracts wrong, data flow incorrect) → recommend `/cc-design` re-entry at Step 5
+- **Architecture assumption failures** (technology can't deliver required capability, fundamental approach flawed) → recommend `/cc-design` re-entry at Step 2

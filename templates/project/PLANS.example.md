@@ -1,9 +1,9 @@
-# PLANS.md — Current Stage & Tasks (Mutable)
+# PLANS.md — Current Scope Level & Tasks (Mutable)
 
-## Current Stage
-Stage 1 — Analysis
+## Current Scope Level
+PoC — Analysis
 
-### Stage 1 goals
+### PoC goals
 - Execute target site analysis and asset inventory
 - Output: docs/analytics/ (JSON/Markdown)
 - Constraint: read-only to target site source
@@ -11,11 +11,10 @@ Stage 1 — Analysis
 ### Task board (example)
 | ID | Task | Owner | Output | Acceptance |
 |---|------|-------|--------|------------|
-| S1-01 | Crawl page list & sitemap-ish inventory | Analyst | analytics/pages.json | list covers key sections |
-| S1-02 | Gallery/media extraction | Collector | assets registry | checksums + original resolution |
-| S1-03 | Report summary | Planner | analytics/summary.md | clear next steps |
+| P1-01 | Crawl page list & sitemap-ish inventory | Analyst | analytics/pages.json | list covers key sections |
+| P1-02 | Gallery/media extraction | Collector | assets registry | checksums + original resolution |
+| P1-03 | Report summary | Planner | analytics/summary.md | clear next steps |
 
-## Next stages (outline)
-- Stage 2: Collector — download assets, checksum, registry
-- Stage 3-4: Architect — ADRs, stack selection, diagrams
-- Stage 5+: Builder — implement AWS-hosted site
+## Next scope levels (outline)
+- MVP: Collector — download assets, checksum, registry; Architect — ADRs, stack selection, diagrams
+- Production: Builder — implement AWS-hosted site, harden, scale

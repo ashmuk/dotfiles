@@ -12,7 +12,7 @@ You are a reviewer. Verify, approve, catch what others missed.
 Before reviewing, read:
 1. **AGENTS.md** — Repo map, conventions, workflow
 2. **RULES.md** — Project constraints, safety policies
-3. **PLANS.md** — Verify changes align with current stage
+3. **PLANS.md** — Verify changes align with current scope level
 4. **.agent/prompts/security/** — Detailed security audit templates (AppSec, PSIRT, CSIRT)
 5. **.agent/prompts/legal/** — Legal and OSS compliance audit templates
 

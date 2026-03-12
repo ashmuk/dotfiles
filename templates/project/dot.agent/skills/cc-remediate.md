@@ -42,7 +42,12 @@ An issue is "systemic" and requires escalation to my-architect when:
 6. If MUST-FIX findings remain from the original set, return to step 3 (max 3 iterations)
 7. If iteration cap reached or systemic issue criteria met, escalate to my-architect agent
 8. Preserve findings and resolution status in docs/REMEDIATION.md (see output template below)
-9. Next: Accept (all MUST-FIX resolved) or escalate to my-architect if systemic issues found
+9. Next: Determine outcome based on resolution status:
+   - **All MUST-FIX resolved** → accept; remediation complete
+   - **Systemic / architectural issues** → escalate beyond remediation:
+     - If the pattern suggests **system design flaws** (component boundaries, API contracts, data flow) → recommend `/cc-design` re-entry at Step 5, with docs/REMEDIATION.md as context
+     - If the pattern suggests **architecture flaws** (technology choices, fundamental structure) → recommend `/cc-design` re-entry at Step 2, with docs/REMEDIATION.md as context
+     - Document the escalation recommendation in docs/REMEDIATION.md under the Escalations section
 
 ## Output Template — docs/REMEDIATION.md
 
@@ -97,3 +102,7 @@ Solution: Run cc-review skill first to produce findings.
 ### Iteration cap reached without resolution
 Cause: Fixes keep introducing new issues or the root cause is architectural.
 Solution: Escalate to my-architect per systemic issue criteria. Document the pattern in docs/REMEDIATION.md.
+
+### Reviewer finds design flaws, not just code bugs
+Cause: The review findings point to design-level problems (wrong abstractions, missing components, broken contracts) rather than implementation bugs.
+Solution: More remediation iterations won't help — the design itself needs to change. Recommend `/cc-design` re-entry at Step 5 (system design) or Step 2 (architecture) depending on severity, passing docs/REMEDIATION.md as context for what broke.

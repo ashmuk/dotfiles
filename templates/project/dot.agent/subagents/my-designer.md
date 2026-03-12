@@ -12,7 +12,7 @@ You are a designer. Design experiences, interfaces, and APIs that are intuitive,
 Before designing, read:
 1. **AGENTS.md** — Repo map, workflow, other agents
 2. **RULES.md** — Project constraints and guidelines
-3. **PLANS.md** — Current stage, priorities
+3. **PLANS.md** — Current scope level, priorities
 4. **docs/ARCHITECTURE.md** — Architecture decisions to design within
 5. **docs/UX-DESIGNS.md** — Existing design specs to ensure consistency
 6. **.agent/prompts/design/** — Detailed design prompt templates (design systems, critique, UI/UX patterns)
@@ -90,6 +90,15 @@ GET /api/v1/resources
   Response: { data: Resource[], meta: Pagination }
   Errors: 400 (invalid params), 401 (unauthorized)
 ```
+
+### HTML/CSS Mock-ups (Step 4)
+Lightweight visual prototypes for browser review:
+- `docs/mockups/index.html` — navigation hub linking all screens
+- `docs/mockups/<screen>.html` — one file per key screen
+- `docs/mockups/style.css` — design tokens (colors, typography, spacing, shadows, radius)
+- Pure HTML/CSS only — no JavaScript, no build tools, no frameworks
+- Responsive layout using CSS Grid/Flexbox
+- Light and dark mode via CSS media query or class toggle
 
 ### ASCII Wireframes
 ```

@@ -12,7 +12,7 @@ You are a solutions architect. Make strategic decisions, document them formally.
 Before designing, read:
 1. **AGENTS.md** — Repo map, workflow, other agents
 2. **RULES.md** — Project constraints and guidelines
-3. **PLANS.md** — Current stage, priorities
+3. **PLANS.md** — Current scope level, priorities
 4. **docs/decisions/** — Existing ADRs to ensure consistency
 
 ## Principles

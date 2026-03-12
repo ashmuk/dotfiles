@@ -54,6 +54,7 @@ Use these commands for common workflows:
 - `/cc-implement` — Build software and artifacts (uses general-purpose agents)
 - `/cc-review` — Review project progress and validate implementations
 - `/cc-remediate` — Apply fixes from review findings and re-validate (uses my-builder + my-reviewer agents)
+- `/cc-deploy` — Execute deployments, releases, and infrastructure provisioning (uses my-builder + my-reviewer agents)
 
 **Git Workflows**:
 - `/cc-commit` — Stage changes and create conventional commit with generated message
@@ -115,7 +116,7 @@ This project uses specialized subagents (defined in `.claude/agents/`) for diffe
 - **my-reviewer** — Code review, security validation, integrity checks
   - Use for: Validating implementations, security audits, final checks before merge
 
-**Coordination**: Use workflow skills (`/cc-define`, `/cc-design`, `/cc-test`, `/cc-implement`, `/cc-review`, `/cc-remediate`) to automatically coordinate these agents for multi-step tasks.
+**Coordination**: Use workflow skills (`/cc-define`, `/cc-design`, `/cc-test`, `/cc-implement`, `/cc-review`, `/cc-remediate`, `/cc-deploy`) to automatically coordinate these agents for multi-step tasks.
 
 ## Claude-Specific Guidelines
 

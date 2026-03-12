@@ -2,7 +2,7 @@
 
 > This file is intentionally short. Detailed rules and current plans live in:
 > - RULES.md (stable policy)
-> - PLANS.md, if present (current stage, tasks, progress)
+> - PLANS.md, if present (current scope level, tasks, progress)
 > - BACKLOG.md, if present
 
 ## Project
@@ -29,30 +29,32 @@
 | `/cc-implement` | my-builder | general-purpose | my-reviewer | — |
 | `/cc-review` | my-reviewer | — | (self) | — |
 | `/cc-remediate` | my-builder | — | my-reviewer | my-architect (systemic) |
+| `/cc-deploy` | my-builder | — | my-reviewer (mandatory gate) | my-architect (infra design) |
 | `/cc-adr` | (template) | — | — | — |
 
-**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect+my-designer) → cc-test(my-analyst) → cc-implement(my-builder) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer)`
+**Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect+my-designer) → cc-implement(my-builder) → cc-test(my-analyst) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer) → cc-deploy(my-builder+my-reviewer)`
 
 ## Model Selection Matrix
 
 > **Principle: Plan with Opus, Build with Sonnet, Run with Haiku**
 >
 > Advisory only — Claude Code does not yet support dynamic model selection per agent invocation.
-> This matrix documents recommended model assignments per skill phase and command.
-> For future reference when model-variant agents or per-phase model parameters become available.
+> This matrix documents recommended model assignments per pipeline step and command.
+> For future reference when model-variant agents or per-step model parameters become available.
 
-### Skills — Per-Phase Model Recommendations
+### Skills — Per-Step Model Recommendations
 
-| Skill | Phase | Agent | Model | Rationale |
-|-------|-------|-------|-------|-----------|
-| `/cc-define` | Context exploration | my-analyst + Explore | Sonnet | Read-and-summarize |
-| `/cc-define` | Requirements synthesis | my-analyst | Opus | Judgment under ambiguity |
-| `/cc-define` | Validation | my-reviewer (policy) | Sonnet | Checklist-driven |
-| `/cc-design` | Phase A: Architecture | my-architect + Plan | Opus | Novel trade-offs |
-| `/cc-design` | Phase B: UX/API Design | my-designer + Plan | Opus | Design judgment, HIG, API ergonomics |
-| `/cc-design` | Phase C: System Design | my-architect + Plan | Opus | Lasting design choices |
-| `/cc-design` | Phase D: Task Breakdown | Plan agents | Sonnet | Structured decomposition |
-| `/cc-design` | Phase E: Planning | Plan agents | Sonnet | Sequencing |
+| Skill | Step | Agent | Model | Rationale |
+|-------|------|-------|-------|-----------|
+| `/cc-define` | Step 1: Context exploration | my-analyst + Explore | Sonnet | Read-and-summarize |
+| `/cc-define` | Step 1: Requirements synthesis | my-analyst | Opus | Judgment under ambiguity |
+| `/cc-define` | Step 1: Validation | my-reviewer (policy) | Sonnet | Checklist-driven |
+| `/cc-design` | Step 2: Architecture | my-architect + Plan | Opus | Novel trade-offs |
+| `/cc-design` | Step 3: UX/UI Design | my-designer + Plan | Opus | Design judgment, HIG, API ergonomics |
+| `/cc-design` | Step 4: Mock-up | my-designer | Sonnet | Tactical HTML/CSS from design specs |
+| `/cc-design` | Step 5: System Design | my-architect + Plan | Opus | Lasting design choices |
+| `/cc-design` | Step 6: Task Breakdown | Plan agents | Sonnet | Structured decomposition |
+| `/cc-design` | Step 7: Planning | Plan agents | Sonnet | Sequencing |
 | `/cc-test` | Test planning/strategy | my-analyst | Opus | Coverage gaps, risk reasoning |
 | `/cc-test` | Strategy validation | my-reviewer | Sonnet | Checklist completeness |
 | `/cc-implement` | Feature code | my-builder | Sonnet | Standard implementation |
@@ -64,6 +66,10 @@
 | `/cc-remediate` | Apply fixes | my-builder | Sonnet | Known fixes from findings |
 | `/cc-remediate` | Re-validation | my-reviewer | Sonnet | Scoped fix verification |
 | `/cc-remediate` | Systemic escalation | my-architect | Opus | Architectural judgment |
+| `/cc-deploy` | Pre-flight plan | my-builder | Sonnet | Structured checklist generation |
+| `/cc-deploy` | Safety gate | my-reviewer | Opus | Adversarial reasoning about irreversible actions |
+| `/cc-deploy` | Command execution | my-builder | Sonnet | Deployment commands may be destructive; needs judgment on partial failures |
+| `/cc-deploy` | Rollback assessment | my-reviewer | Opus | Judgment under pressure |
 | `/cc-adr` | ADR creation | — | Opus | Decision quality matters |
 
 ### Commands — Model Recommendations

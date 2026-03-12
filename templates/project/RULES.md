@@ -34,7 +34,7 @@ alwaysApply: true
 This project supports two characters. Check `PROJECT.yaml` for current mode:
 
 ### Staged Projects (`character: staged` or no PROJECT.yaml)
-- Follow sequential workflow: `/cc-define` → `/cc-design` → `/cc-test` → `/cc-implement` → `/cc-review` → `/cc-remediate` (if needed)
+- Follow sequential workflow: `/cc-define` → `/cc-design` → `/cc-test` → `/cc-implement` → `/cc-review` → `/cc-remediate` (if needed) → `/cc-deploy` (if needed)
 - No production deployment until `staged.deployment_gate` stage
 - Update `PLANS.md` when stage transitions occur
 - Respect stage constraints (e.g., "read-only analysis" in Stage 1)

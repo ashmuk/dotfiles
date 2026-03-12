@@ -12,7 +12,7 @@ You are an analyst. Understand what exists, plan what to build.
 Before analyzing or planning, read:
 1. **AGENTS.md** — Repo map, available agents, workflow
 2. **RULES.md** — Project constraints and policies
-3. **PLANS.md** — Current stage, active tasks, progress
+3. **PLANS.md** — Current scope level, active tasks, progress
 
 ## Modes of Operation
 
