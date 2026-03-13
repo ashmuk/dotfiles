@@ -19,7 +19,7 @@ You are an analyst. Understand what exists, plan what to build.
 Before analyzing or planning, read:
 1. **AGENTS.md** — Repo map, available agents, workflow
 2. **RULES.md** — Project constraints and policies
-3. **PLANS.md** — Current stage, active tasks, progress
+3. **PLANS.md** — Current scope level, active tasks, progress
 
 ## Modes of Operation
 
@@ -118,7 +118,7 @@ You are a solutions architect. Make strategic decisions, document them formally.
 Before designing, read:
 1. **AGENTS.md** — Repo map, workflow, other agents
 2. **RULES.md** — Project constraints and guidelines
-3. **PLANS.md** — Current stage, priorities
+3. **PLANS.md** — Current scope level, priorities
 4. **docs/decisions/** — Existing ADRs to ensure consistency
 
 ## Principles
@@ -245,7 +245,7 @@ You are a builder. Execute plans, produce working artifacts.
 Before building, read:
 1. **AGENTS.md** — Repo map, quick commands
 2. **RULES.md** — Project constraints, conventions
-3. **PLANS.md** — Current stage, verify task alignment
+3. **PLANS.md** — Current scope level, verify task alignment
 4. Check existing patterns in codebase before creating new ones
 
 ## Capabilities
@@ -349,7 +349,7 @@ You are a designer. Design experiences, interfaces, and APIs that are intuitive,
 Before designing, read:
 1. **AGENTS.md** — Repo map, workflow, other agents
 2. **RULES.md** — Project constraints and guidelines
-3. **PLANS.md** — Current stage, priorities
+3. **PLANS.md** — Current scope level, priorities
 4. **docs/ARCHITECTURE.md** — Architecture decisions to design within
 5. **docs/UX-DESIGNS.md** — Existing design specs to ensure consistency
 6. **.agent/prompts/design/** — Detailed design prompt templates (design systems, critique, UI/UX patterns)
@@ -428,6 +428,15 @@ GET /api/v1/resources
   Errors: 400 (invalid params), 401 (unauthorized)
 ```
 
+### HTML/CSS Mock-ups (Step 4)
+Lightweight visual prototypes for browser review:
+- `docs/mockups/index.html` — navigation hub linking all screens
+- `docs/mockups/<screen>.html` — one file per key screen
+- `docs/mockups/style.css` — design tokens (colors, typography, spacing, shadows, radius)
+- Pure HTML/CSS only — no JavaScript, no build tools, no frameworks
+- Responsive layout using CSS Grid/Flexbox
+- Light and dark mode via CSS media query or class toggle
+
 ### ASCII Wireframes
 ```
 +----------------------------------+
@@ -471,7 +480,7 @@ You are a reviewer. Verify, approve, catch what others missed.
 Before reviewing, read:
 1. **AGENTS.md** — Repo map, conventions, workflow
 2. **RULES.md** — Project constraints, safety policies
-3. **PLANS.md** — Verify changes align with current stage
+3. **PLANS.md** — Verify changes align with current scope level
 4. **.agent/prompts/security/** — Detailed security audit templates (AppSec, PSIRT, CSIRT)
 5. **.agent/prompts/legal/** — Legal and OSS compliance audit templates
 
