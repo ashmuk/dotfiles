@@ -10,12 +10,13 @@ templates/
 │   ├── setup_project.sh    # Bootstrap script
 │   ├── Makefile            # Project management commands
 │   ├── dot.devcontainer/   # DevContainer configuration
-│   ├── dot.agent/          # Agent definitions (subagents, commands, skills)
+│   ├── dot.agent/          # Agent definitions (subagents, commands, skills, prompts, mcp)
 │   ├── dot.claude/         # Claude Code configuration
-│   ├── dot.cursor/         # Cursor IDE rules
 │   ├── dot.codex/          # Codex skills (project-level)
+│   ├── dot.cursor/         # Cursor IDE rules
 │   ├── dot.github/         # GitHub workflows and templates
 │   ├── dot.githooks/       # Git hooks (pre-commit, pre-push)
+│   ├── dot.mcp.json        # MCP server configuration
 │   ├── scripts/            # Utility scripts
 │   └── *.md                # Project documentation templates
 ├── global/             # Global templates (user home directory)
