@@ -53,6 +53,47 @@ Steps 8–9 form the **execution loop** — they repeat for each scope level (Po
     Do NOT proceed to Step 9 until user explicitly resumes.
 9. Next: Invoke cc-test skill (Step 9) for test strategy
 
+## Issue Creation (at scope transition) — Optional
+When `github_issues.enabled: true` in PROJECT.yaml:
+
+### First scope level (before Step 2)
+If no open issues exist for the current scope level:
+1. Parse PLANS.md or docs/TASK_BREAKDOWN.md for tasks in the current scope level
+2. Prompt: "Create GitHub Issues for [current scope level]? ([N] tasks)"
+3. If yes:
+   a. Ensure labels and milestones exist (per cc-issue-create taxonomy)
+   b. Create issues for that scope level only via `> /cc-issue-create --bulk --scope [level]`
+   c. Run cc-issue-sync to refresh TASKS.md
+4. If no: continue without issues for this scope level
+5. If `gh` fails: skip and continue
+
+### Scope level transitions (PoC → MVP, MVP → Production)
+At each transition checkpoint (see Scope Level Transition below), before the user decides on next scope level:
+1. Parse PLANS.md or docs/TASK_BREAKDOWN.md for tasks in the NEXT scope level
+2. Prompt: "Create GitHub Issues for [next scope level]? ([N] tasks)"
+3. If yes:
+   a. Ensure labels and milestones exist (per cc-issue-create taxonomy)
+   b. Create issues for that scope level only via `> /cc-issue-create --bulk --scope [level]`
+   c. Run cc-issue-sync to refresh TASKS.md
+4. If no: continue without issues for this scope level
+5. If `gh` fails: skip and continue
+
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:implement` (remove previous step labels)
+2. Post implementation summary as comment:
+   ```
+   ## Implementation (cc-implement)
+   - Files changed: [list]
+   - Scope level: [PoC/MVP/Production]
+   - Status: [complete/in-progress]
+   ```
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: Feature implementation from plan

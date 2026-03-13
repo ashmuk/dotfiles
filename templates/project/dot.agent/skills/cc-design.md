@@ -142,13 +142,13 @@ Break down design into actionable tasks.
 2. Create task breakdowns using the model **Sonnet**
 3. Apply my-reviewer agent policy for validation of task breakdown
 4. Finalize outcome by this feedback loop
-5. Preserve all outcome in docs/TASKS.md
+5. Preserve all outcome in docs/TASK_BREAKDOWN.md
 6. Next: Proceed to Step 7 (Planning)
 
 ### Step 7: Planning (Model: Sonnet) — STOP gate
 Create scope-leveled execution plans respecting my-architect's scope progression (PoC → MVP → Production).
 
-1. Read docs/TASKS.md (if exists, from Step 6)
+1. Read docs/TASK_BREAKDOWN.md (if exists, from Step 6)
 2. Create plans using the model **Sonnet**, defining scope levels (PoC/MVP/Production) aligned with the scope progression recommended by my-architect
 3. Apply my-reviewer agent policy for validation of plans
 4. Finalize outcome by this feedback loop
@@ -164,6 +164,23 @@ Create scope-leveled execution plans respecting my-architect's scope progression
 
     Do NOT proceed until user explicitly resumes.
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:design` (remove previous step labels)
+2. After each STOP gate, post a comment to linked issues with the step outcome:
+   ```
+   ## Design (cc-design)
+   - Step: [N]
+   - Key decisions: [summary]
+   - Artifacts: [list of docs produced]
+   ```
+   For public repositories, post only a summary reference ("Architecture decisions documented in docs/ARCHITECTURE.md") rather than full content.
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: Full design from requirements
@@ -178,7 +195,7 @@ Actions:
 7. Step 6: Task breakdown into implementable units
 8. Step 7: Scope-leveled execution plan — **STOP for user review**
 9. User resumes and proceeds to `/cc-test` then `/cc-implement`
-Result: docs/ARCHITECTURE.md, docs/PREREQUISITES.md, docs/UX-DESIGNS.md, docs/mockups/, docs/DESIGNS.md, docs/TASKS.md, PLANS.md
+Result: docs/ARCHITECTURE.md, docs/PREREQUISITES.md, docs/UX-DESIGNS.md, docs/mockups/, docs/DESIGNS.md, docs/TASK_BREAKDOWN.md, PLANS.md
 
 ### Example 2: API design only (backend)
 User says: "Design the REST API for the payment service"

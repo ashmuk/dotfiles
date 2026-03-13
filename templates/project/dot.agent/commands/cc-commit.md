@@ -40,6 +40,11 @@ Then:
    - Scope: optional, module or component affected
    - Description: imperative mood, lowercase, no period
    - Body: optional, explain what and why
+   - **Issue reference**: If `github_issues.enabled: true` in PROJECT.yaml and the work relates to a GitHub Issue:
+     - Include `Refs #N` in the commit body for in-progress work
+     - Include `Closes #N` in the commit body when the commit completes the issue
+     - Detect the linked issue from: branch name pattern (`feature/123-*`, `fix/123-*`), recent issue context in conversation, or ask user
+     - If no linked issue is detected and issues are enabled, ask: "Link to a GitHub Issue? (enter number, or skip)"
 
 3. Show the proposed commit message and ask for confirmation
 

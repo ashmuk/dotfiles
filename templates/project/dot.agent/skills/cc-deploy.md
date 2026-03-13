@@ -174,6 +174,23 @@ Typical invocation flow:
 - Notes: [any observations]
 ```
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:deploy` (remove previous step labels)
+2. Post deployment status as comment:
+   ```
+   ## Deployment (cc-deploy)
+   - Environment: [target]
+   - Scope level: [PoC/MVP/Production]
+   - Status: [DEPLOYED/ROLLED_BACK/FAILED]
+   ```
+3. Do not close issues automatically — let `Closes #N` in the merged PR handle closure. If no PR will follow, ask the user whether to close the issue.
+4. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: PoC deployment to GitHub Pages

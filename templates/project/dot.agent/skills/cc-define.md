@@ -41,6 +41,23 @@ ClaudeCode built-in Explore agent(s) respects my-analyst agent's policies
 7. Preserve all outcome in REQUIREMENTS.md
 8. Next: Suggest cc-design skill (Step 2 onward) as recommended next step — "Run `/cc-design` to begin Step 2: Architecture"
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:define` (remove previous step labels)
+2. Post a comment to the linked issue summarizing the requirements outcome:
+   ```
+   ## Requirements (cc-define)
+   - Functional requirements: [count]
+   - Non-functional requirements: [count]
+   - Constraints: [count]
+   - Status: Step 1 complete
+   ```
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: New project kickoff

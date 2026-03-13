@@ -47,6 +47,22 @@ Steps 8–9 form the **execution loop** — they repeat for each scope level (Po
 11. Preserve all outcome in docs/TEST_STRATEGY.md or docs/TEST_PLAN.md
 12. Next: Invoke cc-implement skill so my-builder writes tests per the strategy, or invoke cc-deploy skill to execute deployment operations
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:test` (remove previous step labels)
+2. Post test strategy summary as comment:
+   ```
+   ## Test Strategy (cc-test)
+   - Test pyramid: [ratios]
+   - Coverage gaps identified: [count]
+   - Framework: [chosen framework]
+   ```
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: Greenfield test strategy

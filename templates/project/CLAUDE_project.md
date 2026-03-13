@@ -57,10 +57,14 @@ Use these commands for common workflows:
 - `/cc-deploy` — Execute deployments, releases, and infrastructure provisioning (uses my-builder + my-reviewer agents)
 
 **Git Workflows**:
-- `/cc-commit` — Stage changes and create conventional commit with generated message
+- `/cc-commit` — Stage changes and create conventional commit with generated message (includes issue refs when enabled)
 - `/cc-pr-merge` — Validate and merge an open pull request on GitHub
 - `/cc-push` — Push changes to remote with safety checks
-- `/cc-pr-create` — Create pull request with auto-generated title and description
+- `/cc-pr-create` — Create pull request with auto-generated title and description (auto-links issues when enabled)
+
+**Issue Tracking**:
+- `/cc-issue-create` — Create GitHub Issue with labels and milestones
+- `/cc-issue-sync` — Refresh TASKS.md from GitHub Issues
 
 **DevContainer Lifecycle**:
 - `/cc-devcontainer-up` — Start development environment

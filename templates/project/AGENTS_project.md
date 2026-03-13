@@ -19,6 +19,12 @@
 - my-builder — Implement code, scripts, CI/CD, infrastructure, collect assets
 - my-reviewer — Code review, security, safety escalation, integrity verification
 
+### Terminology
+- **Step** (1–9): Pipeline workflow sequence — applies to all projects
+- **Stage** (1–6+): Project lifecycle progression — `character: staged` only
+- **Scope Level** (PoC/MVP/Production): Feature breadth per execution cycle
+- **Phase** (1–4): Deployment sub-workflow within cc-deploy
+
 ## Agent-Skill Coverage Matrix
 
 | Skill | Primary Agent | Co-working Built-in | Reviewer Gate | Escalation |
@@ -33,6 +39,15 @@
 | `/cc-adr` | (template) | — | — | — |
 
 **Workflow chain:** `cc-define(my-analyst) → cc-design(my-architect+my-designer) → cc-implement(my-builder) → cc-test(my-analyst) → cc-review(my-reviewer) → cc-remediate(my-builder+my-reviewer) → cc-deploy(my-builder+my-reviewer)`
+
+### GitHub Issues Integration
+When `github_issues.enabled: true` in PROJECT.yaml, the pipeline integrates with GitHub Issues:
+- **cc-implement** creates issues at scope transition checkpoints (per scope level)
+- **All pipeline skills** auto-post status comments to linked issues
+- **cc-commit** includes `Refs #N` / `Closes #N` in commit messages
+- **cc-pr-create** auto-detects and references issues in PR body
+- **cc-issue-sync** refreshes TASKS.md (auto-generated snapshot of GitHub Issues)
+- **Offline**: all issue operations degrade gracefully — pipeline works without GitHub
 
 ## Model Selection Matrix
 
@@ -83,6 +98,8 @@
 | `/cc-devcontainer-up` | Haiku | Shell command execution |
 | `/cc-devcontainer-down` | Haiku | Shell command execution |
 | `/cc-devcontainer-rebuild` | Haiku | Shell command execution |
+| `/cc-issue-create` | Sonnet | Label inference and issue body generation |
+| `/cc-issue-sync` | Haiku | Fetch and format issues |
 
 ## Quick commands
 ### Agent/AI workflows
@@ -101,10 +118,14 @@
 Available slash commands for common workflows:
 
 **Git workflows:**
-- `/cc-commit` — Stage changes and create conventional commit
+- `/cc-commit` — Stage changes and create conventional commit (includes issue refs when enabled)
 - `/cc-push` — Push changes with safety checks
-- `/cc-pr-create` — Create pull request with generated description
+- `/cc-pr-create` — Create pull request with generated description (auto-links issues when enabled)
 - `/cc-pr-merge` — Validate and merge an open pull request
+
+**Issue tracking:**
+- `/cc-issue-create` — Create GitHub Issue with labels and milestones
+- `/cc-issue-sync` — Refresh TASKS.md from GitHub Issues
 
 **DevContainer lifecycle:**
 - `/cc-devcontainer-up` — Start development environment

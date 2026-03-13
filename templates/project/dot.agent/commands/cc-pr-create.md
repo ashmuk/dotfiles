@@ -42,6 +42,15 @@ Based on the commits and diff, generate content:
 
 Otherwise, follow this below
 
+### Issue Detection
+When `github_issues.enabled: true` in PROJECT.yaml:
+1. Extract issue numbers from branch name (e.g., `feature/123-description` → #123)
+2. Extract issue references from commit messages (`Refs #N`, `Closes #N`)
+3. Include all detected issues in the PR description under "Related Issues"
+4. Use `Closes #N` for issues that will be completed by this PR
+5. Use `Relates to #N` for issues that are referenced but not completed
+6. Show all detected issue references to the user for confirmation before including them in the PR body. Distinguish between `Closes` (will auto-close on merge) and `Relates to` (informational only).
+
 ### Title
 - Follow format: `<type>: <description>` or match branch name pattern
 - Keep under 72 characters
@@ -61,7 +70,8 @@ Use this template:
 <How the changes were tested>
 
 ## Related Issues
-<Link to related issues: Fixes #123, Relates to #456>
+<!-- Auto-detected from branch name and commit messages -->
+<Fixes #N, Relates to #M — auto-detect from branch name pattern and commit body references>
 ```
 
 ## Create PR

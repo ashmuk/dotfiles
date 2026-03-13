@@ -39,6 +39,23 @@ Review all relevant aspects of project progress, co-working with ClaudeCode buil
 6. Preserve findings in docs/REVIEW_FINDINGS.md
 7. Next: If MUST-FIX findings exist, invoke cc-remediate skill. Otherwise, accept.
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:review` (remove previous step labels)
+2. Post review findings summary as comment:
+   ```
+   ## Review (cc-review)
+   - MUST-FIX: [count]
+   - SHOULD-FIX: [count]
+   - SUGGESTION: [count]
+   - Status: [accepted/needs-remediation]
+   ```
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: Pre-commit validation

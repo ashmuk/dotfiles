@@ -75,6 +75,22 @@ An issue is "systemic" and requires escalation to my-architect when:
 - [Systemic issue description and reason for escalation]
 ```
 
+## Issue Integration (optional)
+When `github_issues.enabled: true` and `auto_post: true` in PROJECT.yaml, detect linked issue(s) from:
+(a) branch name pattern (first number after prefix slash, e.g., `feature/123-desc` → #123),
+(b) issue references in recent commit messages (`Refs #N`), or
+(c) conversation context.
+If found:
+1. Update the issue's step label to `step:remediate` (remove previous step labels)
+2. Post remediation summary as comment:
+   ```
+   ## Remediation (cc-remediate)
+   - Iteration: [N of 3]
+   - MUST-FIX resolved: [count]
+   - Status: [RESOLVED/ESCALATED]
+   ```
+3. If `gh` fails (offline/no remote), skip and continue. If the issue is locked, log a note: "Issue #N is locked — skipping comment."
+
 ## Examples
 
 ### Example 1: Straightforward fix cycle
