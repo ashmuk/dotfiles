@@ -171,6 +171,9 @@ alias gloga='git log --oneline --decorate --graph --all'
 alias gmain='git checkout main'
 alias gdev='git checkout develop'
 
+# Tag related
+alias gtn='git tag -n1'
+
 # =============================================================================
 # Shell-specific aliases (to be defined in shell config files)
 # =============================================================================
