@@ -10,7 +10,7 @@ PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // empty' | tr '[:upper:]' '[:low
 KEYWORDS=("simplify" "clean up" "cleanup" "refactor" "readable" "整理" "シンプル" "きれいに" "リファクタ")
 
 for kw in "${KEYWORDS[@]}"; do
-  if printf '%s' "$PROMPT" | grep -q "$kw"; then
+  if printf '%s' "$PROMPT" | grep -qF "$kw"; then
     jq -n '{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "Use the code-simplifier agent for this task."}}'
     exit 0
   fi

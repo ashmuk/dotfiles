@@ -9,7 +9,17 @@ config/claude/
 ├── setup_claude.sh       # Installation script for Claude config
 ├── settings.json         # Main Claude configuration file (English)
 ├── settings.ja.json      # Japanese-commented version for reference
-└── README_claude.md      # This documentation file
+├── README_claude.md      # This documentation file
+└── hooks/                # Hook scripts for Claude Code lifecycle events
+    ├── auto-format.sh          # PostToolUse: Auto-format after Write/Edit
+    ├── file-guard.sh           # PreToolUse: Guard protected files on Write/Edit
+    ├── load-project-env.sh     # SessionStart: Load project environment
+    ├── maybe-simplify.sh       # Stop: Prompt code-simplifier when many files changed
+    ├── notify-attention.sh     # Notification: Sound + popup when Claude needs attention
+    ├── notify-completion.sh    # Stop: Play completion sound (skips if simplifier active)
+    ├── play-sound.sh           # Utility: Cross-platform sound playback helper
+    ├── security-guard.sh       # PreToolUse: Block dangerous Bash commands
+    └── trigger-simplifier.sh   # UserPromptSubmit: Trigger simplifier workflow
 ```
 
 ## Installation
@@ -69,9 +79,24 @@ The configuration implements a three-tier permission system:
 - **Additional Directories**: Access to docs, templates, and shared resources
 - **Platform Detection**: Automatic platform-specific configurations
 
+### 🔔 **Hooks (Lifecycle Events)**
+Hook scripts in `hooks/` run automatically at key points in the Claude Code session:
+
+| Event | Hook | Purpose |
+|-------|------|---------|
+| `SessionStart` | `load-project-env.sh` | Load project environment variables |
+| `PreToolUse` (Bash) | `security-guard.sh` | Block dangerous shell commands |
+| `PreToolUse` (Write/Edit) | `file-guard.sh` | Protect sensitive files from modification |
+| `PostToolUse` (Write/Edit) | `auto-format.sh` | Auto-format code after edits |
+| `Stop` | `notify-completion.sh` | Play completion sound (cross-platform) |
+| `Stop` | `maybe-simplify.sh` | Prompt code-simplifier for large changesets |
+| `UserPromptSubmit` | `trigger-simplifier.sh` | Trigger simplifier workflow |
+| `Notification` | `notify-attention.sh` | Sound + popup when Claude needs attention |
+
+**Notification hooks** (`notify-*`) delegate to `play-sound.sh`, a shared cross-platform sound playback utility that supports custom MP3 sounds with platform-native fallbacks.
+
 ### 📊 **Development Features**
-- **Auto-save**: Automatic file saving
-- **Auto-format**: Automatic code formatting
+- **Auto-format**: Automatic code formatting via hooks
 - **Git Integration**: Co-authored commit support
 - **Status Line**: Custom project status display
 - **Logging**: Comprehensive logging with rotation

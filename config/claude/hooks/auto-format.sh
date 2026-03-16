@@ -2,7 +2,8 @@
 # .claude/hooks/auto-format.sh
 # PostToolUse hook: Auto-format (Prettier + ESLint)
 
-FILE_PATH=$(jq -r '.tool_input.file_path // empty')
+INPUT=$(cat)
+FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty')
 
 # Skip if no file path is available
 [ -z "$FILE_PATH" ] && exit 0
@@ -15,7 +16,7 @@ elif [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "prettier.config.
 fi
 
 # ESLint (JS/TS files only)
-if echo "$FILE_PATH" | grep -qE '\.(js|jsx|ts|tsx|mjs|cjs)$'; then
+if [[ "$FILE_PATH" =~ \.(js|jsx|ts|tsx|mjs|cjs)$ ]]; then
   if command -v npx &>/dev/null; then
     npx eslint --fix "$FILE_PATH" 2>/dev/null
   fi
