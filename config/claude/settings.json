@@ -129,7 +129,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/auto-format.sh"
+            "command": "~/.claude/hooks/auto-format.sh"
           }
         ]
       }
@@ -140,7 +140,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/security-guard.sh"
+            "command": "~/.claude/hooks/security-guard.sh"
           }
         ]
       },
@@ -149,7 +149,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/file-guard.sh"
+            "command": "~/.claude/hooks/file-guard.sh"
           }
         ]
       }
@@ -159,7 +159,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/stop_sound.sh"
+            "command": "~/.claude/hooks/stop_sound.sh"
           }
         ]
       },
@@ -167,7 +167,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/maybe-simplify.sh"
+            "command": "~/.claude/hooks/maybe-simplify.sh"
           }
         ]
       }
@@ -177,7 +177,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/trigger-simplifier.sh"
+            "command": "~/.claude/hooks/trigger-simplifier.sh"
           }
         ]
       }
@@ -187,7 +187,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/notify.sh"
+            "command": "~/.claude/hooks/notify.sh"
           }
         ]
       }
