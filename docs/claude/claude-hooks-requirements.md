@@ -58,9 +58,11 @@ FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 # Skip if no file path is available
 [ -z "$FILE_PATH" ] && exit 0
 
-# Prettier
-if command -v npx &>/dev/null; then
-  npx prettier --write "$FILE_PATH" 2>/dev/null
+# Prettier (only if locally installed or configured)
+if [ -x "node_modules/.bin/prettier" ]; then
+  node_modules/.bin/prettier --write "$FILE_PATH" 2>/dev/null
+elif [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "prettier.config.js" ]; then
+  command -v npx &>/dev/null && npx prettier --write "$FILE_PATH" 2>/dev/null
 fi
 
 # ESLint (JS/TS files only)
@@ -90,28 +92,39 @@ exit 0
 # PreToolUse hook: Dangerous command blocker
 
 INPUT=$(cat)
-TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
+TOOL=$(printf '%s' "$INPUT" | jq -r '.tool_name // empty')
 
 # Skip non-Bash tools
 [ "$TOOL" != "Bash" ] && exit 0
 
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
 
 # Blocked patterns
 DANGEROUS_PATTERNS=(
-  'rm -rf /'
-  'rm -rf \*'
+  '\brm\s+-rf\s+/'
+  '\brm\s+-rf\s+\*'
   'sudo rm'
-  'git push --force.*main'
-  'git push -f.*main'
-  'git reset --hard'
+  'git push --force.*(main|master)'
+  'git push -f.*(main|master)'
+  'git reset --hard'       # Broad: also blocks safe usage on feature branches (trade-off for safety)
   'chmod 777'
+  ':\(\)\{.*\|.*&\}'      # Fork bomb — only matches :() naming; renamed variants bypass
+)
+
+# Case-insensitive SQL patterns
+SQL_PATTERNS=(
   'DROP TABLE'
-  ':\(\)\{.*\|.*&\}'
 )
 
 for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qE "$pattern"; then
+  if printf '%s' "$COMMAND" | grep -qE "$pattern"; then
+    echo "Blocked dangerous command: $pattern" >&2
+    exit 2
+  fi
+done
+
+for pattern in "${SQL_PATTERNS[@]}"; do
+  if printf '%s' "$COMMAND" | grep -qiE "$pattern"; then
     echo "Blocked dangerous command: $pattern" >&2
     exit 2
   fi
@@ -136,14 +149,14 @@ exit 0
 # PreToolUse hook: Warn on writes to sensitive files
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty')
 
 [ -z "$FILE_PATH" ] && exit 0
 
 FILENAME=$(basename "$FILE_PATH")
 
 # Sensitive file patterns
-if echo "$FILENAME" | grep -qiE '^\.env$|^\.env\.|\.pem$|\.key$|^id_rsa|credentials\.json$|secrets\.json$'; then
+if echo "$FILENAME" | grep -qiE '^\.env$|^\.env\.|\.pem$|\.key$|^id_rsa$|^id_ed25519$|credentials\.json$|secrets\.json$'; then
   jq -n --arg warn "Warning: You are about to edit a sensitive file ($FILENAME). Verify this change is truly necessary. Do not commit secrets or tokens in plaintext." \
     '{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": $warn}}'
 fi
@@ -154,7 +167,7 @@ exit 0
 **Behavior**:
 - Always exits 0 (non-blocking)
 - Uses `additionalContext` for soft guidance to Claude
-- Targets: `.env`, `.env.*`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `secrets.json`
+- Targets: `.env`, `.env.*`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`, `credentials.json`, `secrets.json`
 
 ---
 
@@ -170,12 +183,12 @@ exit 0
 INPUT=$(cat)
 
 # Infinite loop prevention: skip if the Stop hook has already fired once
-if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
+if [ "$(printf '%s' "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
   exit 0
 fi
 
-# Check the number of recently changed files in git
-CHANGED=$(git diff --name-only HEAD 2>/dev/null | wc -l | tr -d ' ')
+# Check the number of changed files (staged, unstaged, and untracked)
+CHANGED=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
 
 # Only suggest simplifier if 5 or more files were changed
 if [ "$CHANGED" -ge 5 ]; then
@@ -204,13 +217,14 @@ exit 0
 # UserPromptSubmit hook: Auto-inject code-simplifier on keyword detection
 
 INPUT=$(cat)
-PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty' | tr '[:upper:]' '[:lower:]')
+export LANG=en_US.UTF-8
+PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // empty' | tr '[:upper:]' '[:lower:]')
 
 # Trigger keywords (English and Japanese)
 KEYWORDS=("simplify" "clean up" "cleanup" "refactor" "readable" "整理" "シンプル" "きれいに" "リファクタ")
 
 for kw in "${KEYWORDS[@]}"; do
-  if echo "$PROMPT" | grep -q "$kw"; then
+  if printf '%s' "$PROMPT" | grep -q "$kw"; then
     jq -n '{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "Use the code-simplifier agent for this task."}}'
     exit 0
   fi
@@ -234,11 +248,14 @@ exit 0
 # .claude/hooks/notify.sh
 # Notification hook: Sound effect + popup dialog (parallel execution)
 
+# macOS only — skip silently on other platforms
+[[ "$(uname)" == "Darwin" ]] || exit 0
+
 # Play sound effect in the background (simultaneous with dialog)
 afplay /System/Library/Sounds/Glass.aiff &
 
-# Popup dialog (stays until OK is pressed)
-osascript -e 'display dialog "Claude Code needs your attention." with title "Claude Code" buttons {"OK"} default button "OK" with icon caution'
+# Popup dialog (auto-dismisses after 60 seconds)
+osascript -e 'display dialog "Claude Code needs your attention." with title "Claude Code" buttons {"OK"} default button "OK" with icon caution giving up after 60'
 
 exit 0
 ```
@@ -246,7 +263,7 @@ exit 0
 **Behavior**:
 - `afplay ... &` launches the sound in the background, playing simultaneously with the dialog
 - `display dialog` shows a modal dialog in the center of the screen
-- The dialog remains until the OK button is pressed (partially blocks other app interactions)
+- The dialog auto-dismisses after 60 seconds, or when the OK button is pressed
 - `with icon caution` displays a warning icon
 
 **Alternative sounds** (under `/System/Library/Sounds/`):
@@ -259,7 +276,7 @@ exit 0
 | `Submarine.aiff` | Low and calm |
 | `Tink.aiff` | Small and subtle |
 
-> **Note**: `display dialog` runs in the foreground, so the hook script itself does not exit until the dialog is dismissed. Since Notification hooks are non-blocking, this does not affect Claude's operation, but be aware that the script process persists until the dialog is closed.
+> **Note**: `display dialog` runs in the foreground, so the hook script itself does not exit until the dialog is dismissed or times out (60 seconds). Since Notification hooks are non-blocking, this does not affect Claude's operation. On non-macOS platforms, the hook exits silently.
 
 ---
 
@@ -272,7 +289,7 @@ If an existing `hooks` section exists, merge into it (do not overwrite).
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -292,7 +309,7 @@ If an existing `hooks` section exists, merge into it (do not overwrite).
         ]
       },
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -313,7 +330,6 @@ If an existing `hooks` section exists, merge into it (do not overwrite).
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -324,7 +340,6 @@ If an existing `hooks` section exists, merge into it (do not overwrite).
     ],
     "Notification": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -363,7 +378,7 @@ chmod +x .claude/hooks/*.sh
 |---|---|
 | Claude edits a file | Prettier / ESLint run automatically |
 | Attempts to run `rm -rf /` | Blocked; reason is communicated to Claude |
-| Attempts to run `git push --force main` | Same as above |
+| Attempts to run `git push --force main` or `master` | Same as above |
 | Attempts to edit a `.env` file | Warning context is injected (no block) |
 | Attempts to edit `id_rsa` | Same as above |
 | Session ends with 4 or fewer changed files | Stop hook skips |
@@ -373,7 +388,7 @@ chmod +x .claude/hooks/*.sh
 | Prompt contains "整理して" (Japanese: "clean up") | Same as above |
 | Normal prompt without keywords | Nothing happens |
 | Claude is awaiting permission or idle | Glass.aiff plays and a popup dialog appears |
-| OK button is pressed on the dialog | Dialog closes and the script exits |
+| OK button is pressed or 60s elapsed | Dialog closes and the script exits |
 
 ---
 
