@@ -1,61 +1,61 @@
-# Claude Code Hooks 実装要件
+# Claude Code Hooks Implementation Requirements
 
-6つのHookをまとめた実装仕様です。
+Implementation specification for 6 hooks.
 
-| # | Hook名 | イベント | 役割 |
+| # | Hook Name | Event | Purpose |
 |---|---|---|---|
-| ① | `auto-format.sh` | PostToolUse | ファイル編集後に自動フォーマット |
-| ② | `security-guard.sh` | PreToolUse | 危険コマンドをブロック |
-| ③ | `file-guard.sh` | PreToolUse | センシティブファイルへの書き込みを警告 |
-| ④ | `maybe-simplify.sh` | Stop | 変更多数時に code-simplifier を促す |
-| ⑤ | `trigger-simplifier.sh` | UserPromptSubmit | キーワード検知で code-simplifier を注入 |
-| ⑥ | `notify.sh` | Notification | 音 + ポップアップダイアログで通知 |
+| 1 | `auto-format.sh` | PostToolUse | Auto-format after file edits |
+| 2 | `security-guard.sh` | PreToolUse | Block dangerous commands |
+| 3 | `file-guard.sh` | PreToolUse | Warn on writes to sensitive files |
+| 4 | `maybe-simplify.sh` | Stop | Prompt code-simplifier when many files changed |
+| 5 | `trigger-simplifier.sh` | UserPromptSubmit | Inject code-simplifier on keyword detection |
+| 6 | `notify.sh` | Notification | Sound + popup dialog notification |
 
 ---
 
-## 前提条件
+## Prerequisites
 
-- `jq` コマンドがインストール済みであること
-- プロジェクトルートが git 管理下にあること（④の条件チェックに使用）
-- ④⑤を使う場合は `code-simplifier` プラグインがインストール済みであること
+- `jq` command must be installed
+- Project root must be under git version control (used by hook 4 for change detection)
+- Hooks 4 and 5 require the `code-simplifier` plugin to be installed:
   ```bash
   claude plugin install code-simplifier
-  # またはセッション内で:
+  # Or from within a session:
   /plugin marketplace update claude-plugins-official
   /plugin install code-simplifier
   ```
-  インストール後、セッションを再起動して有効化すること
+  Restart the session after installation to activate.
 
 ---
 
-## ファイル構成
+## File Structure
 
 ```
 .claude/
 ├── settings.json
 └── hooks/
-    ├── auto-format.sh         # ① PostToolUse: 自動フォーマット
-    ├── security-guard.sh      # ② PreToolUse:  危険コマンドブロック
-    ├── file-guard.sh          # ③ PreToolUse:  センシティブファイル保護
-    ├── maybe-simplify.sh      # ④ Stop:        code-simplifier 促進
-    ├── trigger-simplifier.sh  # ⑤ UserPromptSubmit: キーワード注入
-    └── notify.sh              # ⑥ Notification: 音 + ダイアログ通知
+    ├── auto-format.sh         # 1 PostToolUse: Auto-format
+    ├── security-guard.sh      # 2 PreToolUse:  Dangerous command blocker
+    ├── file-guard.sh          # 3 PreToolUse:  Sensitive file protection
+    ├── maybe-simplify.sh      # 4 Stop:        code-simplifier prompt
+    ├── trigger-simplifier.sh  # 5 UserPromptSubmit: Keyword injection
+    └── notify.sh              # 6 Notification: Sound + dialog notification
 ```
 
 ---
 
-## 実装① `.claude/hooks/auto-format.sh`
+## Implementation 1: `.claude/hooks/auto-format.sh`
 
-**役割**: ファイル編集・作成後に Prettier と ESLint を自動実行する。
+**Purpose**: Automatically run Prettier and ESLint after file edits or creation.
 
 ```bash
 #!/bin/bash
 # .claude/hooks/auto-format.sh
-# PostToolUse hook: 自動フォーマット（Prettier + ESLint）
+# PostToolUse hook: Auto-format (Prettier + ESLint)
 
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 
-# ファイルパスが取れない場合はスルー
+# Skip if no file path is available
 [ -z "$FILE_PATH" ] && exit 0
 
 # Prettier
@@ -63,7 +63,7 @@ if command -v npx &>/dev/null; then
   npx prettier --write "$FILE_PATH" 2>/dev/null
 fi
 
-# ESLint（JS/TS系のみ）
+# ESLint (JS/TS files only)
 if echo "$FILE_PATH" | grep -qE '\.(js|jsx|ts|tsx|mjs|cjs)$'; then
   if command -v npx &>/dev/null; then
     npx eslint --fix "$FILE_PATH" 2>/dev/null
@@ -73,31 +73,31 @@ fi
 exit 0
 ```
 
-**動作**:
-- 常に exit 0（ブロックしない）
-- Prettier → ESLint の順で実行
-- ESLint は JS/TS 系ファイルのみ対象
+**Behavior**:
+- Always exits 0 (non-blocking)
+- Runs Prettier first, then ESLint
+- ESLint only targets JS/TS files
 
 ---
 
-## 実装② `.claude/hooks/security-guard.sh`
+## Implementation 2: `.claude/hooks/security-guard.sh`
 
-**役割**: 危険なBashコマンドを検知してブロックする。
+**Purpose**: Detect and block dangerous Bash commands.
 
 ```bash
 #!/bin/bash
 # .claude/hooks/security-guard.sh
-# PreToolUse hook: 危険コマンドブロック
+# PreToolUse hook: Dangerous command blocker
 
 INPUT=$(cat)
 TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
 
-# Bash ツール以外はスルー
+# Skip non-Bash tools
 [ "$TOOL" != "Bash" ] && exit 0
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
-# ブロック対象パターン
+# Blocked patterns
 DANGEROUS_PATTERNS=(
   'rm -rf /'
   'rm -rf \*'
@@ -112,7 +112,7 @@ DANGEROUS_PATTERNS=(
 
 for pattern in "${DANGEROUS_PATTERNS[@]}"; do
   if echo "$COMMAND" | grep -qE "$pattern"; then
-    echo "🚫 危険なコマンドをブロックしました: $pattern" >&2
+    echo "Blocked dangerous command: $pattern" >&2
     exit 2
   fi
 done
@@ -120,20 +120,20 @@ done
 exit 0
 ```
 
-**動作**:
-- マッチした場合 exit 2（ブロック）、stderr の理由が Claude に送られる
-- Bash 以外のツールはスルー
+**Behavior**:
+- On match: exit 2 (block); the reason on stderr is sent to Claude
+- Non-Bash tools are skipped
 
 ---
 
-## 実装③ `.claude/hooks/file-guard.sh`
+## Implementation 3: `.claude/hooks/file-guard.sh`
 
-**役割**: `.env`・秘密鍵・証明書ファイルへの書き込み前に警告コンテキストを注入する（ブロックはしない）。
+**Purpose**: Inject a warning context before writes to `.env`, private keys, and certificate files (does not block).
 
 ```bash
 #!/bin/bash
 # .claude/hooks/file-guard.sh
-# PreToolUse hook: センシティブファイルへの書き込みを警告
+# PreToolUse hook: Warn on writes to sensitive files
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
@@ -142,42 +142,42 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 
 FILENAME=$(basename "$FILE_PATH")
 
-# センシティブファイルパターン
+# Sensitive file patterns
 if echo "$FILENAME" | grep -qiE '^\.env$|^\.env\.|\.pem$|\.key$|^id_rsa|credentials\.json$|secrets\.json$'; then
-  jq -n --arg warn "⚠️ センシティブファイル ($FILENAME) を編集しようとしています。本当に必要な変更か確認してください。シークレット・トークン類を平文でコミットしないよう注意。" \
+  jq -n --arg warn "Warning: You are about to edit a sensitive file ($FILENAME). Verify this change is truly necessary. Do not commit secrets or tokens in plaintext." \
     '{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": $warn}}'
 fi
 
 exit 0
 ```
 
-**動作**:
-- 常に exit 0（ブロックしない）
-- `additionalContext` で Claude に注意を促すソフトな制御
-- 対象: `.env`, `.env.*`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `secrets.json`
+**Behavior**:
+- Always exits 0 (non-blocking)
+- Uses `additionalContext` for soft guidance to Claude
+- Targets: `.env`, `.env.*`, `*.pem`, `*.key`, `id_rsa`, `credentials.json`, `secrets.json`
 
 ---
 
-## 実装④ `.claude/hooks/maybe-simplify.sh`
+## Implementation 4: `.claude/hooks/maybe-simplify.sh`
 
-**役割**: セッション終了時に git の変更ファイル数を確認し、5ファイル以上の変更があれば code-simplifier の実行を促す。
+**Purpose**: Check the number of changed files via git at session end; if 5 or more files were changed, prompt the user to run code-simplifier.
 
 ```bash
 #!/bin/bash
 # .claude/hooks/maybe-simplify.sh
-# Stop hook: 変更ファイル数が多い場合に code-simplifier を促す
+# Stop hook: Prompt code-simplifier when many files are changed
 
 INPUT=$(cat)
 
-# 無限ループ防止: すでに Stop hook が一度発火していたらスルー
+# Infinite loop prevention: skip if the Stop hook has already fired once
 if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
   exit 0
 fi
 
-# 直近の git 変更ファイル数を確認
+# Check the number of recently changed files in git
 CHANGED=$(git diff --name-only HEAD 2>/dev/null | wc -l | tr -d ' ')
 
-# 5ファイル以上変更があった場合のみ simplifier を提案してブロック
+# Only suggest simplifier if 5 or more files were changed
 if [ "$CHANGED" -ge 5 ]; then
   jq -n --arg reason "${CHANGED} files modified in this session. Please run the code-simplifier agent before finishing: 'Use code-simplifier on recently modified files'" \
     '{"decision": "block", "reason": $reason}'
@@ -187,26 +187,26 @@ fi
 exit 0
 ```
 
-**動作**:
-- 変更ファイル数 < 5 → スルー
-- 変更ファイル数 ≥ 5 → `decision: block` で Claude に simplifier 実行を促す
-- `stop_hook_active=true` の場合は無条件スルー（無限ループ防止）
+**Behavior**:
+- Changed files < 5: skip
+- Changed files >= 5: `decision: block` prompts Claude to run the simplifier
+- If `stop_hook_active=true`: unconditional skip (infinite loop prevention)
 
 ---
 
-## 実装⑤ `.claude/hooks/trigger-simplifier.sh`
+## Implementation 5: `.claude/hooks/trigger-simplifier.sh`
 
-**役割**: プロンプトに特定のキーワードが含まれる場合、`code-simplifier` エージェントを使うよう `additionalContext` を注入する。
+**Purpose**: When the prompt contains specific keywords, inject `additionalContext` instructing Claude to use the `code-simplifier` agent.
 
 ```bash
 #!/bin/bash
 # .claude/hooks/trigger-simplifier.sh
-# UserPromptSubmit hook: キーワード検知で code-simplifier を自動注入
+# UserPromptSubmit hook: Auto-inject code-simplifier on keyword detection
 
 INPUT=$(cat)
 PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty' | tr '[:upper:]' '[:lower:]')
 
-# トリガーキーワード（英語・日本語）
+# Trigger keywords (English and Japanese)
 KEYWORDS=("simplify" "clean up" "cleanup" "refactor" "readable" "整理" "シンプル" "きれいに" "リファクタ")
 
 for kw in "${KEYWORDS[@]}"; do
@@ -219,53 +219,53 @@ done
 exit 0
 ```
 
-**動作**:
-- キーワードあり → `additionalContext` に code-simplifier 指示を注入
-- キーワードなし → スルー
+**Behavior**:
+- Keyword found: inject code-simplifier instruction into `additionalContext`
+- No keyword: skip
 
 ---
 
-## 実装⑥ `.claude/hooks/notify.sh`
+## Implementation 6: `.claude/hooks/notify.sh`
 
-**役割**: Claude が通知を送るタイミング（許可待ち・アイドル）に、効果音（afplay）とポップアップダイアログ（display dialog）を並列で出す。ダイアログは OK を押すまで消えないため、確実に気づける。
+**Purpose**: When Claude sends a notification (awaiting permission, idle), play a sound effect (afplay) and show a popup dialog (display dialog) in parallel. The dialog remains visible until OK is pressed, ensuring the user notices.
 
 ```bash
 #!/bin/bash
 # .claude/hooks/notify.sh
-# Notification hook: 効果音 + ポップアップダイアログ（並列実行）
+# Notification hook: Sound effect + popup dialog (parallel execution)
 
-# 効果音をバックグラウンドで再生（ダイアログと同時に鳴らす）
+# Play sound effect in the background (simultaneous with dialog)
 afplay /System/Library/Sounds/Glass.aiff &
 
-# ポップアップダイアログ（OK を押すまで消えない）
+# Popup dialog (stays until OK is pressed)
 osascript -e 'display dialog "Claude Code needs your attention." with title "Claude Code" buttons {"OK"} default button "OK" with icon caution'
 
 exit 0
 ```
 
-**動作**:
-- `afplay ... &` でサウンドをバックグラウンド起動 → ダイアログと同時に音が鳴る
-- `display dialog` で画面中央にモーダルダイアログを表示
-- OK ボタンを押すまでダイアログは消えない（他のアプリ操作も一部ブロック）
-- `with icon caution` で警告アイコン（⚠️）を表示
+**Behavior**:
+- `afplay ... &` launches the sound in the background, playing simultaneously with the dialog
+- `display dialog` shows a modal dialog in the center of the screen
+- The dialog remains until the OK button is pressed (partially blocks other app interactions)
+- `with icon caution` displays a warning icon
 
-**サウンドの変更候補** (`/System/Library/Sounds/` 以下):
+**Alternative sounds** (under `/System/Library/Sounds/`):
 
-| ファイル名 | 印象 |
+| Filename | Impression |
 |---|---|
-| `Glass.aiff` | 軽快・クリア（デフォルト推奨） |
-| `Hero.aiff` | 明るく目立つ |
-| `Ping.aiff` | シンプルで短い |
-| `Submarine.aiff` | 低めで落ち着いた |
-| `Tink.aiff` | 小さく控えめ |
+| `Glass.aiff` | Light and clear (recommended default) |
+| `Hero.aiff` | Bright and prominent |
+| `Ping.aiff` | Simple and short |
+| `Submarine.aiff` | Low and calm |
+| `Tink.aiff` | Small and subtle |
 
-> **注意**: `display dialog` はフォアグラウンドで実行されるため、Hook スクリプト自体がダイアログを閉じるまで終了しない。Notification hook は非ブロッキングのため Claude の動作には影響しないが、ダイアログを閉じないとスクリプトプロセスが残り続ける点に注意。
+> **Note**: `display dialog` runs in the foreground, so the hook script itself does not exit until the dialog is dismissed. Since Notification hooks are non-blocking, this does not affect Claude's operation, but be aware that the script process persists until the dialog is closed.
 
 ---
 
-## `.claude/settings.json` への追記
+## `.claude/settings.json` Configuration
 
-既存の `hooks` セクションがある場合はマージすること（上書き厳禁）。
+If an existing `hooks` section exists, merge into it (do not overwrite).
 
 ```json
 {
@@ -339,51 +339,51 @@ exit 0
 
 ---
 
-## セットアップ手順
+## Setup Steps
 
 ```bash
-# 1. hooks ディレクトリ作成
+# 1. Create hooks directory
 mkdir -p .claude/hooks
 
-# 2. 各スクリプトファイルを上記の内容で作成（6ファイル）
+# 2. Create each script file with the contents above (6 files)
 
-# 3. 実行権限を一括付与
+# 3. Grant execute permissions to all scripts
 chmod +x .claude/hooks/*.sh
 
-# 4. settings.json に hooks 設定を追記（既存設定とマージ）
+# 4. Add hooks configuration to settings.json (merge with existing settings)
 
-# 5. Claude Code を再起動して設定を反映
+# 5. Restart Claude Code to apply the settings
 ```
 
 ---
 
-## 動作確認
+## Verification
 
-| シナリオ | 期待する挙動 |
+| Scenario | Expected Behavior |
 |---|---|
-| Claude がファイルを編集 | Prettier / ESLint が自動実行される |
-| `rm -rf /` を実行しようとする | ブロックされ、理由が Claude に伝わる |
-| `git push --force main` を実行しようとする | 同上 |
-| `.env` ファイルを編集しようとする | 警告コンテキストが注入される（ブロックなし） |
-| `id_rsa` を編集しようとする | 同上 |
-| 変更ファイル 4 以下でセッション終了 | Stop hook がスルー |
-| 変更ファイル 5 以上でセッション終了 | code-simplifier の実行を促してブロック |
-| `stop_hook_active=true` の状態で Stop | 無条件スルー（無限ループ防止） |
-| プロンプトに "refactor" を含む | code-simplifier 指示が注入される |
-| プロンプトに「整理して」を含む | 同上 |
-| キーワードなしの通常プロンプト | 何も起こらない |
-| Claude が許可待ち・アイドルになる | Glass.aiff が鳴り、ポップアップダイアログが表示される |
-| ダイアログの OK を押す | ダイアログが閉じ、スクリプトが終了する |
+| Claude edits a file | Prettier / ESLint run automatically |
+| Attempts to run `rm -rf /` | Blocked; reason is communicated to Claude |
+| Attempts to run `git push --force main` | Same as above |
+| Attempts to edit a `.env` file | Warning context is injected (no block) |
+| Attempts to edit `id_rsa` | Same as above |
+| Session ends with 4 or fewer changed files | Stop hook skips |
+| Session ends with 5 or more changed files | Blocks and prompts code-simplifier execution |
+| Stop fires with `stop_hook_active=true` | Unconditional skip (infinite loop prevention) |
+| Prompt contains "refactor" | code-simplifier instruction is injected |
+| Prompt contains "整理して" (Japanese: "clean up") | Same as above |
+| Normal prompt without keywords | Nothing happens |
+| Claude is awaiting permission or idle | Glass.aiff plays and a popup dialog appears |
+| OK button is pressed on the dialog | Dialog closes and the script exits |
 
 ---
 
-## 調整ポイント
+## Customization Points
 
-- **フォーマッタ変更**: `auto-format.sh` の `npx prettier` を `black`（Python）等に差し替え可能
-- **ブロック対象追加**: `security-guard.sh` の `DANGEROUS_PATTERNS` 配列に追加
-- **保護対象追加**: `file-guard.sh` の grep パターンを拡張
-- **simplifier 閾値変更**: `maybe-simplify.sh` の `[ "$CHANGED" -ge 5 ]` の数値を調整
-- **キーワード追加**: `trigger-simplifier.sh` の `KEYWORDS` 配列に追加
-- **サウンド変更**: `notify.sh` の `Glass.aiff` を別のシステムサウンドに差し替え可能
-- **ダイアログメッセージ変更**: `notify.sh` の `display dialog` の文言を自由に編集可能
-- **スコープ変更**: `settings.json` を `~/.claude/settings.json` に置くと全プロジェクトに適用
+- **Change formatter**: Replace `npx prettier` in `auto-format.sh` with `black` (Python), etc.
+- **Add blocked patterns**: Append to the `DANGEROUS_PATTERNS` array in `security-guard.sh`
+- **Add protected files**: Extend the grep pattern in `file-guard.sh`
+- **Change simplifier threshold**: Adjust the number in `[ "$CHANGED" -ge 5 ]` in `maybe-simplify.sh`
+- **Add keywords**: Append to the `KEYWORDS` array in `trigger-simplifier.sh`
+- **Change sound**: Replace `Glass.aiff` in `notify.sh` with another system sound
+- **Change dialog message**: Edit the `display dialog` text in `notify.sh`
+- **Change scope**: Place `settings.json` at `~/.claude/settings.json` to apply across all projects
