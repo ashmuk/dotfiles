@@ -7,7 +7,7 @@ HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [[ "$(uname)" == "Darwin" ]]; then
   FALLBACK="/System/Library/Sounds/Glass.aiff"
-  osascript -e 'display dialog "Claude Code needs your attention." with title "Claude Code" buttons {"OK"} default button "OK" with icon caution giving up after 60'
+  osascript -e 'display dialog "Claude Code needs your attention." with title "Claude Code" buttons {"OK"} default button "OK" with icon caution giving up after 60' &
 else
   FALLBACK="/usr/share/sounds/freedesktop/stereo/bell.oga"
   # Linux notification (best-effort)
