@@ -91,6 +91,15 @@ if [ -d "$HOST_DIR" ] && [ -n "$(ls -A "$HOST_DIR" 2>/dev/null)" ]; then
         done
     fi
 
+    # Custom sounds — copy from host
+    if [ -d "$HOST_DIR/sounds" ]; then
+        mkdir -p "$CLAUDE_DIR/sounds"
+        for sound in "$HOST_DIR/sounds"/*; do
+            [ -f "$sound" ] || continue
+            cp -f "$sound" "$CLAUDE_DIR/sounds/$(basename "$sound")"
+        done
+    fi
+
     # Rewrite host plugin paths to container paths (handles macOS and Linux hosts)
     if [ -f "$CLAUDE_DIR/plugins/installed_plugins.json" ]; then
         _escaped_home=$(printf '%s' "$HOME" | sed 's/[&\\/]/\\&/g')

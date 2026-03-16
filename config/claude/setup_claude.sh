@@ -53,6 +53,12 @@ create_claude_directory() {
         print_status "Created $HOME/.claude/hooks directory"
     fi
 
+    # Create sounds directory
+    if [[ ! -d "$HOME/.claude/sounds" ]]; then
+        mkdir -p "$HOME/.claude/sounds"
+        print_status "Created $HOME/.claude/sounds directory"
+    fi
+
     return 0
 }
 
@@ -73,6 +79,15 @@ create_symlinks() {
             ln -sf "$hook_script" "$HOME/.claude/hooks/$(basename "$hook_script")"
         done
         print_status "Hook scripts deployed to $HOME/.claude/hooks/"
+    fi
+
+    # Deploy custom sound files
+    if [[ -d "$DOTFILES_DIR/config/claude/sounds" ]]; then
+        for sound_file in "$DOTFILES_DIR/config/claude/sounds"/*; do
+            [[ -f "$sound_file" ]] || continue
+            ln -sf "$sound_file" "$HOME/.claude/sounds/$(basename "$sound_file")"
+        done
+        print_status "Sound files deployed to $HOME/.claude/sounds/"
     fi
 
     print_success "Symbolic links created in home directory"
