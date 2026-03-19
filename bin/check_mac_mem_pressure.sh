@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# check-heavy.sh
+# check_mac_mem_pressure.sh
 # - Compact view of macOS memory / swap / compression,
 #   heavy processes, and background launchd items
 # - Designed to run persistently in a tmux pane
@@ -11,8 +11,27 @@ INTERVAL="${1:-2}"     # Interval (seconds)
 TOPN="${TOPN:-5}"      # Number of top processes to display
 FILTER_REGEX="${FILTER_REGEX:-docker|jetbrains|toolbox|teams|slack|notion|chrome|onedrive|outlook|norton|mds|mdworker|bird}"
 
+# Thresholds — configurable via env vars (values in GB)
+COMP_MODERATE="${COMP_MODERATE:-8}"
+COMP_WARN="${COMP_WARN:-14}"
+COMP_CRITICAL="${COMP_CRITICAL:-20}"
+SWAP_MODERATE="${SWAP_MODERATE:-1}"
+SWAP_WARN="${SWAP_WARN:-3}"
+SWAP_CRITICAL="${SWAP_CRITICAL:-6}"
+# Pre-compute byte thresholds and display strings (avoid per-refresh conversions)
+COMP_MODERATE_B=$(( COMP_MODERATE * 1024 * 1024 * 1024 ))
+COMP_WARN_B=$(( COMP_WARN * 1024 * 1024 * 1024 ))
+COMP_CRITICAL_B=$(( COMP_CRITICAL * 1024 * 1024 * 1024 ))
+SWAP_MODERATE_B=$(( SWAP_MODERATE * 1024 * 1024 * 1024 ))
+SWAP_WARN_B=$(( SWAP_WARN * 1024 * 1024 * 1024 ))
+SWAP_CRITICAL_B=$(( SWAP_CRITICAL * 1024 * 1024 * 1024 ))
+COMP_THRESHOLDS="${COMP_MODERATE}/${COMP_WARN}/${COMP_CRITICAL}"
+SWAP_THRESHOLDS="${SWAP_MODERATE}/${SWAP_WARN}/${SWAP_CRITICAL}"
+
 # ANSI color codes
 RED='\033[0;31m'
+ORANGE='\033[38;5;208m'
+CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 NC='\033[0m'  # No Color
 
@@ -106,17 +125,19 @@ _health_line() {
   comp_g="$(_gib "$comp_bytes")"
   swap_g="$(_gib "$swap_bytes")"
 
-  # Determine status and color: comp > 6GB or swap > 1GB
+  # Determine status: CRITICAL > WARN > MODERATE > OK
   local status color
-  if (( comp_bytes > 6*1024*1024*1024 )) || (( swap_bytes > 1*1024*1024*1024 )); then
-    status="WARN"
-    color="${RED}"
+  if (( comp_bytes > COMP_CRITICAL_B )) || (( swap_bytes > SWAP_CRITICAL_B )); then
+    status="CRITICAL"; color="${RED}"
+  elif (( comp_bytes > COMP_WARN_B )) || (( swap_bytes > SWAP_WARN_B )); then
+    status="WARN"; color="${ORANGE}"
+  elif (( comp_bytes > COMP_MODERATE_B )) || (( swap_bytes > SWAP_MODERATE_B )); then
+    status="MODERATE"; color="${CYAN}"
   else
-    status="OK"
-    color="${GREEN}"
+    status="OK"; color="${GREEN}"
   fi
 
-  echo -e "Health: ${color}${status}${NC} | Free=${free_g}GB | Comp=${comp_g}/>6GB | Swap=${swap_g}/>1GB"
+  echo -e "Health: ${color}${status}${NC} | Free=${free_g}GB | Comp=${comp_g}GB [${COMP_THRESHOLDS}] | Swap=${swap_g}GB [${SWAP_THRESHOLDS}]"
 }
 
 clear
