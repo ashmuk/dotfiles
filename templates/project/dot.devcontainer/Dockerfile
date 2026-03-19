@@ -10,6 +10,8 @@ ARG CLAUDE_CODE_VERSION=latest
 ARG GIT_DELTA_VERSION=0.18.2
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
 ARG YQ_VERSION=v4.44.1
+ARG UV_VERSION=0.7.3
+ARG AWS_CLI_VERSION=2.27.22
 
 # =============================================================================
 # Multi-Runtime Base Image
@@ -66,6 +68,25 @@ RUN ARCH=$(dpkg --print-architecture) && \
  wget "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
  dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
  rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
+
+# Install AWS CLI v2 (official installer, multi-arch)
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "arm64" ]; then AWS_ARCH="aarch64"; \
+    elif [ "$ARCH" = "amd64" ]; then AWS_ARCH="x86_64"; \
+    else AWS_ARCH="$ARCH"; fi && \
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_ARCH}-${AWS_CLI_VERSION}.zip" -o /tmp/awscliv2.zip && \
+    unzip -q /tmp/awscliv2.zip -d /tmp && \
+    /tmp/aws/install && \
+    rm -rf /tmp/awscliv2.zip /tmp/aws
+
+# Install uv (Python package/tool runner by Astral) for MCP server execution
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "arm64" ]; then UV_ARCH="aarch64"; \
+    elif [ "$ARCH" = "amd64" ]; then UV_ARCH="x86_64"; \
+    else UV_ARCH="$ARCH"; fi && \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${UV_ARCH}-unknown-linux-gnu.tar.gz" -o /tmp/uv.tar.gz && \
+    tar -xzf /tmp/uv.tar.gz -C /usr/local/bin --strip-components=1 && \
+    rm /tmp/uv.tar.gz
 
 # Create developer user from existing vscode user
 ARG USERNAME=developer
