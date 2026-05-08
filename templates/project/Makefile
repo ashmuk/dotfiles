@@ -1,4 +1,4 @@
-.PHONY: help init init-cli setup-hooks check-env sync sync-check sync-verify sync-claude sync-cursor sync-codex fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run _check-starters init-staged init-toolbox show-character
+.PHONY: help init init-cli setup-hooks check-env sync sync-check sync-verify sync-claude sync-cursor sync-codex fetch-from-upstream fetch-from-upstream-check fetch-from-upstream-status fetch-from-upstream-dry-run push-to-upstream push-to-upstream-check push-to-upstream-status push-to-upstream-dry-run _check-starters init-staged init-toolbox show-character test-coverage
 
 # ============================================
 # Help
@@ -36,6 +36,10 @@ help:
 	@echo "  make push-to-upstream-check     # Show what would be pushed (dry-run)"
 	@echo "  make push-to-upstream-status    # Compare local vs upstream"
 	@echo "  make push-to-upstream-dry-run   # Preview push without changes"
+	@echo ""
+	@echo "Test Coverage:"
+	@echo "  make test-coverage             # Run project's test coverage script (delegates to tools/test-coverage)"
+	@echo "  make test-coverage ARGS=...    # Pass additional flags through to the project script"
 	@echo ""
 	@echo "Options:"
 	@echo "  VERBOSE=1 make init    # Show detailed command output and errors"
@@ -233,3 +237,29 @@ push-to-upstream-status:
 # Preview push without changes
 push-to-upstream-dry-run:
 	@./scripts/boilerplate/push-to-upstream.sh --dry-run
+
+# ============================================
+# Test Coverage
+# ============================================
+# Generate the project's test coverage / catalog report.
+# This target is tech-stack-agnostic — it delegates to a project-local script
+# so each project can wire up its own toolchain (vitest, pytest, go test, bats,
+# cargo, etc.).
+#
+# Convention:
+#   - Place an executable at tools/test-coverage (any language, no extension).
+#   - The script is responsible for running the suite and writing whatever
+#     report file the project chooses (e.g. docs/TEST-COVERAGE.md).
+#   - ARGS=... is passed through to the script.
+#
+# If tools/test-coverage is not present, this target prints a hint and exits
+# non-zero — projects without a coverage script can simply not invoke it.
+test-coverage:
+	@if [ -x tools/test-coverage ]; then \
+	  ./tools/test-coverage $(ARGS); \
+	else \
+	  echo "test-coverage: tools/test-coverage not found or not executable."; \
+	  echo "  Provide a project-specific script that runs your test suite and emits a report,"; \
+	  echo "  or remove this target if your project does not need it."; \
+	  exit 1; \
+	fi
