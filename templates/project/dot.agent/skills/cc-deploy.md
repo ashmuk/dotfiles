@@ -7,7 +7,7 @@ description: >-
   deployment operations — it does NOT write deployment code (use cc-implement)
   or plan deployment strategy (use cc-design).
 metadata:
-  version: 1.0.0
+  version: 2.0.0
   category: workflow-automation
 ---
 
@@ -68,6 +68,8 @@ Typical invocation flow:
 | Safety gate | Opus | Adversarial reasoning about irreversible actions |
 | Command execution | Sonnet | Deployment commands may be destructive; needs judgment on partial failures |
 | Rollback assessment | Opus | Judgment under pressure |
+| Verification checklist | Sonnet | Mechanical walk through PASS/FAIL items |
+| Post-deploy findings | Sonnet | Issue triage and acceptance-criteria drafting; mechanical fixes can drop to Haiku |
 
 ## Workflow
 
@@ -89,6 +91,11 @@ Typical invocation flow:
    - Correct environment targeted
    - Prerequisites met (credentials, env vars, infra health)
    - Blast radius acceptable
+   - **Pre-deploy environment validation** — verify runtime config before deploying, not after:
+     - [ ] Required env / config files exist with all expected variables set
+     - [ ] External dependencies (APIs, DBs, queues) reachable from the target environment with the configured credentials
+     - [ ] Inter-service contract spot-check: a sample call from each upstream caller returns the expected content type and shape (e.g. JSON, not an error page)
+     - Adapt these checks to the current project's stack.
 5. **STOP — Present deployment plan for user approval.**
 
    > **Decision options:**
@@ -103,16 +110,48 @@ Typical invocation flow:
 7. After each major step: capture output, verify success
 8. On failure: **STOP immediately**, capture state, present rollback options
 
-### Phase 4: VERIFY (my-reviewer)
-9. Run health checks and smoke tests
-10. Validate deployment outcome
-11. Append to `docs/DEPLOYMENTS.md` (create file with header if it does not exist)
-12. Present results:
+### Phase 4: VERIFY (my-reviewer) — Structured Checklist
+
+9. **Generate verification checklist** — output a deploy-specific checklist. Adapt the categories below to the project's surface area; only the relevant ones apply to any single deployment:
+
+   **API / Service endpoints** (where applicable):
+   - [ ] Each endpoint returns expected status code + response shape
+   - [ ] Auth-protected endpoints reject unauthenticated requests (if auth is implemented)
+   - [ ] Error responses match the project's error contract
+
+   **Frontend / UI** (where applicable, per locale the project supports):
+   - [ ] Every page loads without console errors
+   - [ ] No hardcoded copy from another locale visible in any locale mode
+   - [ ] Smallest supported viewport: no overflow, clipping, or layout shift
+   - [ ] Largest supported viewport: responsive layout renders correctly
+
+   **Cross-Cutting**:
+   - [ ] User-facing settings (theme, locale, units, etc.) persist across navigation
+   - [ ] Domain entities (account name, project name, etc.) appear where expected in the page chrome
+   - [ ] Domain values render in their human-readable form, not raw codes
+
+   The list above is a baseline — add project-specific items, and remove categories that don't apply.
+
+10. **Execute checklist** — a Sonnet agent (or human) works through each item. Record PASS/FAIL for each.
+11. Validate deployment outcome
+12. Append to `docs/DEPLOYMENTS.md` (create file with header if it does not exist)
+
+### Phase 5: POST-DEPLOY FINDINGS — Issue-First Rule
+
+13. For ANY finding from verification (failed checklist items, unexpected behavior, UX issues):
+    - **Track it before deciding fix-or-defer.** The "issue" is whatever tracker the project uses:
+      - When `github_issues.enabled: true` in PROJECT.yaml, create a GitHub Issue via `/cc-issue-create` and tag with milestone, severity, and `step:deploy` label.
+      - Otherwise, append the finding to `docs/feedback/REVIEW-FINDINGS.md` (or the project's chosen tracker) with severity.
+    - THEN decide: fix now or defer to next cycle.
+    - If fix now and the fix is mechanical (string renames, config tweaks, single-file edits): delegate to my-builder with acceptance criteria from the tracked finding; my-reviewer policy applies to the resulting diff.
+
+14. Present results:
 
     > **Decision options:**
-    > - **Accept** → deployment complete
+    > - **Accept** → deployment complete, any issues are tracked
     > - **Rollback** → execute rollback procedure (user-approved)
     > - **Investigate** → need more info before deciding
+    > - **Fix now** → address critical findings immediately (issues already created)
 
 ## Tool Integration: Progressive Complexity
 

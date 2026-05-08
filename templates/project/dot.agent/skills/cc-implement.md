@@ -8,7 +8,7 @@ description: >-
   Do NOT use for architecture or design (use cc-design), test strategy (use
   cc-test), or code review (use cc-review).
 metadata:
-  version: 3.0.0
+  version: 4.0.0
   category: workflow-automation
 ---
 
@@ -36,11 +36,35 @@ Steps 8–9 form the **execution loop** — they repeat for each scope level (Po
 1. general-purpose agent(s) is co-working with my-builder agent and respect its policies
 2. Read PLANS.md (if exists) — identify the current scope level (PoC/MVP/Production)
 3. Analyze the context and start implementations (invoke general-purpose or relevant agents as needed)
-4. Implement using the appropriate model: **Sonnet** for multi-file or complex logic; **Haiku** for single-file, well-scoped tasks
+4. Implement using the appropriate model:
+   - **Opus** for architectural judgment, cross-package coordination, security-sensitive code
+   - **Sonnet** for multi-file or complex logic, size:M+ tasks
+   - **Haiku** for single-file, well-scoped tasks
+   - **Sonnet for size:S fixes** — when fixing mechanical issues (string renames, i18n keys, CSS tweaks, adding imports), delegate to Sonnet (my-builder) with clear acceptance criteria. Opus drafts the acceptance criteria, Sonnet implements, Opus reviews.
 5. Apply my-reviewer agent policy for validation of what was implemented
 6. Finalize outcome by this feedback loop
 7. Preserve notable points in docs/IMPLEMENTATIONS.md
-8. **STOP — Present implementation to user for local review.**
+
+### Per-Phase Gates
+
+These gates apply at **MVP and Production** scope levels. At PoC scope, per-phase gates are optional.
+
+After completing each implementation phase boundary (not at the end of all phases):
+
+8. **Contract test gate** — run the project's test command (e.g. `npm test`, `pytest`, `go test ./...`). If any contract test fails, fix in the current phase before proceeding. Do NOT move to the next phase with failing contract tests.
+   - Skip if: no contract tests exist yet for this scope level.
+
+9. **Code simplification gate** — invoke a code-simplification agent (e.g. `code-simplifier@claude-plugins-official`, or any equivalent agent the project has installed) to review code written in this phase for duplication, dead code, and quality issues. Commit cleanup separately from feature code.
+   - Skip if: phase produced fewer than ~3 files or under ~200 lines of new code (small phases rarely benefit).
+   - Skip if: no simplification agent is available in the current environment — log this and proceed.
+
+10. **Commit** — stage and commit the phase's work (feature commit + cleanup commit if simplification produced changes)
+
+Then repeat steps 3–10 for the next phase.
+
+### After All Phases Complete
+
+11. **STOP — Present implementation to user for local review.**
     Inform the user: "Review the implementation locally. Verify it meets the plan for the current scope level."
 
     > **Decision options:**
@@ -51,14 +75,35 @@ Steps 8–9 form the **execution loop** — they repeat for each scope level (Po
     > - **Review first** → run `/cc-review` before proceeding to test
 
     Do NOT proceed to Step 9 until user explicitly resumes.
-9. Next: Invoke cc-test skill (Step 9) for test strategy
+12. Next: Invoke cc-test skill (Step 9) for test strategy
+
+## Issue Sections — Roadmap
+
+This skill has three issue-related sections that cover distinct scenarios:
+
+| Section | Scope | Trigger |
+|---------|-------|---------|
+| **Issue-First Rule** (below) | Per-finding tracking | A single feedback item / bug / improvement is discovered mid-implementation |
+| **Issue Creation (at scope transition)** | Bulk task creation | Entering a new scope level (PoC → MVP, MVP → Production) |
+| **Issue Integration** | Posting summaries | A linked issue exists for the current branch/commit |
+
+The three are complementary, not alternatives — a single implementation cycle may use all three.
+
+## Issue-First Rule
+
+When any feedback item, bug, or improvement is identified during implementation — whether from contract test failures, code review, user feedback, or agent discovery — track it BEFORE deciding whether to fix now or defer:
+
+- **When `github_issues.enabled: true` in PROJECT.yaml:** create a GitHub Issue via `/cc-issue-create` with the appropriate milestone (MVP, Production) and severity labels. The issue is the source of truth; if you fix now, branch from it and reference `Fixes #N` in the PR. Feedback docs (if used) are narrative summaries with issue cross-references, not primary trackers.
+- **When GitHub integration is disabled or unreachable:** append the finding to `docs/feedback/REVIEW-FINDINGS.md` (or the project's chosen tracker) with severity, then decide fix-or-defer.
+
+The principle is the same regardless of tracker: capture the finding before fix-vs-defer triage, so the decision is recorded. (For bulk task creation at scope transitions, see [Issue Creation](#issue-creation-at-scope-transition--optional) below.)
 
 ## Issue Creation (at scope transition) — Optional
 When `github_issues.enabled: true` in PROJECT.yaml:
 
 ### First scope level (before Step 2)
 If no open issues exist for the current scope level:
-1. Parse PLANS.md or docs/TASK_BREAKDOWN.md for tasks in the current scope level
+1. Parse PLANS.md or docs/TASK-BREAKDOWN.md for tasks in the current scope level
 2. Prompt: "Create GitHub Issues for [current scope level]? ([N] tasks)"
 3. If yes:
    a. Ensure labels and milestones exist (per cc-issue-create taxonomy)
