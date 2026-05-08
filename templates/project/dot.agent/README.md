@@ -132,6 +132,7 @@ Project Lifecycle (Stage 1 → 2 → ... → 6+)
 │   ├── cc-pr-merge.md     # /cc-pr-merge - Validate and merge a pull request
 │   ├── cc-issue-create.md # /cc-issue-create - Create GitHub Issue with labels
 │   ├── cc-issue-sync.md   # /cc-issue-sync - Refresh TASKS.md from GitHub Issues
+│   ├── cc-preview.md      # /cc-preview - Visual project status dashboard
 │   ├── cc-devcontainer-up.md
 │   ├── cc-devcontainer-down.md
 │   └── cc-devcontainer-rebuild.md
@@ -150,12 +151,42 @@ Project Lifecycle (Stage 1 → 2 → ... → 6+)
 │   ├── my-builder.md   # Implementation specialist
 │   ├── my-designer.md  # UX/UI design, API design, user flows
 │   └── my-reviewer.md  # Code review, security validation
+├── prompts/            # Reusable expert-persona prompts (read on demand by skills)
+│   ├── architecture/   # Architecture & code health audit
+│   ├── cost/           # Cost & financial sustainability audit
+│   ├── design/         # UI/UX critique, design system, design-to-code
+│   ├── docs-dx/        # Documentation & developer experience audit
+│   ├── legal/          # OSS license & legal compliance audit
+│   ├── perf-scale/     # Performance & scalability audit
+│   ├── review/         # Cross-domain master review prompt
+│   ├── security/       # AppSec threat model, supply chain, incident response
+│   ├── teamwork/       # Pipeline & multi-agent orchestration audit
+│   └── test/           # Test adequacy audit
 └── starters/           # Project initialization templates
     ├── PROJECT.staged.yaml   # For staged development projects
     ├── PROJECT.toolbox.yaml  # For ad-hoc toolbox projects
     ├── PLANS.md              # Roadmap template (staged)
     └── BACKLOG.md            # Task queue template (toolbox)
 ```
+
+### Prompt Library
+
+The `prompts/` directory holds long-form expert-persona prompts that skills load on demand. Each file is a self-contained briefing — drop it into a sub-agent (or your own context) when you need a deep audit in that domain.
+
+| Directory | When to use |
+|-----------|-------------|
+| `architecture/` | Module boundaries, coupling, complexity hotspots, technical debt audit |
+| `cost/` | Cloud spend, FinOps review, sustainability |
+| `design/` | UI/UX critique, design system definition, design-to-code |
+| `docs-dx/` | Onboarding, API docs, developer experience |
+| `legal/` | OSS license inventory and compliance |
+| `perf-scale/` | Latency, throughput, capacity planning |
+| `review/` | Cross-domain master prompt (entry point that triages across all 11 domains and delegates) |
+| `security/` | Threat modeling, supply chain (PSIRT), incident response (CSIRT) |
+| `teamwork/` | Pipeline discipline, agent orchestration |
+| `test/` | Test pyramid balance, coverage adequacy, flakiness |
+
+**Entry point:** `prompts/review/project_review_master_prompt.md` triages across all 11 domains and points at the right deep-dive prompt for each finding.
 
 ## Dual-Mode Project Characters
 
