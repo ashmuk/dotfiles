@@ -107,6 +107,11 @@ cmake-build-debug/
 .claude/worktrees/
 .claude/*.lock
 
+# Pipeline review/remediate scratch (canonical names — overwritten each cycle;
+# date-stamped historical records like REVIEW_FINDINGS_*_YYYYMMDD.md remain committable)
+docs/feedback/REVIEW-FINDINGS.md
+docs/feedback/REMEDIATION.md
+
 # Cache directories
 .cache/
 
