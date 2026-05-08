@@ -4,8 +4,16 @@
 
 INPUT=$(cat)
 
-# Parse tool name and command in a single jq call
-read -r TOOL COMMAND < <(printf '%s' "$INPUT" | jq -r '[.tool_name // "", .tool_input.command // ""] | @tsv')
+# Fail-open with stderr note rather than silently — visibility matters when the guard can't run.
+if ! command -v jq >/dev/null 2>&1; then
+  echo "security-guard: jq unavailable; failing open" >&2
+  exit 0
+fi
+
+# Two jq calls preserve real whitespace (tabs/newlines) in the command string.
+# Earlier @tsv approach escaped real tabs to literal \t, letting tab-separated commands slip past \s patterns.
+TOOL=$(printf '%s' "$INPUT" | jq -r '.tool_name // ""')
+COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // ""')
 
 # Skip non-Bash tools
 [ "$TOOL" != "Bash" ] && exit 0
