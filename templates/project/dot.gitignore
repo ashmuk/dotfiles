@@ -104,6 +104,8 @@ cmake-build-debug/
 
 # Claude Code
 .claude/settings.local.json
+.claude/worktrees/
+.claude/*.lock
 
 # Cache directories
 .cache/
@@ -153,6 +155,15 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# TypeScript
+**/*.tsbuildinfo
+
+# Web Frameworks
+**/.astro/
+
+# Infrastructure as Code
+**/cdk.out/
 
 # Java
 *.class
@@ -307,6 +318,11 @@ coverage/
 # Test results
 test-results/
 junit.xml
+
+# Playwright
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # =============================================================================
 # Miscellaneous
