@@ -150,7 +150,8 @@
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "~/.claude/hooks/security-guard.sh" }
+          { "type": "command", "command": "~/.claude/hooks/security-guard.sh" },
+          { "type": "command", "command": "~/.claude/hooks/policy-guard.sh" }
         ]
       },
       {
