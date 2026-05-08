@@ -37,7 +37,21 @@ alias ds='dirs -v'
 # =============================================================================
 # Claude Code aliases
 # =============================================================================
-alias claude-teams='tmux new-session -s claude-agents "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --teammate-mode tmux"'
+alias cld='claude'
+alias cld-plan='claude --permission-mode plan'
+alias cld-god='CLAUDE_CODE_EFFORT_LEVEL=max claude'
+alias cld-god-prev='CLAUDE_CODE_EFFORT_LEVEL=max \
+  CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1 \
+  claude --model claude-opus-4-6'
+alias cld-fast='CLAUDE_CODE_EFFORT_LEVEL=low claude'
+alias cld-teams='tmux new-session -s claude-agents \
+  "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+   CLAUDE_CODE_EFFORT_LEVEL=xhigh \
+   claude --teammate-mode tmux"'
+alias cld-teams-auto='tmux new-session -s claude-agents \
+  "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+   CLAUDE_CODE_EFFORT_LEVEL=xhigh \
+   claude --permission-mode auto --teammate-mode tmux"'
 
 # =============================================================================
 # DevContainer Aliases

@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
   "env": {
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "BASH_MAX_TIMEOUT_MS": "300000",
@@ -8,9 +10,24 @@
     "MAX_MCP_OUTPUT_TOKENS": "50000",
     "CLAUDE_CODE_WORKSPACE": "~/projects",
     "CLAUDE_CODE_HISTORY_SIZE": "1000",
-    "CLAUDE_CODE_RETRY_ATTEMPTS": "3"
+    "CLAUDE_CODE_RETRY_ATTEMPTS": "3",
+
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN": "1"
   },
-  "includeCoAuthoredBy": true,
+
+  "model": "claude-opus-4-7",
+  "effortLevel": "xhigh",
+  "alwaysThinkingEnabled": true,
+
+  "autoUpdatesChannel": "stable",
+
+  "attribution": {
+    "commits": true,
+    "pullRequests": true
+  },
+  "includeGitInstructions": true,
+
   "permissions": {
     "allow": [
       "Read(~/.zshrc)",
@@ -63,7 +80,6 @@
       "Bash(curl:*)",
       "Bash(wget:*)",
       "Bash(rm -rf /)",
-      "OgkoKSB7IDp8OiYgfTs6",
       "Bash(fork:*)",
       "Bash(bomb:*)",
       "Bash(nc:*)",
@@ -100,6 +116,7 @@
     "defaultMode": "acceptEdits",
     "additionalDirectories": []
   },
+
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "filesystem",
@@ -111,15 +128,13 @@
     "chrome-devtools",
     "playwright"
   ],
+
   "hooks": {
     "SessionStart": [
       {
         "matcher": "",
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/load-project-env.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/load-project-env.sh" }
         ]
       }
     ],
@@ -127,10 +142,7 @@
       {
         "matcher": "Write|Edit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/auto-format.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/auto-format.sh" }
         ]
       }
     ],
@@ -138,57 +150,44 @@
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/security-guard.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/security-guard.sh" }
         ]
       },
       {
         "matcher": "Write|Edit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/file-guard.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/file-guard.sh" }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify-completion.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/notify-completion.sh" }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/trigger-simplifier.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/trigger-simplifier.sh" }
         ]
       }
     ],
     "Notification": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify-attention.sh"
-          }
+          { "type": "command", "command": "~/.claude/hooks/notify-attention.sh" }
         ]
       }
     ]
   },
+
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
+
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "github@claude-plugins-official": true,
@@ -196,6 +195,7 @@
     "code-simplifier@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true
   },
+
   "outputStyle": "Explanatory",
   "editorMode": "vim"
 }

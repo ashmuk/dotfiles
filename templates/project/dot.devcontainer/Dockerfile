@@ -180,8 +180,13 @@ WORKDIR /workspace
 # (not here) because ~/.claude is a volume mount that overwrites Dockerfile changes
 
 # Alias for dangerous mode
-RUN echo "alias claude-hard=\"claude --dangerously-skip-permissions\"" >> "/home/${USERNAME}/.zshrc"
-RUN echo "alias claude-teams-hard='tmux new-session -s claude-agents \"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --dangerously-skip-permissions --teammate-mode tmux\"'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld='claude'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-plan='claude --permission-mode plan'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-god='CLAUDE_CODE_EFFORT_LEVEL=max claude'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-god-prev='CLAUDE_CODE_EFFORT_LEVEL=max CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1 claude --model claude-opus-4-6'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-fast='CLAUDE_CODE_EFFORT_LEVEL=low claude'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-teams-hard='tmux new-session -s claude-agents \"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_CODE_EFFORT_LEVEL=max claude --dangerously-skip-permissions --teammate-mode tmux\"'" >> "/home/${USERNAME}/.zshrc"
+RUN echo "alias cld-teams-auto='tmux new-session -s claude-agents \"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_CODE_EFFORT_LEVEL=xhigh claude --permission-mode auto --teammate-mode tmux\"'" >> "/home/${USERNAME}/.zshrc"
 
 # Enable vi mode
 RUN echo "bindkey -v" >> "/home/${USERNAME}/.zshrc"
