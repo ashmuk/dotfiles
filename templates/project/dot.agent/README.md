@@ -253,7 +253,7 @@ github_issues:
 | File | Purpose |
 |------|---------|
 | `TASKS.md` (root) | Auto-generated snapshot of GitHub Issues (via cc-issue-sync) |
-| `docs/TASK_BREAKDOWN.md` | Design artifact from cc-design Step 6 (task decomposition) |
+| `docs/TASK-BREAKDOWN.md` | Design artifact from cc-design Step 6 (task decomposition) |
 | `PLANS.md` / `BACKLOG.md` | Manually authored strategy and task definitions |
 
 ### Commands
@@ -273,10 +273,10 @@ Step 2: Architecture (cc-design) → docs/ARCHITECTURE.md  ← STOP
 Step 3: UX/UI & API Design    → docs/UX-DESIGNS.md
 Step 4: Mock-up                → docs/mockups/            ← STOP
 Step 5: System Design          → docs/DESIGNS.md
-Step 6: Task Breakdown         → docs/TASK_BREAKDOWN.md
+Step 6: Task Breakdown         → docs/TASK-BREAKDOWN.md
 Step 7: Planning               → PLANS.md                 ← STOP
 Step 8: Build (cc-implement)   → code + artifacts         ← STOP
-Step 9: Test Strategy (cc-test) → docs/TEST_STRATEGY.md
+Step 9: Test Strategy (cc-test) → docs/TEST-STRATEGY.md
 ```
 
 Steps 8–9 form the **execution loop** — they repeat for each Scope Level (PoC → MVP → Production) as defined in PLANS.md. At each scope transition, cc-implement offers to create GitHub Issues for the next scope level.
@@ -284,6 +284,27 @@ Steps 8–9 form the **execution loop** — they repeat for each Scope Level (Po
 Post-pipeline: `cc-review → cc-remediate → cc-deploy`
 
 See individual skill files in `skills/` for detailed step documentation.
+
+## Migration Notes
+
+### 2026-05 — Pipeline artifact filename normalization
+
+Pipeline artifacts now use **kebab-case** instead of `SCREAMING_SNAKE_CASE`, and review artifacts moved into `docs/feedback/`. If your project predates this change, rename existing files after fetching from upstream:
+
+```bash
+# Pipeline artifacts: SCREAMING_SNAKE_CASE → kebab-case
+[ -f docs/TASK_BREAKDOWN.md  ] && git mv docs/TASK_BREAKDOWN.md  docs/TASK-BREAKDOWN.md
+[ -f docs/TEST_STRATEGY.md   ] && git mv docs/TEST_STRATEGY.md   docs/TEST-STRATEGY.md
+[ -f docs/TEST_PLAN.md       ] && git mv docs/TEST_PLAN.md       docs/TEST-PLAN.md
+
+# Review/remediation artifacts moved into docs/feedback/
+mkdir -p docs/feedback
+[ -f docs/REVIEW_FINDINGS.md ] && git mv docs/REVIEW_FINDINGS.md docs/feedback/REVIEW-FINDINGS.md
+[ -f docs/REVIEW-FINDINGS.md ] && git mv docs/REVIEW-FINDINGS.md docs/feedback/REVIEW-FINDINGS.md
+[ -f docs/REMEDIATION.md     ] && git mv docs/REMEDIATION.md     docs/feedback/REMEDIATION.md
+```
+
+After renaming, the pipeline skills (cc-design, cc-test, cc-review, cc-remediate) will pick up the new locations automatically. Date-stamped historical artifacts (e.g. `docs/REVIEW_FINDINGS_DOTFILES_20260306.md`) retain their original names.
 
 ## Quick Start
 

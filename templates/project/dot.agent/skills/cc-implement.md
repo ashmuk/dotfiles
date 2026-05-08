@@ -69,7 +69,7 @@ If no open issues exist for the current scope level:
 
 ### Scope level transitions (PoC → MVP, MVP → Production)
 At each transition checkpoint (see Scope Level Transition below), before the user decides on next scope level:
-1. Parse PLANS.md or docs/TASK_BREAKDOWN.md for tasks in the NEXT scope level
+1. Parse PLANS.md or docs/TASK-BREAKDOWN.md for tasks in the NEXT scope level
 2. Prompt: "Create GitHub Issues for [next scope level]? ([N] tasks)"
 3. If yes:
    a. Ensure labels and milestones exist (per cc-issue-create taxonomy)
@@ -107,7 +107,7 @@ Result: Feature code committed, docs/IMPLEMENTATIONS.md updated
 ### Example 2: Test implementation from strategy
 User says: "Write the tests from the test strategy"
 Actions:
-1. Read docs/TEST_STRATEGY.md for test requirements
+1. Read docs/TEST-STRATEGY.md for test requirements
 2. my-builder writes tests in a SEPARATE session from feature code
 3. my-reviewer validates coverage against strategy
 Result: Test suite created matching the defined strategy
